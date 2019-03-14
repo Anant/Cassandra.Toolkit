@@ -1,14 +1,9 @@
 
 
-# Cassandra Vision
-
-A set of tools to visualize what happens in Cassandra
-
-## TableAnalyzer
-
+# Cassandra Vision - TableAnalyzer
 Make sure to use pip3 / python3. Needs pandas, statistics for analysis tool 
 
-### prerequisities
+## prerequisities
 - pandas
 - statistics
 - xlsxwriter 
@@ -16,7 +11,7 @@ Make sure to use pip3 / python3. Needs pandas, statistics for analysis tool
 
 Install using `pip3 install -r requirements.txt` `pip install -r requirements.txt`
 
-### How to use
+## How to use
 
 1. In the home directory, in a folder `config`, create the file `environments.yaml` if it does not yet exist using a copy of `environments-sample.yaml`
 2. In the home directory, in a folder `keys`, add pem files needed to ssh into each node to be analyzed - reference these in your `environments.yaml`
@@ -25,7 +20,7 @@ Install using `pip3 install -r requirements.txt` `pip install -r requirements.tx
 5. Run `csv2formattedxls.py data/region/cluster/region.cluster.cfstats.pivot.csv data/region/cluster/region.prod.cfstats.xlsx` to pivot the data into a formatted excel file 
 
 
-### environments.yaml
+## environments.yaml
 
 ```
 us:
@@ -58,3 +53,13 @@ region:
     datacenter:
 ```
 
+
+
+## Credits
+
+1. Rahul Singh - Concept, Initial Version
+2. Tom Hada - Refactoring, Code Cleanup
+3. Shridhar Nandeshwar - Testing, User Feedback
+4. Senthilvel Palaniappan - Testing, User Feedback
+5. Ameer Ajmal Baig - Testing, User Feedback
+6. Rohan Bane - Refactoring, Dockerization, Gridview Start
