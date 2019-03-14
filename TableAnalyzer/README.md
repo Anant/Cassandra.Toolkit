@@ -59,7 +59,8 @@ region:
 
 1. Rahul Singh - Concept, Initial Version
 2. Tom Hada - Refactoring, Code Cleanup
-3. Shridhar Nandeshwar - Testing, User Feedback
-4. Senthilvel Palaniappan - Testing, User Feedback
-5. Ameer Ajmal Baig - Testing, User Feedback
-6. Rohan Bane - Refactoring, Dockerization, Gridview Start
+3. Rohan Bane - Refactoring, Dockerization, Gridview Start
+4. Jagannath Bilgi - Refactoring, Testing
+5. Shridhar Nandeshwar - Testing, User Feedback
+6. Senthilvel Palaniappan - Testing, User Feedback
+7. Ameer Ajmal Baig - Testing, User Feedback
