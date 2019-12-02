@@ -8,6 +8,7 @@ Make sure to use pip3 / python3. Needs pandas, statistics for analysis tool
 - statistics
 - xlsxwriter 
 - openpyxl
+- pyyaml
 
 Install using `pip3 install -r requirements.txt` `pip install -r requirements.txt`
 
