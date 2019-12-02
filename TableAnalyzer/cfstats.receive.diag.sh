@@ -2,7 +2,7 @@
 
 if [ -z "$1" ]
     then 
-        echo $"Usage: $0 {region} {environment} {datacenter}  {0|1}"
+        echo $"Usage: $0 {region} {environment} {datacenter} {0|1}"
 fi
 
 region=$1

@@ -6,6 +6,7 @@ import config
 import json
 import pandas as pd
 import re
+import util
 
 parser = argparse.ArgumentParser(
     description='Collecting config varibales from environments.yaml and Start receiving stats',
@@ -36,7 +37,7 @@ def main():
         result = str(e.output)
         if result.find("Connection refused") >= 0:
             print("Cannot Connect To " + args.db.title() + ", Terminating code")
-            sys.exit();
+            sys.exit()
     if args.debug: print(args.db + " Version : " + output)
 
     if int((output.split(": ")[1])[0]) == 2:
@@ -88,23 +89,23 @@ def main():
             result = str(e.output)
             if result.find("Connection refused") >= 0:
                 print("Cannot Connect To " + args.db.title() + ", Terminating code")
-                sys.exit();
+                sys.exit()
         except:
             print("Something Went Wrong While Getting The Node/s, Terminating code (You can also provide nodes via config)")
-            sys.exit();
+            sys.exit()
     else:
         keys = config.get_keys(args.region, args.environ, "key")
 
     hosts = config.get_keys(args.region, args.environ, args.db)
 
     if args.debug: print("Total No. of Hosts", len(hosts))
-    progress(0, len(hosts), "Getting Data From Nodes")
+    util.progress(0, len(hosts), args.debug, "Getting Data From Nodes")
 
     for i, x in enumerate(hosts):
         if args.debug: print("Processing host", (i + 1))
         receive_cfstats(keys, args.region, args.environ, x, args.keySpace, args.table, useSSH, stats)
         sys.stdout.flush()
-        progress((i + 1), len(hosts), "Getting Data From Nodes")
+        util.progress((i + 1), len(hosts), args.debug, "Getting Data From Nodes")
         if args.debug: print("Done processing host", (i + 1))
 
     print("\nFinished Getting Data")
@@ -173,26 +174,6 @@ def get_stats(key, command, region, environ, x):
             print("Error While Connecting to Server, Skipping This Node")
             os.remove("data/" + region + "/" + environ + "/" + x + ".txt")
             return True
-
-
-def progress(count, total, suffix=''):
-    if not args.debug:
-        bar_len = 60
-        filled_len = int(round(bar_len * count / float(total)))
-
-        percents = round(100.0 * count / float(total), 1)
-        bar = '=' * filled_len + '-' * (bar_len - filled_len)
-
-        sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
-        sys.stdout.flush()
-        bar_len = 60
-        filled_len = int(round(bar_len * count / float(total)))
-
-        percents = round(100.0 * count / float(total), 1)
-        bar = '=' * filled_len + '-' * (bar_len - filled_len)
-
-        sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
-        sys.stdout.flush()
 
 
 if __name__ == '__main__':
