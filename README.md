@@ -20,7 +20,8 @@ The very original original original code came from "https://github.com/thejaspm/
 Eventually we want compatability for the following items. 
 
 
-||Platform||Receive||Transform||
+|Platform|Receive|Transform|
+|-----|-----|-----|
 |DSE 4.8.x|Diagnostic Tarball|Y|
 |DSE 4.8.x/C* 2.1.x|Nodetool|Y|
 |DSE 4.8.x/C* 2.1.x|SSH|Y|
