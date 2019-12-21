@@ -17,7 +17,24 @@ It also creates the data set as JSON which can be then sent to ElasticSearch, Ne
 
 The very original original original code came from "https://github.com/thejaspm/cfstatsParseVisualize" which has been worked over several times. In the spirit of open source, credit goes to https://github.com/thejaspm for starting it off.  
 
+Eventually we want compatability for the following items. 
 
+
+||Platform||Receive||Transform||
+|DSE 4.8.x|Diagnostic Tarball|Y|
+|DSE 4.8.x/C* 2.1.x|Nodetool|Y|
+|DSE 4.8.x/C* 2.1.x|SSH|Y|
+|DSE 5.1.x|Diagnostic Tarball|Y|
+|DSE 5.1.x/C* 3.1.x|Nodetool|Y|
+|DSE 5.1.x/C* 3.1.x|SSH|Y|
+|DSE 6.7.x|Diagnostic Tarball|Y|
+|DSE 6.7.x/C* 4.0.x|Nodetool|Y|
+|DSE 6.7.x/C* 4.0.x|SSH|Y|
+|Scylla?|Tarball|Y|
+|Elassandra?|Tarball|Y|
+|YugaByte?|Tarball|Y|
+|CosmosDB?|Tarball|Y|
+|AWS MCS?|Tarball|Y|
 
 
 ### Backlog
