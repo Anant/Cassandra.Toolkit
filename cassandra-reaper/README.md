@@ -12,7 +12,7 @@ The script has a few variable which can be modified if a different version is ne
 - `REAPER_JMX_AUTH_USERNAME` - jmx username cassandra-reaper uses to connect to cluster
 - `REAPER_JMX_AUTH_PASSWORD` - jmx password cassandra-reaper uses to connect to cluster
 
-cassandra-reaper can user cassandra itself as its backend to store cluster meta-info:
+cassandra-reaper can use cassandra itself as backend to store clusters meta-info:
 - `REAPER_CASS_CLUSTER_NAME="Test Cluster"`
 - `REAPER_CASS_CONTACT_POINTS=["172.17.0.1"]`
 - `REAPER_CASS_KEYSPACE=reaper_db`
