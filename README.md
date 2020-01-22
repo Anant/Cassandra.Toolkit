@@ -11,6 +11,9 @@ A curated + created set of the best and most useful Cassandra / Cassandra compat
 ### tablesnap
 - To install and configure `tablesnap` follow **Install tablesnap for AWS S3 backups** section in **dseauto/ansible/cassandra/README.md** document.
 
+### node_exporter
+- To install and configure `node_exporter` follow **Install node_exporter for exporting node metrics to prometheus server** section in **dseauto/ansible/cassandra/README.md** document.
+
 ## Resources
 
 ### Backup
