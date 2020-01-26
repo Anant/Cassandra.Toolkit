@@ -1,5 +1,7 @@
-# cassandra-vision
-A curated + created set of useful Cassandra / Cassandra compatible tools specifically for Visualizing Cassandra cluster related things. Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra. Please take a look!
+# cassandra.tools
+A curated + created set of useful Cassandra / Cassandra compatible tools building, managing, and monitoring Cassandra clusters.
+
+Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra. Please take a look!
 
 
 ## TableAnalyzer 
