@@ -38,6 +38,7 @@ def generate(path, save, version):
             map = json.load(f)
             if version == 2:
                 mapper = map['cfstats']
+            
             elif version == 3:
                 mapper = map['tablestats']
     except FileNotFoundError:
@@ -55,7 +56,6 @@ def generate(path, save, version):
         if (ks not in exclude_ks):
             if "Table:" in line:
                 cf = (line.split(":")[1]).strip()
-
         for key, val in mapper.items():
             if (str(line) != "") & (str(line).find(":") != -1):
                 line_key, line_val = line.split(":")
