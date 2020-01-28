@@ -3,11 +3,10 @@ A curated + created set of useful Cassandra / Cassandra compatible tools buildin
 
 Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra. Please take a look!
 
-## Credits
+## Cassandra Tools
 
-1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](TableAnalyzer) 
-2. Sean Bogaard - Concept, Advisor, Curator 
-3. Ion Olaru - Testing, Documentation of 3rd Party Tools
+### tableanalyzer / cassandra.vision
+- A python based cfstat data anlyzer with a future in being able to visualize other Cassandra / Distributed platform stats. 
 
 ### tablesnap
 - To install and configure `tablesnap` follow **Install tablesnap for AWS S3 backups** section in **dseauto/ansible/cassandra/README.md** document.
@@ -15,9 +14,35 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 ### node_exporter
 - To install and configure `node_exporter` follow **Install node_exporter for exporting node metrics to prometheus server** section in **dseauto/ansible/cassandra/README.md** document.
 
+
+## Credits
+
+1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](TableAnalyzer) 
+2. Sean Bogaard - Concept, Advisor, Curator 
+3. Ion Olaru - Testing, Documentation of 3rd Party Tools
+
+Eventually we want compatability for the following items. 
+
+|Platform|Receive|Transform|
+|-----|-----|-----|
+|DSE 4.8.x|Diagnostic Tarball|Y|
+|DSE 4.8.x/C* 2.1.x|Nodetool|Y|
+|DSE 4.8.x/C* 2.1.x|SSH|Y|
+|DSE 5.1.x|Diagnostic Tarball|Y|
+|DSE 5.1.x/C* 3.1.x|Nodetool|Y|
+|DSE 5.1.x/C* 3.1.x|SSH|Y|
+|DSE 6.7.x|Diagnostic Tarball|Y|
+|DSE 6.7.x/C* 4.0.x|Nodetool|Y|
+|DSE 6.7.x/C* 4.0.x|SSH|Y|
+|Scylla?|Tarball|Y|
+|Elassandra?|Tarball|Y|
+|YugaByte?|Tarball|Y|
+|CosmosDB?|Tarball|Y|
+|AWS MCS?|Tarball|Y|
+
 ## Resources
 
-### Backup
+### Backup 
 - https://thelastpickle.com/blog/2018/04/03/cassandra-backup-and-restore-aws-ebs.html
 - https://8kmiles.com/blog/cassandra-backup-and-restore-methods/
 - https://github.com/JeremyGrosser/tablesnap
@@ -34,3 +59,4 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 1. Take / keep a snapshot every 30 min for the latest 3 hours;
 2. Keep a snapshot every 6 hours for the last day, delete other snapshots;
 3. Keep a snapshot every day for the last month, delete other snapshots;
+
