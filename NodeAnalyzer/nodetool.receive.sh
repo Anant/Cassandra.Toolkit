@@ -19,7 +19,7 @@ receive_nodetool_command() {
 }
 
 receive_copy_config_log() {
-    copy_command="cp -r ${logdirectory} data/ && cp -r ${confdirectory} data/"
+    copy_command="cp -r ${logdirectory}/* data/log/ && cp -r ${confdirectory}/* data/conf/"
     echo $copy_command
 }
 
