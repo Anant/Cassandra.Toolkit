@@ -8,5 +8,4 @@ compactionstats
 getcompactionthroughput
 getstreamthroughput
 proxyhistograms
-cfhistrograms
 version

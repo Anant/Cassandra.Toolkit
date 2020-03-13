@@ -18,3 +18,7 @@ Silent output
 ```
 
 It uses `hostname -i` to get the IP address to name the tar.gz file
+
+If you want, you can add other nodetool commands to nodetool.commands.txt
+
+http://cassandra.apache.org/doc/latest/tools/nodetool/nodetool.html
