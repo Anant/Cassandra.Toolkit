@@ -1,5 +1,5 @@
 info
-stats
+status
 describecluster
 cfstats
 tpstats
