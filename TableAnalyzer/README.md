@@ -1,5 +1,5 @@
 
-# TableAnalyzer 
+# cassandra.toolkit/TableAnalyzer 
 A Cassandra (CFStats/TableStats) output analyzer that visualizes variance in metrics between nodes. This is the first of many tools I've been working on that help understand what's going on in a Cassandra cluster. It's not supposed to replace OpsCenter, Prometheus+Grafana, or other tools out there. The goal is to eventually build intelligence in here to help people build better tables through analysis of the keys, etc. 
 
 This tool was created because we had a hard time explaining to non-believers that data-model issues were the reason their "amazing app" crashed all the time, and that it wasn't Cassandra's fault. 
