@@ -1,12 +1,15 @@
-# cassandra.tools
+# cassandra.toolkit
 A curated + created set of useful Cassandra / Cassandra compatible tools building, managing, and monitoring Cassandra clusters.
 
 Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra. Please take a look!
 
-## Cassandra Tools
+## Cassandra Toolkit
 
 ### tableanalyzer / cassandra.vision
 - A python based cfstat data anlyzer with a future in being able to visualize other Cassandra / Distributed platform stats. 
+
+### nodenalyzer / cassandra.vision
+- Shell based tool to collect conf, logs, nodetool output as a tar.gz file  
 
 ### tablesnap
 - To install and configure `tablesnap` follow **Install tablesnap for AWS S3 backups** section in **dseauto/ansible/cassandra/README.md** document.
@@ -20,6 +23,7 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](TableAnalyzer) 
 2. Sean Bogaard - Concept, Advisor, Curator 
 3. Ion Olaru - Testing, Documentation of 3rd Party Tools
+4. Obi Anomnachi - Testing, Documentation of 3rd Party Tools
 
 Eventually we want compatability for the following items. 
 
