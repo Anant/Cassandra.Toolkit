@@ -1,0 +1,12 @@
+info
+stats
+describecluster
+cfstats
+tpstats
+compactionhistory
+compactionstats
+getcompactionthroughput
+getstreamthroughput
+proxyhistograms
+cfhistrograms
+version
