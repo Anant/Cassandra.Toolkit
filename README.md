@@ -23,7 +23,7 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](TableAnalyzer) 
 2. Sean Bogaard - Concept, Advisor, Curator 
 3. Ion Olaru - Testing, Documentation of 3rd Party Tools
-4. Obi Anomnachi - Testing, Documentation of 3rd Party Tools
+4. Obi Anomnachi - Testing
 
 Eventually we want compatability for the following items. 
 

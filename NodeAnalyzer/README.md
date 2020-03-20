@@ -3,6 +3,11 @@ A quick and dirty tool to grab all the information for a specific node and tarzi
 
 TODO: Later will be integrated better with how TableAnalyzer goes and gets all the data for a cluster. 
 
+Please make sure you move the empty data/* directories if you move this script out. It uses a relative directory reference. 
+
+![NodeAnalyzer Folders](../doc/assets/NodeAnalyzer_folders.jpg)
+
+
 Example:
 
 Verbose output 
