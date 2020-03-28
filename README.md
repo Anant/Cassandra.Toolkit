@@ -1,3 +1,15 @@
+- [cassandra.toolkit](#cassandratoolkit)
+    - [Cassandra Toolkit](#cassandra-toolkit)
+        - [tableanalyzer / cassandra.vision](#tableanalyzer--cassandravision)
+        - [nodenalyzer / cassandra.vision](#nodenalyzer--cassandravision)
+        - [tablesnap](#tablesnap)
+        - [node_exporter](#node_exporter)
+    - [Credits](#credits)
+    - [Resources](#resources)
+        - [Backup](#backup)
+        - [Cluster management](#cluster-management)
+        - [Snapshot strategy (future changes)](#snapshot-strategy-future-changes)
+
 # cassandra.toolkit
 A curated + created set of useful Cassandra / Cassandra compatible tools building, managing, and monitoring Cassandra clusters.
 
@@ -16,10 +28,12 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 - Shell based tool to collect conf, logs, nodetool output as a tar.gz file  
 
 ### tablesnap
-- To install and configure `tablesnap` follow **Install tablesnap for AWS S3 backups** section in **dseauto/ansible/cassandra/README.md** document.
+- To install and configure `tablesnap` follow **Install tablesnap for AWS S3 backups** section in **dse
+auto/ansible/cassandra/README.md** document.
 
 ### node_exporter
-- To install and configure `node_exporter` follow **Install node_exporter for exporting node metrics to prometheus server** section in **dseauto/ansible/cassandra/README.md** document.
+- To install and configure `node_exporter` follow **Install node_exporter for exporting node metrics to prometheus server** section in **dse
+auto/ansible/cassandra/README.md** document.
 
 
 ## Credits
@@ -31,22 +45,22 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 
 Eventually we want compatability for the following items. 
 
-|Platform|Receive|Transform|
-|-----|-----|-----|
-|DSE 4.8.x|Diagnostic Tarball|Y|
-|DSE 4.8.x/C* 2.1.x|Nodetool|Y|
-|DSE 4.8.x/C* 2.1.x|SSH|Y|
-|DSE 5.1.x|Diagnostic Tarball|Y|
-|DSE 5.1.x/C* 3.1.x|Nodetool|Y|
-|DSE 5.1.x/C* 3.1.x|SSH|Y|
-|DSE 6.7.x|Diagnostic Tarball|Y|
-|DSE 6.7.x/C* 4.0.x|Nodetool|Y|
-|DSE 6.7.x/C* 4.0.x|SSH|Y|
-|Scylla?|Tarball|Y|
-|Elassandra?|Tarball|Y|
-|YugaByte?|Tarball|Y|
-|CosmosDB?|Tarball|Y|
-|AWS MCS?|Tarball|Y|
+| Platform           | Receive            | Transform |
+| ------------------ | ------------------ | --------- |
+| DSE 4.8.x          | Diagnostic Tarball | Y         |
+| DSE 4.8.x/C* 2.1.x | Nodetool           | Y         |
+| DSE 4.8.x/C* 2.1.x | SSH                | Y         |
+| DSE 5.1.x          | Diagnostic Tarball | Y         |
+| DSE 5.1.x/C* 3.1.x | Nodetool           | Y         |
+| DSE 5.1.x/C* 3.1.x | SSH                | Y         |
+| DSE 6.7.x          | Diagnostic Tarball | Y         |
+| DSE 6.7.x/C* 4.0.x | Nodetool           | Y         |
+| DSE 6.7.x/C* 4.0.x | SSH                | Y         |
+| Scylla?            | Tarball            | Y         |
+| Elassandra?        | Tarball            | Y         |
+| YugaByte?          | Tarball            | Y         |
+| CosmosDB?          | Tarball            | Y         |
+| AWS MCS?           | Tarball            | Y         |
 
 ## Resources
 
