@@ -5,6 +5,10 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 
 ## Cassandra Toolkit
 
+<img src="https://github.com/Anant/cassandra.toolkit/blob/master/deployment.png"
+     alt="deployment"
+     style="float: left; margin-right: 10px;" />
+
 ### tableanalyzer / cassandra.vision
 - A python based cfstat data anlyzer with a future in being able to visualize other Cassandra / Distributed platform stats. 
 
