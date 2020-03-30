@@ -3,6 +3,9 @@
 A curated + created set of useful Cassandra / Cassandra compatible tools building, managing, and monitoring Cassandra clusters.
 
 - [Cassandra Toolkit](#cassandra-toolkit)
+    - [How to install](#how-to-install)
+        - [New cassandra cluster](#new-cluster)
+        - [Existing cassandra cluster](#existing-cluster)
 - [Credits](#credits)
 - [Resources](#resources)
     - [Backup](#backup)
@@ -27,6 +30,16 @@ Cassandra Toolkit consists of the next set of tools:
 - [grafana](#grafana)
 - [table-reaper](#table-reaper)
 - [cassandra-medusa](#cassandra-medusa)
+
+### How to install
+
+#### New cassandra cluster
+
+ToDo:
+
+#### Existing cassandra cluster
+
+ToDo:
 
 ### tableanalyzer / cassandra.vision
 
