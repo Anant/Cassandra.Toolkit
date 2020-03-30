@@ -95,7 +95,7 @@ ToDo:
 
 1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](TableAnalyzer)
 2. Sean Bogaard - Concept, Advisor, Curator
-3. Ion Olaru - Testing, Documentation of 3rd Party Tools
+3. John Doe (*) - Developing terraform & ansible automation, testing, documentation of 3rd party tools
 4. Obi Anomnachi - Testing
 
 Eventually we want compatability for the following items.
