@@ -4,8 +4,8 @@ A curated + created set of useful Cassandra / Cassandra compatible tools buildin
 
 - [Cassandra Toolkit](#cassandra-toolkit)
     - [How to install](#how-to-install)
-        - [New cassandra cluster](#new-cluster)
-        - [Existing cassandra cluster](#existing-cluster)
+        - [New cassandra cluster](#new-cassandra-cluster)
+        - [Existing cassandra cluster](#existing-cassandra-cluster)
 - [Credits](#credits)
 - [Resources](#resources)
     - [Backup](#backup)
