@@ -25,7 +25,7 @@ Cassandra Toolkit consists of the next set of tools:
 - [flebeat](#flebeat)
 - [elasticsearch](#elasticsearch)
 - [kibana](#kibana)
-- [cassandra_exporter](#cassandraexporter)
+- [cassandra_exporter](#cassandra_exporter)
 - [prometheus](#prometheus)
 - [grafana](#grafana)
 - [table-reaper](#table-reaper)
