@@ -21,7 +21,7 @@ Cassandra Toolkit consists of the next set of tools:
 - [tableanalyzer / cassandra.vision](#tableanalyzer--cassandravision)
 - [nodenalyzer / cassandra.vision](#nodenalyzer--cassandravision)
 - [tablesnap](#tablesnap)
-- [node_exporter](#nodeexporter)
+- [node_exporter](#node_exporter)
 - [flebeat](#flebeat)
 - [elasticsearch](#elasticsearch)
 - [kibana](#kibana)
