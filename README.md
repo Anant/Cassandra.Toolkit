@@ -2,21 +2,31 @@
 
 A curated + created set of useful Cassandra / Cassandra compatible tools building, managing, and monitoring Cassandra clusters.
 
-- [cassandra.toolkit](#cassandratoolkit)
-    - [Cassandra Toolkit](#cassandra-toolkit)
-        - [tableanalyzer / cassandra.vision](#tableanalyzer--cassandravision)
-        - [nodenalyzer / cassandra.vision](#nodenalyzer--cassandravision)
-        - [tablesnap](#tablesnap)
-        - [node_exporter](#node_exporter)
-    - [Credits](#credits)
-    - [Resources](#resources)
-        - [Backup](#backup)
-        - [Cluster management](#cluster-management)
-        - [Snapshot strategy (future changes)](#snapshot-strategy-future-changes)
+- [Cassandra Toolkit](#cassandra-toolkit)
+- [Credits](#credits)
+- [Resources](#resources)
+    - [Backup](#backup)
+    - [Cluster management](#cluster-management)
+    - [Snapshot strategy (future changes)](#snapshot-strategy-future-changes)
 
 Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra. Please take a look!
 
 ## Cassandra Toolkit
+
+Cassandra Toolkit consists of the next set of tools:
+
+- [tableanalyzer / cassandra.vision](#tableanalyzer--cassandravision)
+- [nodenalyzer / cassandra.vision](#nodenalyzer--cassandravision)
+- [tablesnap](#tablesnap)
+- [node_exporter](#nodeexporter)
+- [flebeat](#flebeat)
+- [elasticsearch](#elasticsearch)
+- [kibana](#kibana)
+- [cassandra_exporter](#cassandraexporter)
+- [prometheus](#prometheus)
+- [grafana](#grafana)
+- [table-reaper](#table-reaper)
+- [cassandra-medusa](#cassandra-medusa)
 
 ### tableanalyzer / cassandra.vision
 
@@ -29,12 +39,44 @@ Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if y
 ### tablesnap
 
 - To install and configure `tablesnap` follow **Install tablesnap for AWS S3 backups** section in **dse
-auto/ansible/cassandra/README.md** document.
+  auto/ansible/cassandra/README.md** document.
 
 ### node_exporter
 
 - To install and configure `node_exporter` follow **Install node_exporter for exporting node metrics to prometheus server** section in **dse
-auto/ansible/cassandra/README.md** document.
+  auto/ansible/cassandra/README.md** document.
+
+### flebeat
+
+- ToDo:
+
+### elasticsearch
+
+- ToDo:
+
+### kibana
+
+- ToDo:
+
+### cassandra_exporter
+
+- ToDo:
+
+### prometheus
+
+- ToDo:
+
+### grafana
+
+- ToDo:
+
+### table-reaper
+
+- ToDo:
+
+### cassandra-medusa
+
+- ToDo:
 
 ## Credits
 
