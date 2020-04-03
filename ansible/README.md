@@ -54,6 +54,13 @@ As a reference, `./envs/_local/group_vars/all.yml` can be used.
 - `tools_install_folder` - an absolute path where to install all cassandra tools
 - `cassandra_install_lib_folder` - absolute path to cassandra `lib` folder to install cassandra_exporter as java agent. *This path is not used when cassandra_exporter is installed as a standalone service.*
 
+Also, provide the next variables to select which steps are needed for your environment:
+By default they are `False`.
+- `install_tablesnap`
+- `install_cassandra_exporter`
+- `install_filebeat`
+- `enable_jmx`
+
 ##### Step 2 - access verification
 Make sure you can access all apache-cassandra or dse cluster nodes you want the tools for:
 
@@ -69,7 +76,7 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.
 
 The next tools will be installed on cassandra nodes:
 - tablesnap
-- flebeat
+- filebeat
 - elasticsearch
 - kibana
 - cassandra_exporter

@@ -3,10 +3,14 @@
   become: true
   become_method: sudo
   roles:
-    - cassandra-exporter-install
-    - tablesnap-install
-    - filebeat
-    - enable-jmx
+    - role: cassandra-exporter-install
+      when: install_cassandra_exporter | default(False)
+    - role: tablesnap-install
+      when: install_tablesnap | default(False)
+    - role: filebeat
+      when: install_filebeat | default(False)
+    - role: enable-jmx
+      when: enable_jmx | default(False)
 
 ###
 ### GENERATE DOCKER ARTIFACTS, GATHER CLUSTER INFO

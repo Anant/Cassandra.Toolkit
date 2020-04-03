@@ -8,3 +8,8 @@ nodetool_exec: /opt/cassandra/ddac/bin/nodetool
 cassandra_env_exec: /opt/cassandra/ddac/conf/cassandra-env.sh
 tools_install_folder: /opt/cassandra
 cassandra_install_lib_folder: /opt/cassandra/ddac/lib
+
+install_tablesnap: False
+install_cassandra_exporter: False
+install_filebeat: False
+enable_jmx: False
