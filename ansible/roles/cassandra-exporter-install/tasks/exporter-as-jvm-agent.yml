@@ -2,14 +2,14 @@
 - name: download cassandra_exporter
   get_url:
     url: "{{ cassandra_exporter_agent_url }}"
-    dest: /opt/cassandra/ddac/lib/
+    dest: "{{ cassandra_install_lib_folder }}"
     mode: '0440'
     group: cassandra
     owner: cassandra
 
 - name: adding a new cassandra javaagent
   lineinfile:
-    name: "/opt/cassandra/ddac/conf/cassandra-env.sh"
+    name: "{{ tools_install_folder }}/ddac/conf/cassandra-env.sh"
     line: "{{ item.line }}"
   with_items:
     - { line: 'JVM_OPTS="$JVM_OPTS -javaagent:$CASSANDRA_HOME/lib/cassandra-exporter-agent-0.9.10.jar"' }

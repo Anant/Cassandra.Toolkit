@@ -5,8 +5,8 @@ Description=tablesnap
 After=cassandra.service
 
 [Service]
-PIDFile=/opt/cassandra/ddac/tablesnap.pid
-ExecStart=/opt/cassandra/venv/python2/bin/tablesnap -r -a -B -k {{ aws_access_key_id }} -s {{ aws_secret_access_key }} {{ s3_folder }} {{ cassandra_data_file_directories|join(' ') }}
+PIDFile=/run/tablesnap.pid
+ExecStart={{ tools_install_folder }}/venv/python2/bin/tablesnap -r -a -B -k {{ aws_access_key_id }} -s {{ aws_secret_access_key }} {{ s3_folder }} {{ cassandra_data_file_directories|join(' ') }}
 StandardOutput=journal
 StandardError=journal
 User=cassandra

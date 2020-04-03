@@ -16,13 +16,13 @@
 
 - name: enable remote jmx
   lineinfile:
-    name: "/opt/cassandra/ddac/conf/cassandra-env.sh"
+    name: "{{ cassandra_env_exec }}"
     insertafter: "JMX_PORT=\"7199\""
     line: "LOCAL_JMX=no"
 
 - name: adding user to "/etc/cassandra/jmxremote.password"
   lineinfile:
-    name: "/opt/cassandra/ddac/conf/cassandra-env.sh"
+    name: "{{ cassandra_env_exec }}"
     insertafter: "# turn on JMX authentication"
     line: "{{ item }}"
   with_items:

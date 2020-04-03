@@ -1,0 +1,10 @@
+### used by table snap to monitor and back up files to AWS-S3
+cassandra_data_file_directories: ["/data/cassandra/data1", "/data/cassandra/data2"]
+
+cassandra_ops_os_user: cassandra
+cassandra_shell_user: cassandra
+cassandra_shell_password: cassandra
+nodetool_exec: /opt/cassandra/ddac/bin/nodetool
+cassandra_env_exec: /opt/cassandra/ddac/conf/cassandra-env.sh
+tools_install_folder: /opt/cassandra
+cassandra_install_lib_folder: /opt/cassandra/ddac/lib

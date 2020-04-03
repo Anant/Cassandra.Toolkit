@@ -2,7 +2,7 @@
 - name: download cassandra_exporter standalone
   get_url:
     url: "{{ cassandra_exporter_url }}"
-    dest: /opt/cassandra/
+    dest: "{{ tools_install_folder }}"
     mode: '0440'
     group: cassandra
     owner: cassandra
@@ -11,7 +11,7 @@
 - name: deploy cassandra_exporter config.yml
   template:
     src: "config.yml"
-    dest: "/opt/cassandra/cassandra_exporter-config.yml"
+    dest: "{{ tools_install_folder }}/cassandra_exporter-config.yml"
     mode: 0644
   tags: ["exporter"]
 
