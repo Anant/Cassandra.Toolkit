@@ -9,7 +9,7 @@
 
 - name: adding a new cassandra javaagent
   lineinfile:
-    name: "{{ tools_install_folder }}/ddac/conf/cassandra-env.sh"
+    name: "{{ cassandra_env_exec }}"
     line: "{{ item.line }}"
   with_items:
     - { line: 'JVM_OPTS="$JVM_OPTS -javaagent:$CASSANDRA_HOME/lib/cassandra-exporter-agent-0.9.10.jar"' }
