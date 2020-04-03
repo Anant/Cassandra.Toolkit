@@ -10,7 +10,7 @@ See the main page README.md
 Installation tested with `ansible-2.9.6`
 
 ##### Step 1.1 - list all hosts in hosts.ini
-Create your environment folder inside `./envs/YOUR_ENV`
+Create your environment folder inside `./envs/YOUR_ENV`.
 Add all cassandra hosts in your `./envs/<YOUR_ENV>/hosts.ini` file.
 As a reference, `./envs/_local/hosts.ini` can be used and modified
 
