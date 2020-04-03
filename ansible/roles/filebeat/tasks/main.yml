@@ -1,0 +1,25 @@
+- name: install elastic yum repo key
+  command: "rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch"
+  tags: ["filebeat"]
+
+- name: install elastic repo
+  template:
+    src: "elastic.repo"
+    dest: "/etc/yum.repos.d"
+  tags: ["filebeat"]
+
+- name: install filebeat
+  yum:
+    name: "filebeat"
+    state: present
+  tags: ["filebeat"]
+
+- name: add filebeat.yml
+  template:
+    src: filebeat.yml
+    dest: /etc/filebeat/filebeat.yml
+  tags: ["filebeat"]
+
+- name: (start | restart) & enable filebeat
+  service: name=filebeat state=restarted enabled=yes
+  tags: ["filebeat"]

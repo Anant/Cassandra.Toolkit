@@ -1,0 +1,33 @@
+---
+- name: download cassandra_exporter standalone
+  get_url:
+    url: "{{ cassandra_exporter_url }}"
+    dest: /opt/cassandra/
+    mode: '0440'
+    group: cassandra
+    owner: cassandra
+  tags: ["exporter"]
+
+- name: deploy cassandra_exporter config.yml
+  template:
+    src: "config.yml"
+    dest: "/opt/cassandra/cassandra_exporter-config.yml"
+    mode: 0644
+  tags: ["exporter"]
+
+- name: install systemd cassandra_exporter.service unit
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: 0644
+  with_items:
+    - cassandra_exporter.service
+  tags: ["exporter"]
+
+- name: enable and start cassandra_exporter systemd service
+  systemd:
+    name: cassandra_exporter.service
+    daemon_reload: yes
+    enabled: true
+    state: started
+  tags: ["exporter"]

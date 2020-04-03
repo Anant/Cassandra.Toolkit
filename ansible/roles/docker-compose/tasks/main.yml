@@ -1,0 +1,40 @@
+---
+- debug: msg="Determining the IP addresses for docker containers"
+
+- name: Gateway IP address
+  set_fact: docker_net_ip_gw="{{ docker_net_ip | next_nth_usable(1) }}"
+
+- name: ElasticSearch IP address
+  set_fact: docker_net_ip_elasticsearch="{{ docker_net_ip | next_nth_usable(2) }}"
+
+- name: Kibana IP address
+  set_fact: docker_net_ip_kibana="{{ docker_net_ip |  next_nth_usable(3) }}"
+
+- name: Prometheus IP address
+  set_fact: docker_net_ip_prometheus="{{ docker_net_ip |  next_nth_usable(4) }}"
+
+- name: Grafana IP address
+  set_fact: docker_net_ip_grafana="{{ docker_net_ip |  next_nth_usable(5) }}"
+
+- name: Cassandra-Reaper IP address
+  set_fact: docker_net_ip_cassandra_reaper="{{ docker_net_ip |  next_nth_usable(6) }}"
+
+- name: IP addresses
+  debug: msg="{{ item }}"
+  with_items:
+    - "Docker network gateway: {{ docker_net_ip_gw }}"
+    - "ElasticSearch: {{ docker_net_ip_elasticsearch }}"
+    - "Kibana: {{ docker_net_ip_kibana }}"
+    - "Prometheus: {{ docker_net_ip_prometheus }}"
+    - "Grafana: {{ docker_net_ip_grafana }}"
+    - "Cassandra-Reaper: {{ docker_net_ip_cassandra_reaper }}"
+
+- name: create docker-compose folder
+  file:
+    path: "{{ playbook_dir }}/../artifacts/docker/"
+    state: directory
+  tags: ["docker-compose"]
+
+- name: generate docker-compose.yml file
+  template: src=docker-compose.yml dest={{ playbook_dir }}/../artifacts/docker/docker-compose.yml mode=0644
+  tags: ["docker-compose"]

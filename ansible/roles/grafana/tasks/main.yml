@@ -1,0 +1,31 @@
+- name: generate grafana folders
+  file:
+    path: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "{{ playbook_dir }}/../artifacts/grafana/dashboards"
+    - "{{ playbook_dir }}/../artifacts/grafana/datasources"
+  tags: ["grafana"]
+
+- name: generate grafana datasources yaml file
+  template:
+    src: "datasources.yml.j2"
+    dest: "{{ playbook_dir }}/../artifacts/grafana/datasources/datasources.yml"
+    mode: "0666"
+  tags: ["grafana"]
+
+- name: generate grafana dashboard sample.yaml file
+  template:
+    src: "sample.yaml.j2"
+    dest: "{{ playbook_dir }}/../artifacts/grafana/dashboards/sample.yaml"
+    mode: "0666"
+  tags: ["grafana"]
+
+- name: generate grafana cassandra dashboard json file
+  template:
+    src: "cassandra_default.json.j2"
+    dest: "{{ playbook_dir }}/../artifacts/grafana/dashboards/cassandra.json"
+    mode: "0666"
+    variable_start_string: "<<<"
+    variable_end_string: ">>>"
+  tags: ["grafana"]

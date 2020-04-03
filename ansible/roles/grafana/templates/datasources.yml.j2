@@ -1,0 +1,8 @@
+# ansible generated grafana datasources config file
+apiVersion: 1
+datasources:
+- name: {{ prometheus_ds_name }}
+  type: prometheus
+  url: {{ prometheus_address }}
+  access: proxy
+  basicAuth: false

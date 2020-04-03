@@ -1,0 +1,56 @@
+output.elasticsearch:
+    enabled: true
+    hosts: ["192.168.56.1:9200"]
+
+setup.kibana:
+  host: "192.168.56.1:5601"
+
+filebeat.inputs:
+  - type: log
+    enabled: true
+    document_type: cassandra_system_logs
+    exclude_files: ['\.zip$']
+    multiline.pattern: '^TRACE|DEBUG|WARN|INFO|ERROR'
+    multiline.negate: true
+    multiline.match: after
+    paths:
+      - /var/log/cassandra/system.log
+
+  - type: log
+    enabled: true
+    document_type: cassandra_gc_logs
+    exclude_files: ['\.zip$']
+    multiline.pattern: '^TRACE|DEBUG|WARN|INFO|ERROR'
+    multiline.negate: true
+    multiline.match: after
+    paths:
+      - /var/log/cassandra/gc.log.*.current
+
+  - type: log
+    enabled: true
+    document_type: cassandra_debug_logs
+    exclude_files: ['\.zip$']
+    multiline.pattern: '^TRACE|DEBUG|WARN|INFO|ERROR'
+    multiline.negate: true
+    multiline.match: after
+    paths:
+      - /var/log/cassandra/debug.log
+
+###filebeat.prospectors:
+###    - input_type: log
+###      paths:
+###        - "/var/log/cassandra/system.log*"
+###      document_type: cassandra_system_logs
+###      exclude_files: ['\.zip$']
+###      multiline.pattern: '^TRACE|DEBUG|WARN|INFO|ERROR'
+###      multiline.negate: true
+###      multiline.match: after
+
+###    - input_type: log
+###      paths:
+###        - "/var/log/cassandra/gc.log.*.current"
+###      document_type: cassandra_gc_logs
+###      exclude_files: ['\.zip$']
+###      multiline.pattern: '^TRACE|DEBUG|WARN|INFO|ERROR'
+###      multiline.negate: true
+###      multiline.match: after

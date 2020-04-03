@@ -1,0 +1,10 @@
+cassandra_exporter_agent_url: https://github.com/instaclustr/cassandra-exporter/releases/download/v0.9.10/cassandra-exporter-agent-0.9.10.jar
+cassandra_exporter_url: https://github.com/criteo/cassandra_exporter/releases/download/2.3.2/cassandra_exporter-2.3.2-all.jar
+
+### used by table snap to monitor and back up files to AWS-S3
+cassandra_data_file_directories: ["/data/cassandra/data1", "/data/cassandra/data2"]
+
+cassandra_ops_os_user: cassandra
+cassandra_shell_user: cassandra
+cassandra_shell_password: cassandra
+nodetool_exec: /opt/cassandra/ddac/bin/nodetool
