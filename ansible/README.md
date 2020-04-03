@@ -50,7 +50,7 @@ As a reference, `./envs/_local/group_vars/all.yml` can be used.
 - `cassandra_shell_user` - used by `ansible` to authenticate with `nodetool`
 - `cassandra_shell_password` used by `ansible` to authenticate with `nodetool`
 - `nodetool_exec`: - absolute path to `nodetool`
-- `cassandra_env_exec` - absolute path to `cassandra-env.sh` to adjust JMX configs
+- `cassandra_env_exec` - absolute path to `cassandra-env.sh` to adjust JMX configs. *JMX access is needed by cassandra_exporter and cassandra-reaper*.
 - `tools_install_folder` - an absolute path where to install all cassandra tools
 - `cassandra_install_lib_folder` - absolute path to cassandra `lib` folder to install cassandra_exporter as java agent. *This path is not used when cassandra_exporter is installed as a standalone service.*
 
