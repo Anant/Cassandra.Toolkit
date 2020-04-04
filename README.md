@@ -15,6 +15,9 @@ A curated + created set of useful Cassandra / Cassandra compatible tools buildin
 Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra. Please take a look!
 
 ## Cassandra Toolkit
+<img src="https://github.com/Anant/cassandra.toolkit/blob/dev/deployment.png"
+     alt="deployment"
+     style="float: left; margin-right: 10px;" />
 
 Cassandra Toolkit consists of the next set of tools:
 
