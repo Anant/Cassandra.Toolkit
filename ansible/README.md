@@ -61,6 +61,8 @@ By default they are `False`.
 - `install_filebeat`
 - `enable_jmx`
 
+You can also enable the above variable in the cli when the playbook is executed as shown in **Example B**. 
+
 ##### Step 2 - access verification
 Make sure you can access all apache-cassandra or dse cluster nodes you want the tools for:
 
@@ -70,8 +72,13 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-hello.yml
 
 ##### Step 3 - installation
 
+- Example A (with defaults)
 ```
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml
+```
+- Example B (enabling features in cli)
+```
+ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e "install_tablesnap=True" -e "install_cassandra_exporter=True" -e "install_filebeat=True" -e "enable_jmx=True"
 ```
 
 The next tools will be installed on cassandra nodes:
