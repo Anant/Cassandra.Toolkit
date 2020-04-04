@@ -30,6 +30,17 @@
     - debug:
         msg: "Determining cluster name: {{ cassandra_cluster_name[0] }}"
 
+    - name: copy CQL file to a node
+      copy:
+        dest: /tmp/create-reaper-db.cql
+        content: |
+          CREATE KEYSPACE IF NOT EXISTS reaper_db WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
+      when: create_reaper_db | default(False)
+
+    - name: Create reaper_db keyspace
+      shell: "{{ cqlsh_exec }} -u {{ cassandra_shell_user }} -p {{ cassandra_shell_password }} < /tmp/create-reaper-db.cql"
+      when: create_reaper_db | default(False)
+
 ###
 ### GENERATE DOCKER ARTIFACTS, GENERATE FILES
 ###

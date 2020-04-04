@@ -5,6 +5,7 @@ cassandra_ops_os_user: cassandra
 cassandra_shell_user: cassandra
 cassandra_shell_password: cassandra
 nodetool_exec: /opt/cassandra/ddac/bin/nodetool
+cqlsh_exec: /opt/cassandra/ddac/bin/cqlsh
 cassandra_env_exec: /opt/cassandra/ddac/conf/cassandra-env.sh
 tools_install_folder: /opt/cassandra
 cassandra_install_lib_folder: /opt/cassandra/ddac/lib
@@ -13,3 +14,4 @@ install_tablesnap: False
 install_cassandra_exporter: False
 install_filebeat: False
 enable_jmx: False
+create_reaper_db: False
