@@ -1,7 +1,7 @@
 # Cassandra Tools
-Tested on apache-cassandra-3.11.x
+Tested on apache-cassandra-3.11.x, DSE-6.8.x
 
-**ToDo:** Test DSE-5.x and DSE-6.x 
+**ToDo:** Test DSE-5.x
 
 ### What is it?
 See the main page README.md
@@ -87,6 +87,10 @@ The next tools will be installed on cassandra nodes:
 - filebeat
 - cassandra_exporter
 - prometheus
+ 
+ 
+##### Step 3 - note
+If installation has run with `enable_jmx=True` then cassandra cluster has to be restarted to allow new jmx configs to be enabled.
  
 ##### Step 4 - docker compose
 Run the next command 
