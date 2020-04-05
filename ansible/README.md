@@ -85,12 +85,35 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.
 The next tools will be installed on cassandra nodes:
 - tablesnap
 - filebeat
-- elasticsearch
-- kibana
 - cassandra_exporter
 - prometheus
-- grafana
-- table-reaper
-- cassandra-medusa
  
- 
+##### Step 4 - docker compose
+Run the next command 
+```
+docker-compose -f ./artifacts/docker/docker-compose.yml up
+```
+which will start the next containers:
+- `elasticsearch` - ingests logs from cassandra hosts
+- `kibana` - visualize elasticsearch data
+- `prometheus` - ingests metrics from cassandra hosts
+- `grafana` - visualize cassandra metrics received from prometheus server
+- `cassandra-reaper` - performs repairs on cassandra cluster
+
+In a separate shell you can check that all containers are running and healthy
+```
+# docker ps 
+CONTAINER ID        IMAGE                                   COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+f80d5376a0e9        thelastpickle/cassandra-reaper:latest   "/usr/local/bin/entr…"   24 seconds ago      Up 18 seconds       0.0.0.0:8080-8081->8080-8081/tcp                 cassandra-reaper
+cc40031372d0        grafana/grafana:6.5.1                   "/run.sh"                2 hours ago         Up 20 seconds       0.0.0.0:3000->3000/tcp                           grafana-6.5.1
+9d61fd45924c        prom/prometheus:v2.17.1                 "/bin/prometheus --c…"   2 hours ago         Up 22 seconds       0.0.0.0:9090->9090/tcp                           prometheus-2.17.1
+7044c5820a08        kibana:7.6.1                            "/usr/local/bin/dumb…"   2 hours ago         Up 19 seconds       0.0.0.0:5601->5601/tcp                           kibana-7.6.1
+836733e43a1d        elasticsearch:7.6.1                     "/usr/local/bin/dock…"   2 hours ago         Up 21 seconds       0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   elasticsearch-7.6.1
+```
+
+The above tools are available to access in the browser at following urls:
+- `http://localhost:9090/` - prometheus 
+- `http://localhost:3000/` - grafana (admin:admin)
+- `http://localhost:9200/` - elasticsearch
+- `http://localhost:5601/` - kibana
+- `http://localhost:8080/webui/` - cassandra reaper (admin:admin)
