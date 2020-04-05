@@ -1,17 +1,25 @@
 ---
+- name: create cassandra_exporter folder
+  file:
+    path: "{{ tools_install_folder }}/cassandra_exporter"
+    state: directory
+    mode: '0700'
+    group: "{{ cassandra_ops_os_user }}"
+    owner: "{{ cassandra_ops_os_user }}"
+
 - name: download cassandra_exporter standalone
   get_url:
     url: "{{ cassandra_exporter_url }}"
-    dest: "{{ tools_install_folder }}"
+    dest: "{{ tools_install_folder }}/cassandra_exporter"
     mode: '0440'
-    group: cassandra
-    owner: cassandra
+    group: "{{ cassandra_ops_os_user }}"
+    owner: "{{ cassandra_ops_os_user }}"
   tags: ["exporter"]
 
 - name: deploy cassandra_exporter config.yml
   template:
     src: "config.yml"
-    dest: "{{ tools_install_folder }}/cassandra_exporter-config.yml"
+    dest: "{{ tools_install_folder }}/cassandra_exporter/cassandra_exporter-config.yml"
     mode: 0644
   tags: ["exporter"]
 
@@ -29,5 +37,5 @@
     name: cassandra_exporter.service
     daemon_reload: yes
     enabled: true
-    state: started
+    state: restarted
   tags: ["exporter"]

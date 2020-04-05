@@ -4,7 +4,7 @@ After=cassandra.service
 
 [Service]
 PIDFile=/run/cassandra_exporter.pid
-ExecStart=/bin/java -jar {{ tools_install_folder }}/cassandra_exporter-2.3.2-all.jar {{ tools_install_folder }}/cassandra_exporter-config.yml
+ExecStart=/bin/java -jar {{ tools_install_folder }}/cassandra_exporter/cassandra_exporter-2.3.2-all.jar {{ tools_install_folder }}/cassandra_exporter/cassandra_exporter-config.yml
 StandardOutput=journal
 StandardError=journal
 User=cassandra

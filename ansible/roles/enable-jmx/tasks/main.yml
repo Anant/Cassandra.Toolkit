@@ -1,11 +1,19 @@
 ---
+- name: ensure file "/etc/cassandra/" folder exists
+  file:
+    path: /etc/cassandra/
+    state: directory
+    group: cassandra
+    owner: cassandra
+    mode: 0755
+
 - name: ensure file "/etc/cassandra/jmxremote.password" exists
   file:
     path: "{{ item }}"
     state: touch
     group: cassandra
     owner: cassandra
-    mode: 0600
+    mode: 0644
   with_items:
     - "/etc/cassandra/jmxremote.password"
 

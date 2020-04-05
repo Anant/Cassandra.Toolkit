@@ -38,7 +38,7 @@
       when: create_reaper_db | default(False)
 
     - name: Create reaper_db keyspace
-      shell: "{{ cqlsh_exec }} -u {{ cassandra_shell_user }} -p {{ cassandra_shell_password }} < /tmp/create-reaper-db.cql"
+      shell: "{{ cqlsh_exec }} -u {{ cassandra_shell_user }} -p {{ cassandra_shell_password }} {{ private_ip }} < /tmp/create-reaper-db.cql"
       when: create_reaper_db | default(False)
 
 ###
