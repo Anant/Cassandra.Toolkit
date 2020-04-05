@@ -1,4 +1,4 @@
-host: localhost:7199
+host: {{ private_ip }}:7199
 ssl: False
 user: {{ jmx_user }}
 password: {{ jmx_password }}
