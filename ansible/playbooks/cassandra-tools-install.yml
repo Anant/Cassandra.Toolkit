@@ -21,11 +21,21 @@
   become_user: "{{ cassandra_ops_os_user }}"
   run_once: true
   tasks:
-    - name: nodetool describecluster
-      command: "{{ nodetool_exec }} -u {{ cassandra_shell_user }} -pw {{ cassandra_shell_password }} -h {{ private_ip }} describecluster"
+    - name: nodetool describecluster on 127.0.0.1
+      command: "{{ nodetool_exec }} -u {{ cassandra_shell_user }} -pw {{ cassandra_shell_password }} -h 127.0.0.1 describecluster"
       register: nodetool_output
+      ignore_errors: true
 
     - set_fact: cassandra_cluster_name={{ nodetool_output.stdout | regex_search("Name:\s(.*)\s", '\\1', multiline=True, ignorecase=False) }} cacheable=yes
+      when: nodetool_output.rc == 0
+
+    - name: nodetool describecluster on private_ip
+      command: "{{ nodetool_exec }} -u {{ cassandra_shell_user }} -pw {{ cassandra_shell_password }} -h {{ private_ip }} describecluster"
+      register: nodetool_output2
+      when: nodetool_output.rc == 1
+
+    - set_fact: cassandra_cluster_name={{ nodetool_output2.stdout | regex_search("Name:\s(.*)\s", '\\1', multiline=True, ignorecase=False) }} cacheable=yes
+      when: nodetool_output.rc == 1 and nodetool_output2.rc == 0
 
     - debug:
         msg: "Determining cluster name: {{ cassandra_cluster_name[0] }}"
