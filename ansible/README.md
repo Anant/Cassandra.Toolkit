@@ -1,7 +1,8 @@
 # Cassandra Tools
-Tested on apache-cassandra-3.11.x, DSE-6.8.x
-
-**ToDo:** Test DSE-5.x
+Tested on **CentOS Linux release 7.7.1908 (Core)** with 
+- apache-cassandra-3.11.x
+- dse-5.1.x
+- dse-6.8.x
 
 ### What is it?
 See the main page README.md

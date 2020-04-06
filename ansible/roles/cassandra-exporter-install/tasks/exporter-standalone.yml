@@ -36,6 +36,6 @@
   systemd:
     name: cassandra_exporter.service
     daemon_reload: yes
-    enabled: true
+    enabled: yes
     state: restarted
   tags: ["exporter"]
