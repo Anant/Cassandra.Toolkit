@@ -37,12 +37,15 @@ Cassandra Toolkit consists of the next set of tools:
 ### How to install
 
 #### New cassandra cluster
+To install a new cassandra cluster use one of the next links:
+- https://github.com/xingh/DSE.Auto/tree/master/ansible/cassandra - for apache-cassandra
+- https://github.com/xingh/DSE.Auto/tree/master/ansible/datastax_yum - for DSE 5.x, 6.x
 
-ToDo:
+The `hosts.ini` file used the in scenarios above can be reused in the [Existing cassandra cluster](#existing-cassandra-cluster) section.
 
 #### Existing cassandra cluster
 
-ToDo:
+Populate the `hosts.ini` file with all the needed cassandra hosts as described in https://github.com/Anant/cassandra.toolkit/tree/dev/ansible#step-11---list-all-hosts-in-hostsini 
 
 ### tableanalyzer / cassandra.vision
 
