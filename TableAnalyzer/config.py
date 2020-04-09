@@ -1,31 +1,36 @@
 import yaml
+import sys
 import argparse
 
-
 def get_keys(region, environ, key, imp="True"):
+
     with open("./config/environments.yaml", 'r') as f:
         doc = yaml.load(f)
+
+    inputArray = [region, environ, key]
+
     data = []
-    if region in doc:
-        if environ in doc[region]:
-            if key in doc[region][environ]:
-                item = doc[region][environ][key]
+
+    if inputArray[0] in doc:
+        if inputArray[1] in doc[inputArray[0]]:
+            if inputArray[2] in doc[inputArray[0]][inputArray[1]]:
+                item = doc[inputArray[0]][inputArray[1]][inputArray[2]]
                 if type(item) == list:
-                    data.append(doc[region][environ][key])
-                    if not imp: print(','.join(doc[region][environ][key]))
+                    data.append(doc[inputArray[0]][inputArray[1]][inputArray[2]])
+                    if not imp: print (','.join(doc[inputArray[0]][inputArray[1]][inputArray[2]]))
                 else:
-                    data = (doc[region][environ][key])
-                    if not imp: print(doc[region][environ][key])
+                    data = (doc[inputArray[0]][inputArray[1]][inputArray[2]])
+                    if not imp: print (doc[inputArray[0]][inputArray[1]][inputArray[2]])
             else:
-                data = (["No entry"])
-                if not imp: print("No entry")
+                data = ("No entry")
+                if not imp: print ("No entry")
         else:
-            data = (["No entry"])
-            if not imp: print("No entry")
+            data = ("No entry")
+            if not imp: print ("No entry")
     else:
-        data = (["No entry"])
-        if not imp: print("No entry")
-    # change no entry to array, because you return as an array, if you pass string, will only pass `N` back to function    
+        data = ("No entry")
+        if not imp: print ("No entry")
+
     return data[0]
 
 

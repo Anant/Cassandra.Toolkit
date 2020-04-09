@@ -6,6 +6,7 @@ import re
 import platform
 import argparse
 import json
+import numpy as np
 
 """
 This script parses through `nodetool -h localhost cfstats` output, and creates CSV files. 
@@ -13,7 +14,7 @@ This script parses through `nodetool -h localhost cfstats` output, and creates C
 
 
 def cfstats(path):
-    return open(path).read().split("\n")
+    return open(path).read().split("----------------")   #split by keyspaces
 
 def find_numbers(string, ints=True):
     numexp = re.compile(r'[-]?\d[\d,]*[\.]?[\d{2}]*') #optional - in front
@@ -29,50 +30,68 @@ def generate(path, save, version):
     timestamp = int(time.time())
     data = []
     ks = ''
-    cf = ''
-    exclude_ks = ["system", "cfs", "cfs_archive", "HiveMetaStore", "OpsCenter", "dse_perf", "dse_security",
-                  "dse_system", "system_traces", "dsefs", "dse_leases", "dse_analytics"]
-
+    #cf = ''
+    exclude_ks = ["dse_insights_local","system_distributed","system", "cfs", "cfs_archive","dse_insights","system_schema", "HiveMetaStore", "OpsCenter", "dse_perf", "dse_system", "system_traces", "dsefs", "dse_leases", "dse_analytics","system_auth"]
+    mapper={} 
     try:
+         
         with open('config/parsingMap.json', 'r') as f:
             map = json.load(f)
-            if version == 2:
-                mapper = map['cfstats']
-            
-            elif version == 3:
-                mapper = map['tablestats']
+        
+            if  int(sys.argv[4]) == 2:
+                for i,v in map['cfstats'].items():
+                    mapper[i] = v
+            elif int(sys.argv[4]) == 3:
+                for i,v in map['tablestats'].items():
+                    mapper[i] = v
+            #print(mapper)
+        
+         
     except FileNotFoundError:
         print("parsingMap.json File Not Found OR Error While Getting Setting Parameters, Terminating The Code")
         sys.exit()
 
-    for line in cfstats(path):
+    #print(cfstats(path))
+    for line in cfstats(path): # iterating each keyspace
         # here we go
-        if "Keyspace :" in line:
+       cf=[]
+       
+       if ("Keyspace :" or "Keyspace:") in line:
+            #print("keyspace found")
             # if it's a new keyspace, reset cf name
-            ks = (line.split(":")[1]).strip()
-            cf = "keyspace"
+            ks1 = (line.split(":")[1]).split("\n")[0].strip()
+    
+            if ks1 not in exclude_ks:   #condition to check if the keyspace is not in exclude_ks list
+                print("keyspace not in exclude list")
+                if "Table:" in line:    #get the table name from each keyspace
+                    for i in (line.split("\n\t\t")):
+                        if 'Table' == (i.split(":")[0]):
+                            cf.append (i.split(":")[1].strip()) # list of tables in each keyspace
+            
+                    for key, val in mapper.items():
+                        
+                            for i in (line.split("\n\t\t")):
+                                line_key = (i.split(":")[0].strip())  #key 
+                                line_val = (i.split(":")[1].strip())  #value
+                        
+                                if key.lower() in line_key.lower():
+                                    if "NaN" in line_val:
+                                        line_val = 0
+                                    else:
+                                        line_val = find_numbers(line_val)[0]
+                            
+                                    for j in cf:
+                                        data.append([hostname, ks1, j, val, line_val, timestamp])
+                                 
 
-        # we are only interested in non-internal keyspaces
-        if (ks not in exclude_ks):
-            if "Table:" in line:
-                cf = (line.split(":")[1]).strip()
-        for key, val in mapper.items():
-            if (str(line) != "") & (str(line).find(":") != -1):
-                line_key, line_val = line.split(":")
-                if key.lower() in line_key.lower():
-                    if "NaN" in line_val:
-                        line_val = 0
-                    else:
-                        line_val = find_numbers(line_val)[0]
-                    data.append([hostname, ks, cf, val, line_val, timestamp])
+                                         
 
-    # send gathered data to carbon server
-    # message = '\n'.join(data) + '\n'
-    with open(save, "w", newline="") as f:
+    
+    with open(save, "w") as f:
         writer = csv.writer(f)
         for line in data:
             writer.writerow(line)
-        return True
+    return True
 
 
 if __name__ == '__main__':
