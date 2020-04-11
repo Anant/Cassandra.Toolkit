@@ -129,9 +129,9 @@ Make sure you pass the next 3 variable related to AWS authentication and S3 loca
 - `aws_secret_access_key`
 - `s3_folder` - location where cassandra backups will be stored;
 
-### Install node_exporter for exporting node metrics to prometheus server
+### Metrics to prometheus server
 
-If cassandra is installed using ansible playbooks above there are metrics exposed by `cassandra_exporter.service` compatible with prometheus server.
+There are metrics exposed by `cassandra_exporter.service` compatible with prometheus server.
 Metrics can be available on port `8080` when it runs as a `systemd` service in standalone mode, or on port `9500` when it's configured as a JVM agent in `cassandra-env.sh` file. 
 
 Check if cassandra exporter run as as `systemd` service, if it runs successfully, then `prometheus` is already ingesting metrics and no changes are needed.
@@ -146,7 +146,7 @@ $ sudo systemctl status cassandra_exporter
    CGroup: /system.slice/cassandra_exporter.service
            └─1184 /bin/java -jar /opt/cassandra/ddac/lib/cassandra_exporter-2.3.2-all.jar /opt/cassandra/ddac/conf/config.yml
 ```
-In case node_exporter seems like a better alternative to you, manually disable the `cassandra_exporter.service` or cassandra_exporter agent in `cassandra-env.sh` file, when the exporter runs as a JVM agent, and execute the next command to install node_exporter.
+In case `node_exporter` is also needed, execute the next command to install it.
 
 ```
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-node_exporter-install.yml
