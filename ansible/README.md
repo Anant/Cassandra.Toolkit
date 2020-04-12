@@ -48,12 +48,19 @@ As a reference, `./envs/_local/group_vars/all.yml` can be used.
 
 - `cassandra_data_file_directories` - used by tablesnap to monitor and back up files to AWS-S3
 - `cassandra_ops_os_user` - used by `ansible` to ssh into a cassandra host and run `nodetool`
-- `cassandra_shell_user` - used by `ansible` to authenticate with `nodetool` and to create a new keyspace named `reaper_db` used by cassandra-reaper meta-data 
+- `cassandra_shell_user` - used by `ansible` to authenticate with `nodetool` and to create a new keyspace named `reaper_db` used by cassandra-reaper meta-data, also used by `cassandra-medusa` 
 - `cassandra_shell_password` 
 - `nodetool_exec`: - absolute path to `nodetool`
 - `cassandra_env_exec` - absolute path to `cassandra-env.sh` to adjust JMX configs. *JMX access is needed by cassandra_exporter and cassandra-reaper*.
+- `cassandra_yml_file` - absolute location of `cassandra.yml` file (used by `cassandra-medusa` to learn about cassandra configs)
 - `tools_install_folder` - an absolute path where to install all cassandra tools
 - `cassandra_install_lib_folder` - absolute path to cassandra `lib` folder to install cassandra_exporter as java agent. *This path is not used when cassandra_exporter is installed as a standalone service.*
+- `tablesnap_aws_backup_bucket_name` - tablesnap aws-s3 backup bucket name
+- `medusa_aws_credentials_file` - location of aws credentials file tp be used to talk to aws-s3
+- `medusa_aws_backup_cluster_prefix` - multitenancy support in the same aws-s3 bucket  
+- `medusa_aws_backup_bucket_name` - medusa aws-s3 backup bucket name
+- `cassandra_stop_command` - used by `cassandra-medusa` to operate cluster nodes backups and restores
+- `cassandra_start_command` - used by `cassandra-medusa` to operate cluster nodes backups and restores
 
 Also, provide the next variables to select which steps are needed for your environment:
 By default they are `False`.
@@ -124,11 +131,19 @@ The above tools are available to access in the browser at following urls:
 - `http://localhost:5601/` - kibana
 - `http://localhost:8080/webui/` - cassandra reaper (admin:admin)
 
-##### Install tablesnap for AWS S3 backups
+##### AWS S3 backups
+Backups can be done by using cassandra-medusa or tablesnap, install only one, even though you can have both
+ 
+###### Install tablesnap for AWS S3 backups
+If `-e install_tablesnap=True` is used, you need to also pass the next 2 variable
 Make sure you pass the next 3 variable related to AWS authentication and S3 location
 - `aws_access_key_id`
 - `aws_secret_access_key`
-- `tablesnap_aws_backup_bucket_name` - location where cassandra backups will be stored by tablesnap;
+
+###### Install cassandra-medusa for AWS S3 backups
+If `-e install_medusa=True` is used, you need to also pass the next 2 variable
+- `aws_access_key_id`
+- `aws_secret_access_key`
 
 ### Metrics to prometheus server
 

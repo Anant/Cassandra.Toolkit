@@ -11,7 +11,6 @@ cassandra_env_exec: /opt/cassandra/ddac/conf/cassandra-env.sh
 tools_install_folder: /opt/cassandra
 cassandra_install_lib_folder: /opt/cassandra/ddac/lib
 
-cassandra_restart_command: systemctl restart cassandra
 cassandra_stop_command: systemctl stop cassandra
 cassandra_start_command: systemctl start cassandra
 
@@ -25,7 +24,6 @@ tablesnap_aws_backup_bucket_name: ion-cassandra-tablesnap-test
 aws_access_key_id: SOME_AWS_ACCESS_KEY
 aws_secret_access_key: SOME_AWS_SECRET_ACCESS_KEY
 ###
-
 
 install_tablesnap: False
 install_cassandra_exporter: False
