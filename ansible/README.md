@@ -128,7 +128,7 @@ The above tools are available to access in the browser at following urls:
 Make sure you pass the next 3 variable related to AWS authentication and S3 location
 - `aws_access_key_id`
 - `aws_secret_access_key`
-- `s3_folder` - location where cassandra backups will be stored;
+- `tablesnap_aws_backup_bucket_name` - location where cassandra backups will be stored by tablesnap;
 
 ### Metrics to prometheus server
 
