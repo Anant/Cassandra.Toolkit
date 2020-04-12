@@ -90,12 +90,17 @@ Populate the `hosts.ini` file with all the needed cassandra hosts as described i
 - ToDo:
 
 ### table-reaper
+Reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
+http://cassandra-reaper.io/
 
 - ToDo:
 
 ### cassandra-medusa
+Medusa is an Apache Cassandra backup system.
+https://github.com/thelastpickle/cassandra-medusa
 
-- ToDo:
+- AWS setup
+https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.md
 
 ## Credits
 

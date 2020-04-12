@@ -11,6 +11,8 @@
       when: install_filebeat | default(False)
     - role: enable-jmx
       when: enable_jmx | default(False)
+    - role: cassandra-medusa-install
+      when: enable_medusa | default(False)
 
 ###
 ### GENERATE DOCKER ARTIFACTS, GATHER CLUSTER INFO

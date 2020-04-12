@@ -17,3 +17,4 @@ install_cassandra_exporter: False
 install_filebeat: False
 enable_jmx: False
 create_reaper_db: False
+enable_medusa: False
