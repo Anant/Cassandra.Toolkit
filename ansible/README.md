@@ -62,6 +62,7 @@ By default they are `False`.
 - `install_filebeat`
 - `enable_jmx`
 - `create_reaper_db` - create a keyspace named `reaper_db` used by cassandra_reaper to store its metadata
+- `install_medusa`
 
 You can also enable the above variable in the cli when the playbook is executed as shown in **Example B**. 
 
@@ -80,7 +81,7 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.
 ```
 - Example B (enabling features in cli)
 ```
-ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e "install_tablesnap=True" -e "install_cassandra_exporter=True" -e "install_filebeat=True" -e "enable_jmx=True" -e 'create_reaper_db=True'
+ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e "install_tablesnap=True" -e "install_cassandra_exporter=True" -e "install_filebeat=True" -e "enable_jmx=True" -e 'create_reaper_db=True' -e 'install_medusa=True'
 ```
 
 The next tools will be installed on cassandra nodes:

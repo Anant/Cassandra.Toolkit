@@ -21,8 +21,8 @@
 - name: create virtual env && install tablesnap
   command: "{{ item }}"
   with_items:
-    - "virtualenv -p python2 {{ tools_install_folder }}/venv/python2"
-    - "{{ tools_install_folder }}/venv/python2/bin/pip install tablesnap"
+    - "virtualenv -p python2 {{ tools_install_folder }}/venv/python2-tablesnap"
+    - "{{ tools_install_folder }}/venv/python2-tablesnap/bin/pip install tablesnap"
 
 - name: install systemd tablesnap.service unit
   template:
