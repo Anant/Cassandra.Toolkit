@@ -4,6 +4,7 @@ cassandra_data_file_directories: ["/data/cassandra/data1", "/data/cassandra/data
 cassandra_ops_os_user: cassandra
 cassandra_shell_user: cassandra
 cassandra_shell_password: cassandra
+cassandra_yml_file: /opt/cassandra/ddac/conf/cassandra.yaml
 nodetool_exec: /opt/cassandra/ddac/bin/nodetool
 cqlsh_exec: /opt/cassandra/ddac/bin/cqlsh
 cassandra_env_exec: /opt/cassandra/ddac/conf/cassandra-env.sh
@@ -11,6 +12,12 @@ tools_install_folder: /opt/cassandra
 cassandra_install_lib_folder: /opt/cassandra/ddac/lib
 
 cassandra_restart_command: systemctl restart cassandra
+cassandra_stop_command: systemctl stop cassandra
+cassandra_start_command: systemctl start cassandra
+
+medusa_aws_credentials_file: /opt/cassandra/.aws/credentials
+medusa_aws_backup_cluster_prefix: cluster-a
+medusa_aws_backup_bucket_name: ion-cassandra-medusa-test
 
 install_tablesnap: False
 install_cassandra_exporter: False
