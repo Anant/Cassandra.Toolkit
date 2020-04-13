@@ -1,0 +1,19 @@
+[Unit]
+Description=Cassandra Exporter
+After=cassandra.service
+
+[Service]
+PIDFile=/run/cassandra_exporter.pid
+ExecStart=/bin/java -jar {{ tools_install_folder }}/cassandra_exporter/cassandra_exporter-2.3.2-all.jar {{ tools_install_folder }}/cassandra_exporter/cassandra_exporter-config.yml
+StandardOutput=journal
+StandardError=journal
+User=cassandra
+Group=cassandra
+LimitNOFILE=100000
+LimitMEMLOCK=infinity
+LimitNPROC=32768
+LimitAS=infinity
+Restart=always
+
+[Install]
+WantedBy=cassandra.service

@@ -1,0 +1,15 @@
+{% set nodes_ip_list = []  %}
+{% for node in groups['cassandra'] %}
+{% set ignored_var = nodes_ip_list.append( "'" + hostvars[node].private_ip + ":8080'") %}
+{% endfor %}
+
+global:
+  scrape_interval: 5s # By default, scrape targets every 5 second.
+
+scrape_configs:
+  - job_name: 'cassandra'
+    static_configs:
+      - targets: [{{ nodes_ip_list|join(', ') }}]
+
+
+

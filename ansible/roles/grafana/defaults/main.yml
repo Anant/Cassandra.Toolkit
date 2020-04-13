@@ -1,0 +1,2 @@
+prometheus_address: http://{{ docker_net_ip_prometheus }}:9090
+prometheus_ds_name: super-prometheus

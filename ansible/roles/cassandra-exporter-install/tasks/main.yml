@@ -1,0 +1,3 @@
+---
+### - include: "exporter-as-jvm-agent.yml"
+- include: "exporter-standalone.yml"

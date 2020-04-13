@@ -1,0 +1,1 @@
+This folder contains ansible generated artifacts needed in subsequent operations.

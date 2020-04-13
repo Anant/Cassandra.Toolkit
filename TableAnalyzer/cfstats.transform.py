@@ -6,8 +6,6 @@ import pandas
 import subprocess
 import config
 import cassandra_cfstatsCsvAnalyze
-import glob
-import util
 
 parser = argparse.ArgumentParser(
     description='Collecting config varibales from environments.yaml and Start receiving stats',
@@ -22,64 +20,98 @@ args = parser.parse_args()
 
 
 def main():
+
     print("Generating CSV file From Stats")
-    file_names = []
-    version = args.version or config.get_keys(args.region, args.environ, "version")
-    # question, if version is a mandatory value for input, Do we have to check yml file?
+    fileNames = []
+
+    #if args.debug: print("Checking " + args.db.title() + " Version")
+    #command = str("nodetool version")
+    #try:
+    #    output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
+    #except subprocess.CalledProcessError as e:
+    #    result = str(e.output)
+    #    if result.find("Connection refused") >= 0:
+    #        print("Cannot Connect To " + args.db.title() + ", Terminating code")
+    #        sys.exit();
+    #if args.debug: print(args.db + " Version : " + output)
+
+    #if int((output.split(": ")[1])[0]) == 2:
+    #    if args.debug: print("Cassandra Version v2")
+    #    version = 2
+    #else:
+    #    if args.debug: print("Cassandra Version v3")
+    #    version = 3
+
+    version = config.get_keys(args.region, args.environ, "version")  
     keys = config.get_keys(args.region, args.environ, "key")
     hosts = config.get_keys(args.region, args.environ, args.db)
 
     if args.debug: print("Total No. of Hosts", len(hosts))
-    util.progress(0, len(hosts), args.debug, "Generating CSV File form Stats")
+    progress(0, len(hosts), "Generating CSV File form Stats")
+
     for i, x in enumerate(hosts):
-        if args.debug: print("Processing Stats From host", (i + 1))
-        path = transform_cfstats(keys, args.region, args.environ, x, version)
+        if args.debug: print("Processing Stats From host", (i+1))
+        path = transform_cfstats(keys, args.region, args.environ, x,version)
+        if args.debug: print(path)
         if path:
-            file_names.append(path)
+            fileNames.append(path)
         sys.stdout.flush()
-        util.progress((i + 1), len(hosts), args.debug, "Generating CSV File form Stats")
-        if args.debug: print("Done processing Stats", (i + 1))
+        progress((i + 1), len(hosts), "Generating CSV File form Stats")
+        if args.debug: print("Done processing Stats", (i+1))
 
     print("\nFinished, CSV File/s Created")
-    if len(hosts) > 1:
-        print("\nNow Combining CSV Files Form Different Nodes")
-        os.chdir("data/" + args.region + "/" + args.environ)
-        extension = 'csv'
-        all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
-        combined_csv = pandas.concat([pandas.read_csv(f) for f in all_filenames])
-        # export to csv
-        combined_csv.to_csv(args.region + "." + args.environ + ".cfstats.csv", index=False, encoding='utf-8-sig')
-        print("Finished, CVS files combined")
-    else:
-        print("One files only, Job done")
-    # command = str("cat data/" + args.region + "/" + args.environ + "/*.csv > data/" + args.region + "/" + args.environ + "/"+ args.region + "." + args.environ +".cfstats.csv" )
-    # output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
+    print("\nNow Combining CSV Files Form Diffrent Nodes")
 
-    # print("\nMerging Complete.")
-    # print("\nPivoting The Data.")
+    command = str("cat data/" + args.region + "/" + args.environ + "/*.csv > data/" + args.region + "/" + args.environ + "/"+ args.region + "." + args.environ +".cfstats.csv" )
+    output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
 
-    # path = "data/" + args.region + "/" + args.environ + "/"+ args.region + "." + args.environ +".cfstats.csv"
-    # save = "data/" + args.region + "/" + args.environ + "/"+ args.region + "." + args.environ +".cfstats"
-    # cassandra_cfstatsCsvAnalyze.endStats(path,save)
+    print("\nMerging Complete.")
+    print("\nPivoting The Data.")
 
-    # print("\nPivoting Complete.")
+    path = "data/" + args.region + "/" + args.environ + "/"+ args.region + "." + args.environ +".cfstats.csv"
+    save = "data/" + args.region + "/" + args.environ + "/"+ args.region + "." + args.environ +".cfstats"
+    cassandra_cfstatsCsvAnalyze.endStats(path,save)
+
+    print("\nPivoting Complete.")
 
 
-def transform_cfstats(keys, region, environ, x, version):
-    if args.debug: print("Generating CSV File form Stats " + x + ".txt")
+
+def transform_cfstats(keys, region, environ, x,version):
+    if args.debug: print("Generating CSV File from Stats "+x+".txt")
 
     path = str("data/" + region + "/" + environ + "/" + x + ".txt")
     save = str("data/" + region + "/" + environ + "/" + x + ".csv")
-    if args.debug: print(version)
+
     if os.path.exists(path):
-        result = cassandra_cfstats2csv.generate(path, save, version)
+        result = cassandra_cfstats2csv.generate(path,save,version)
         if result:
-            if args.debug: print("Generation of CSV File form Stats " + x + ".txt is Compeleted")
+            if args.debug: print("Generation of CSV File form Stats "+x+".txt is Compeleted")
             return save
         else:
             print("Fail to Generate CSV")
     else:
         print("\nStats File Not Exists, Skipping This Node")
+
+
+
+def progress(count, total, suffix=''):
+    if not args.debug:
+        bar_len = 60
+        filled_len = int(round(bar_len * count / float(total)))
+
+        percents = round(100.0 * count / float(total), 1)
+        bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+        sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+        sys.stdout.flush()
+        bar_len = 60
+        filled_len = int(round(bar_len * count / float(total)))
+
+        percents = round(100.0 * count / float(total), 1)
+        bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+        sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     main()

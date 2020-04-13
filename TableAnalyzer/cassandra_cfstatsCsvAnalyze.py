@@ -81,7 +81,8 @@ def endStats(path, save):
                 for stat in ar_stats:
                     df_host_data = \
                     df_table_data[(df_table_data['Hostname'] == host) & (df_table_data['Stats'] == stat)]['Value']
-                    s_host_data = s_host_data.set_value(stat, df_host_data.iloc[0])
+                   # s_host_data = s_host_data.set_value(stat, df_host_data.iloc[0])
+                    s_host_data.at[stat] = df_host_data.iloc[0]
                 if (table != 'keyspace'):
                     df_pivot.loc[pivot_index] = s_host_data
                     pivot_index = pivot_index + 1

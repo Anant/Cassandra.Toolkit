@@ -1,0 +1,40 @@
+---
+- name: ensure file "/etc/cassandra/" folder exists
+  file:
+    path: /etc/cassandra/
+    state: directory
+    group: cassandra
+    owner: cassandra
+    mode: 0755
+
+- name: ensure file "/etc/cassandra/jmxremote.password" exists
+  file:
+    path: "{{ item }}"
+    state: touch
+    group: cassandra
+    owner: cassandra
+    mode: 0644
+  with_items:
+    - "/etc/cassandra/jmxremote.password"
+
+- name: adding user to "/etc/cassandra/jmxremote.password"
+  lineinfile:
+    name: "/etc/cassandra/jmxremote.password"
+    line: "{{ jmx_user }} {{ jmx_password }}"
+
+- name: enable remote jmx
+  lineinfile:
+    name: "{{ cassandra_env_exec }}"
+    insertafter: "JMX_PORT=\"7199\""
+    line: "LOCAL_JMX=no"
+
+- name: adding user to "/etc/cassandra/jmxremote.password"
+  lineinfile:
+    name: "{{ cassandra_env_exec }}"
+    insertafter: "# turn on JMX authentication"
+    line: "{{ item }}"
+  with_items:
+    - "  JVM_OPTS=\"$JVM_OPTS -Dcom.sun.management.jmxremote.host={{ private_ip }}\""
+    - "  JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname={{ private_ip }}\""
+
+

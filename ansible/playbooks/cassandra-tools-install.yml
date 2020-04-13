@@ -1,0 +1,73 @@
+- hosts: cassandra
+  any_errors_fatal: true
+  become: true
+  become_method: sudo
+  roles:
+    - role: cassandra-exporter-install
+      when: install_cassandra_exporter | default(False)
+    - role: tablesnap-install
+      when: install_tablesnap | default(False)
+    - role: filebeat
+      when: install_filebeat | default(False)
+    - role: enable-jmx
+      when: enable_jmx | default(False)
+    - role: cassandra-medusa-install
+      when: install_medusa | default(False)
+
+###
+### GENERATE DOCKER ARTIFACTS, GATHER CLUSTER INFO
+###
+- hosts: cassandra[0]
+  become: true
+  become_method: sudo
+  become_user: "{{ cassandra_ops_os_user }}"
+  run_once: true
+  tasks:
+    - name: nodetool describecluster on 127.0.0.1
+      command: "{{ nodetool_exec }} -u {{ cassandra_shell_user }} -pw {{ cassandra_shell_password }} -h 127.0.0.1 describecluster"
+      register: nodetool_output
+      ignore_errors: true
+
+    - set_fact: cassandra_cluster_name={{ nodetool_output.stdout | regex_search("Name:\s(.*)\s", '\\1', multiline=True, ignorecase=False) }} cacheable=yes
+      when: nodetool_output.rc == 0
+
+    - name: nodetool describecluster on private_ip
+      command: "{{ nodetool_exec }} -u {{ cassandra_shell_user }} -pw {{ cassandra_shell_password }} -h {{ private_ip }} describecluster"
+      register: nodetool_output2
+      when: nodetool_output.rc == 1
+
+    - set_fact: cassandra_cluster_name={{ nodetool_output2.stdout | regex_search("Name:\s(.*)\s", '\\1', multiline=True, ignorecase=False) }} cacheable=yes
+      when: nodetool_output.rc == 1 and nodetool_output2.rc == 0
+
+    - debug:
+        msg: "Determining cluster name: {{ cassandra_cluster_name[0] }}"
+
+    - name: copy CQL file to a node
+      copy:
+        dest: /tmp/create-reaper-db.cql
+        content: |
+          CREATE KEYSPACE IF NOT EXISTS reaper_db WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
+      when: create_reaper_db | default(False)
+
+    - name: Create reaper_db keyspace
+      shell: "{{ cqlsh_exec }} -u {{ cassandra_shell_user }} -p {{ cassandra_shell_password }} {{ private_ip }} < /tmp/create-reaper-db.cql"
+      when: create_reaper_db | default(False)
+
+###
+### GENERATE DOCKER ARTIFACTS, GENERATE FILES
+###
+### - hosts: localhost
+###   tasks:
+###     - copy: content="{{ hostvars[groups['cassandra'][0]]['ansible_all_ipv4_addresses'] }}" dest=/tmp/11.json
+
+- hosts: localhost
+  tasks:
+    - set_fact: cassandra_node_ip={{ hostvars[groups['cassandra'][0]]['private_ip'] }}
+    - set_fact: cassandra_cluster_name={{ hostvars[groups['cassandra'][0]]['cassandra_cluster_name'][0] }}
+
+- hosts: localhost
+  roles:
+      ### keep "docker-compose" on top because it sets facts needed by the others
+    - docker-compose
+    - prometheus
+    - grafana

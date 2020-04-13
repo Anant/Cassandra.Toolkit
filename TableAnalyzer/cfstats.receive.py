@@ -6,7 +6,6 @@ import config
 import json
 import pandas as pd
 import re
-import util
 
 parser = argparse.ArgumentParser(
     description='Collecting config varibales from environments.yaml and Start receiving stats',
@@ -19,7 +18,7 @@ parser.add_argument('-k', '--keySpace', default='', type=str, help='Name Of Keys
 parser.add_argument('-t', '--table', default='', type=str, help='Name Of Table')
 
 args = parser.parse_args()
-
+print(args)
 
 def main():
     useSSH = False
@@ -28,24 +27,26 @@ def main():
     nodeArray = []
     nodeTable = ''
     keys = []
-
+    nodeToolVer=0
     if args.debug: print("Checking " + args.db.title() + " Version")
-    command = str("nodetool version")
+    command = str("nodetool -h `hostname -i` version")
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
     except subprocess.CalledProcessError as e:
         result = str(e.output)
         if result.find("Connection refused") >= 0:
             print("Cannot Connect To " + args.db.title() + ", Terminating code")
-            sys.exit()
+            sys.exit();
     if args.debug: print(args.db + " Version : " + output)
 
     if int((output.split(": ")[1])[0]) == 2:
         if args.debug: print("Cassandra Version v2 using nodetool cfstats")
         stats = str("cfstats")
+        nodeToolVer = 2
     else:
         if args.debug: print("Cassandra Version v3 using nodetool tablestats")
         stats = str("tablestats")
+        nodeToolVer = 3
 
     if (args.keySpace == "") & (args.table != ""):
         print("Please Provide the Key Space Before Table Using -k / --keySapace")
@@ -63,7 +64,7 @@ def main():
 
     if detectTopology:
         if args.debug: print("Detechting Nodes")
-        command = str("nodetool status")
+        command = str("nodetool -h `hostname -i` status")
         try:
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
             dataArray = output.split("\n")
@@ -73,39 +74,53 @@ def main():
                         continue
                     if i.find("--  Address") != -1:
                         header = re.sub(r'\s+',',',i).split(",")
-                        header[5] = str(str(header[5])+str(header[6]))
-                        del header[6]
+                        #print(header)
+                        if nodeToolVer==2:
+                            if args.debug: print("Nodetool Version 2")
+                            header[4] = str(str(header[4])+str(header[5]))
+                            del header[5]
+                            header[5] = str(str(header[5])+str(header[6]))
+                            del header[6]
+                        elif nodeToolVer==3:
+                            if args.debug: print("NodeTool Version 3")
+                            header[5] = str(str(header[5])+str(header[6]))
+                            del header[6]
+                        #print (header)
                         gotHeader = True
                         continue
                     if gotHeader:
                         temp = re.sub(r'\s+',',',i).split(",")
+                        #print(temp)
                         temp[2] = str(str(temp[2])+str(temp[3]))
                         del temp[3]
+                        #print(temp)
                         nodeArray.append(temp)
             nodeTable = pd.DataFrame(nodeArray,columns =header)
+            #print (nodeTable)
             for i in range(0, len(nodeTable["Address"])):
                 keys.append(nodeTable["Address"].iloc[i])
         except subprocess.CalledProcessError as e:
             result = str(e.output)
             if result.find("Connection refused") >= 0:
                 print("Cannot Connect To " + args.db.title() + ", Terminating code")
-                sys.exit()
+                sys.exit();
         except:
+            print(sys.exc_info())
             print("Something Went Wrong While Getting The Node/s, Terminating code (You can also provide nodes via config)")
-            sys.exit()
+            sys.exit();
     else:
         keys = config.get_keys(args.region, args.environ, "key")
 
     hosts = config.get_keys(args.region, args.environ, args.db)
 
     if args.debug: print("Total No. of Hosts", len(hosts))
-    util.progress(0, len(hosts), args.debug, "Getting Data From Nodes")
+    progress(0, len(hosts), "Getting Data From Nodes")
 
     for i, x in enumerate(hosts):
         if args.debug: print("Processing host", (i + 1))
         receive_cfstats(keys, args.region, args.environ, x, args.keySpace, args.table, useSSH, stats)
         sys.stdout.flush()
-        util.progress((i + 1), len(hosts), args.debug, "Getting Data From Nodes")
+        progress((i + 1), len(hosts), "Getting Data From Nodes")
         if args.debug: print("Done processing host", (i + 1))
 
     print("\nFinished Getting Data")
@@ -153,12 +168,13 @@ def create_dir(command, region, environ, x):
 def get_stats(key, command, region, environ, x):
     try:
         if args.debug: print("Running the Get_Stats Command")
+        if args.debug: print(command)
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
         if args.debug: print("Get_Stats Success")
         return True
 
     except FileNotFoundError as e:
-        create_dir(command, region, environ, x)
+        create_dir(command, regioni, environ, x)
         return False
 
     except subprocess.CalledProcessError as e:
@@ -174,6 +190,26 @@ def get_stats(key, command, region, environ, x):
             print("Error While Connecting to Server, Skipping This Node")
             os.remove("data/" + region + "/" + environ + "/" + x + ".txt")
             return True
+
+
+def progress(count, total, suffix=''):
+    if not args.debug:
+        bar_len = 60
+        filled_len = int(round(bar_len * count / float(total)))
+
+        percents = round(100.0 * count / float(total), 1)
+        bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+        sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+        sys.stdout.flush()
+        bar_len = 60
+        filled_len = int(round(bar_len * count / float(total)))
+
+        percents = round(100.0 * count / float(total), 1)
+        bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+        sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+        sys.stdout.flush()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,11 @@
+- name: generate prometheus folder
+  file:
+    path: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "{{ playbook_dir }}/../artifacts/prometheus"
+  tags: ["prometheus"]
+
+- name: generate prometheus.yml file
+  template: src=prometheus.yml.j2 dest={{ playbook_dir }}/../artifacts/prometheus/prometheus.yml mode=0666
+  tags: ["prometheus"]
