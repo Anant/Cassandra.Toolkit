@@ -1,6 +1,9 @@
 # Spark Cluster with docker & docker-compose
 
 Run the next command to build all needed docker images:
+- spark-base:latest
+- spark-master:latest
+- spark-worker:latest
 ```
 ./build-images.sh
 ```
