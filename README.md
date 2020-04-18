@@ -1,6 +1,6 @@
 # cassandra.toolkit
 
-A curated + created set of useful Cassandra / Cassandra compatible tools building, managing, and monitoring Cassandra clusters.
+A curated + created set of useful Cassandra compatible tools for building, managing, and monitoring Cassandra clusters.
 
 - [Cassandra Toolkit](#cassandra-toolkit)
     - [How to install](#how-to-install)
@@ -12,7 +12,7 @@ A curated + created set of useful Cassandra / Cassandra compatible tools buildin
     - [Cluster management](#cluster-management)
     - [Snapshot strategy (future changes)](#snapshot-strategy-future-changes)
 
-Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra. Please take a look!
+Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra.
 
 ## Cassandra Toolkit
 <img src="https://github.com/Anant/cassandra.toolkit/blob/dev/deployment.png"
@@ -65,39 +65,54 @@ Populate the `hosts.ini` file with all the needed cassandra hosts as described i
 - To install and configure `node_exporter` follow **Install node_exporter for exporting node metrics to prometheus server** section in **dse
   auto/ansible/cassandra/README.md** document.
 
-### flebeat
+### filebeat
+https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html
 
-- ToDo:
+Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events, and forwards them either to Elasticsearch or Logstash for indexing.
 
 ### elasticsearch
+https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html
 
-- ToDo:
+Elasticsearch is the distributed search and analytics engine at the heart of the Elastic Stack.
 
 ### kibana
+https://www.elastic.co/guide/en/kibana/7.6/introduction.html
 
-- ToDo:
+Kibana makes your data actionable by providing three key functions. Kibana is:
+
+- An open-source analytics and visualization platform. Use Kibana to explore your Elasticsearch data, and then build beautiful visualizations and dashboards.
+- A UI for managing the Elastic Stack. Manage your security settings, assign user roles, take snapshots, roll up your data, and more — all from the convenience of a Kibana UI.
+- A centralized hub for Elastic’s solutions. From log analytics to document discovery to SIEM, Kibana is the portal for accessing these and other capabilities.
+
 
 ### cassandra_exporter
+https://github.com/criteo/cassandra_exporter
 
-- ToDo:
+Cassandra exporter is a standalone application which exports Apache Cassandra® metrics throught a prometheus friendly endpoint. 
 
 ### prometheus
 
-- ToDo:
+https://prometheus.io/
+
+Prometheus is an open-source systems monitoring and alerting toolkit
 
 ### grafana
 
-- ToDo:
+https://grafana.com/
+
+Grafana is a multi-platform open source analytics and interactive visualization software.
 
 ### table-reaper
-Reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
+
 http://cassandra-reaper.io/
 
-- ToDo:
+Reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
 ### cassandra-medusa
-Medusa is an Apache Cassandra backup system.
+
 https://github.com/thelastpickle/cassandra-medusa
+
+Medusa is an Apache Cassandra backup system.
 
 - AWS setup
 https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.md
