@@ -9,7 +9,10 @@ if [ $? -eq 0 ]; then
 fi
 
 printf "Starting a new ($CONTAINER_NAME) container...\n"
-docker run --name $CONTAINER_NAME -d -p $PROMETHEUS_PORT:9090 -v $PWD/artifacts/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus:v2.14.0
+docker run -d \
+  --name $CONTAINER_NAME \
+  -p $PROMETHEUS_PORT:9090 \
+  -v $PWD/../ansible/artifacts/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus:v2.14.0
 
 IP_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${CONTAINER_NAME})
 echo "${CONTAINER_NAME} is running "

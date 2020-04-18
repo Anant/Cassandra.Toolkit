@@ -16,13 +16,13 @@ fi
 
 printf "Starting a new ($CONTAINER_NAME) container...\n"
 docker run -d \
-     -v $PWD/artifacts/grafana/dashboards:/etc/grafana/provisioning/dashboards:z \
-     -v $PWD/artifacts/grafana/datasources:/etc/grafana/provisioning/datasources:z \
-     -e "GF_AUTH_BASIC_ENABLED=$GF_AUTH_BASIC_ENABLED" \
-     -e "GF_AUTH_ANONYMOUS_ENABLED=$GF_AUTH_ANONYMOUS_ENABLED" \
-     -e "GF_SECURITY_ADMIN_PASSWORD=$GF_SECURITY_ADMIN_PASSWORD" \
-     -e "GF_AUTH_ANONYMOUS_ORG_ROLE=$GF_AUTH_ANONYMOUS_ORG_ROLE" \
-     -e "GF_PANELS_DISABLE_SANITIZE_HTML=$GF_PANELS_DISABLE_SANITIZE_HTML" \
     --name $CONTAINER_NAME \
+    -v $PWD/../ansible/artifacts/grafana/dashboards:/etc/grafana/provisioning/dashboards:z \
+    -v $PWD/../ansible/artifacts/grafana/datasources:/etc/grafana/provisioning/datasources:z \
+    -e "GF_AUTH_BASIC_ENABLED=$GF_AUTH_BASIC_ENABLED" \
+    -e "GF_AUTH_ANONYMOUS_ENABLED=$GF_AUTH_ANONYMOUS_ENABLED" \
+    -e "GF_SECURITY_ADMIN_PASSWORD=$GF_SECURITY_ADMIN_PASSWORD" \
+    -e "GF_AUTH_ANONYMOUS_ORG_ROLE=$GF_AUTH_ANONYMOUS_ORG_ROLE" \
+    -e "GF_PANELS_DISABLE_SANITIZE_HTML=$GF_PANELS_DISABLE_SANITIZE_HTML" \
     --publish $GRAFANA_PORT:3000 \
     grafana/grafana:6.5.1
