@@ -57,13 +57,15 @@ Populate the `hosts.ini` file with all the needed cassandra hosts as described i
 
 ### tablesnap
 
-- To install and configure `tablesnap` follow **Install tablesnap for AWS S3 backups** section in **dse
-  auto/ansible/cassandra/README.md** document.
+https://github.com/JeremyGrosser/tablesnap
+
+Tablesnap is a script that uses inotify to monitor a directory for IN_MOVED_TO events and reacts to them by spawning a new thread to upload that file to Amazon S3, along with a JSON-formatted list of what other files were in the directory at the time of the copy.
 
 ### node_exporter
 
-- To install and configure `node_exporter` follow **Install node_exporter for exporting node metrics to prometheus server** section in **dse
-  auto/ansible/cassandra/README.md** document.
+https://github.com/prometheus/node_exporter
+
+Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written in Go with pluggable metric collectors.
 
 ### filebeat
 https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html
