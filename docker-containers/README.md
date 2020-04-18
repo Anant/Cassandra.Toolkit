@@ -1,6 +1,6 @@
 # Cassandra docker-tools
 **Note:** All the tools described here are installed and configured with ansible from [ansible](../ansible) folder. 
-It's better to use that approach to run all these containers, because ansible will generate all needed artifacts depending on what cassandra hosts are mentioned in the context.
+It's better to use that approach to run them all because ansible will generate all needed artifacts depending on what cassandra hosts are mentioned in the context.
 
 In case you need to experiment more, you can run the cotainers using the set of shell scripts provided here.
 - `./start-elasticsearch.sh`
