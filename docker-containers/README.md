@@ -1,6 +1,19 @@
-# cassandra-reaper
+# Cassandra docker-tools
+**Note:** All the tools described here are installed and configured with ansible from [ansible](../ansible) folder. 
+It's better to use that approach to run all these containers, because ansible will generate all needed artifacts depending on what cassandra hosts are mentioned in the context.
 
-## run cassandra-reaper with docker
+In case you need to experiment more, you can run the cotainers using the set of shell scripts provided here.
+- `./start-elasticsearch.sh`
+- `./start-grafana.sh`
+- `./start-kibana.sh`
+- `./start-prometheus.sh`
+- `./start-reaper.sh`
+   
+## start-elasticsearch
+## start-grafana
+## start-kibana
+## start-prometheus
+## start-reaper
 
 Run `start-reaper.sh` to launch cassandra-reaper in a docker container.
 The script has a few variable which can be modified if a different version is needed, or to match the jmx cassandra cluster jmx authentication credentials.
