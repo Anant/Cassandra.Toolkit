@@ -22,6 +22,7 @@ The script has a few variable which can be modified if a different version is ne
 ```
 
 - `TAG` - docker tag
+- `CONTAINER_NAME` - docker container name
 - `REAPER_JMX_AUTH_USERNAME` - jmx username cassandra-reaper uses to connect to cluster
 - `REAPER_JMX_AUTH_PASSWORD` - jmx password cassandra-reaper uses to connect to cluster
 
