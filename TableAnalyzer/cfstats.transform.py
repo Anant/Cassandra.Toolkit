@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('region', type=str, help='Region {us-east-1|usw|us|aws}')
 parser.add_argument('environ', type=str, help='Environment {dev|stage|prod}')
 parser.add_argument('db', type=str, help='Datacenter {cassandra|spark}')
-parser.add_argument('version', type=int, help='Cassandra Version: {2|3}')
+parser.add_argument('version', type=int, help='Cassandra Version: {2|3|4}')
 parser.add_argument('debug', type=int, help='Debug {0|1}')
 
 args = parser.parse_args()

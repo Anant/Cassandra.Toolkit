@@ -44,6 +44,9 @@ def generate(path, save, version):
             elif int(sys.argv[4]) == 3:
                 for i,v in map['tablestats'].items():
                     mapper[i] = v
+            elif int(sys.argv[4]) == 4:
+                for i,v in map['tablestats4'].items():
+                    mapper[i] = v
             #print(mapper)
         
          

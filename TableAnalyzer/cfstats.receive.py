@@ -32,6 +32,8 @@ def main():
     command = str("nodetool -h `hostname -i` version")
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
+        if args.debug: print("command output")
+        if args.debug: print(output.split("\n"))
     except subprocess.CalledProcessError as e:
         result = str(e.output)
         if result.find("Connection refused") >= 0:
@@ -40,19 +42,23 @@ def main():
     if args.debug: print(args.db + " Version : " + output)
 
     if int((output.split(": ")[1])[0]) == 2:
-        if args.debug: print("Cassandra Version v2 using nodetool cfstats")
+        if args.debug: print("NodeTool Version v2 using nodetool cfstats")
         stats = str("cfstats")
         nodeToolVer = 2
-    else:
-        if args.debug: print("Cassandra Version v3 using nodetool tablestats")
+    elif int((output.split(": ")[1])[0]) == 3:
+        if args.debug: print("NodeTool Version v3 using nodetool tablestats")
         stats = str("tablestats")
         nodeToolVer = 3
+    elif (int((output.split(": ")[1])[0]) == 4) or (int(output.split("\n")[1].split(": ")[1][0]) == 4):
+        if args.debug: print("NodeTool Version v4 using nodetool tablestats")
+        stats = str("tablestats")
+        nodeToolVer = 4
 
     if (args.keySpace == "") & (args.table != ""):
         print("Please Provide the Key Space Before Table Using -k / --keySapace")
         sys.exit()
 
-    print("Collecting config varibales from Config")
+    print("Collecting config variables from Config")
 
     try:
         with open('config/settings.json', 'r') as f:
@@ -68,12 +74,15 @@ def main():
         try:
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
             dataArray = output.split("\n")
+            #if args.debug: print(dataArray)
             for i in dataArray:
                 if i != '':
                     if i.find("Note:") != -1:
                         continue
                     if i.find("--  Address") != -1:
+                        i = re.sub(r'\s+$','',i)
                         header = re.sub(r'\s+',',',i).split(",")
+                        #print(re.sub(r'\s+',',',i))
                         #print(header)
                         if nodeToolVer==2:
                             if args.debug: print("Nodetool Version 2")
@@ -83,6 +92,12 @@ def main():
                             del header[6]
                         elif nodeToolVer==3:
                             if args.debug: print("NodeTool Version 3")
+                            header[5] = str(str(header[5])+str(header[6]))
+                            del header[6]
+                        elif nodeToolVer==4:
+                            if args.debug: print("Nodetool Version 4")
+                            header[4] = str(str(header[4])+str(header[5]))
+                            del header[5]
                             header[5] = str(str(header[5])+str(header[6]))
                             del header[6]
                         #print (header)
@@ -95,6 +110,8 @@ def main():
                         del temp[3]
                         #print(temp)
                         nodeArray.append(temp)
+            #print ("Total table")
+            #print (nodeArray)
             nodeTable = pd.DataFrame(nodeArray,columns =header)
             #print (nodeTable)
             for i in range(0, len(nodeTable["Address"])):
