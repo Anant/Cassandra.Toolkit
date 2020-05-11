@@ -47,6 +47,9 @@ The `hosts.ini` file used the in scenarios above can be reused in the [Existing 
 
 Populate the `hosts.ini` file with all the needed cassandra hosts as described in https://github.com/Anant/cassandra.toolkit/tree/dev/ansible#step-11---list-all-hosts-in-hostsini 
 
+#### Install cassandra toolkit
+To install cassandra toolkit, follow instructions under current `ansible` folder. 
+
 ### tableanalyzer / cassandra.vision
 
 - A python based cfstat data anlyzer with a future in being able to visualize other Cassandra / Distributed platform stats.
