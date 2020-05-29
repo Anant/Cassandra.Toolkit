@@ -111,7 +111,7 @@ Now Expanded output is enabled
 (1 rows)
 ```
 
-##### API calls can also be made using Swagger UI
+##### Stargate API calls can also be made using Swagger UI
 <img src="https://github.com/Anant/cassandra.toolkit/blob/master/stargate/stargate-swagger.png"
      alt="stargate-swagger"
      style="float: left; margin-right: 10px;" />
