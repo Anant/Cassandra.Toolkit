@@ -19,6 +19,7 @@ Success!
 ```
 
 ##### Apply the schema to Stargate server 
+More about Stargate Schema Definition here: https://github.com/datastax/stargate/blob/master/docs/schema_definition.md
 ```
 ./stargate apply keyspace1 article.conf
 ```
