@@ -1,4 +1,4 @@
-#Datastax Stargate in action
+# Datastax Stargate in action
 
 ##### Download Stargate
 ```
