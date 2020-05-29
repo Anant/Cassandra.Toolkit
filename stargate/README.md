@@ -34,7 +34,7 @@ View your API at: http://localhost:8080/api-docs/keyspace1/swagger/
 ```
 docker exec -it stargate-cassandra cqlsh -e 'USE keyspace1; DESC TABLES;'
 ```
-Output
+:tv: Output
 ```
 article
 ```
@@ -68,7 +68,7 @@ curl -X POST 'http://localhost:8080/v1/api/keyspace1/query/entity/article' \
     }
 ]'
 ```
-Output similar to next block
+:tv: Output similar to next block
 ```
 [
   {
@@ -81,7 +81,7 @@ Output similar to next block
 ```
 docker exec -it stargate-cassandra cqlsh -e 'EXPAND ON; SELECT * FROM keyspace1.article;'
 ```
-Output
+:tv: Output
 ```
 Now Expanded output is enabled
 
