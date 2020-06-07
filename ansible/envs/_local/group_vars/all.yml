@@ -11,6 +11,7 @@ cassandra_env_exec: /opt/cassandra/ddac/conf/cassandra-env.sh
 tools_install_folder: /opt/cassandra
 cassandra_install_lib_folder: /opt/cassandra/ddac/lib
 
+cassandra_restart_command: systemctl restart cassandra
 cassandra_stop_command: systemctl stop cassandra
 cassandra_start_command: systemctl start cassandra
 
@@ -31,3 +32,4 @@ install_filebeat: False
 enable_jmx: False
 create_reaper_db: False
 install_medusa: False
+install_datastax_mcac: False

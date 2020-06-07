@@ -1,0 +1,32 @@
+---
+- name: create datastax mcac folder
+  file:
+    path: "{{ tools_install_folder }}/datastax_mcac"
+    state: directory
+    mode: '0700'
+    group: "{{ cassandra_ops_os_user }}"
+    owner: "{{ cassandra_ops_os_user }}"
+
+- name: download datastax mcac
+  get_url:
+    url: "{{ datastax_mcac_url }}"
+    dest: "{{ tools_install_folder }}/datastax_mcac"
+    mode: '0440'
+    group: "{{ cassandra_ops_os_user }}"
+    owner: "{{ cassandra_ops_os_user }}"
+
+- name: un-archiving datastax mcac into {{ tools_install_folder }}
+  unarchive:
+    remote_src: yes
+    src: "{{ tools_install_folder }}/datastax_mcac/{{ datastax_mcac_file_name }}{{ datastax_mcac_file_ext}}"
+    dest: "{{ tools_install_folder }}/datastax_mcac/"
+    owner: cassandra
+    group: cassandra
+
+- name: adding a new cassandra javaagent
+  lineinfile:
+    name: "{{ cassandra_env_exec }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { line: 'MCAC_ROOT={{ tools_install_folder }}/datastax_mcac/{{ datastax_mcac_file_name }}' }
+    - { line: 'JVM_OPTS="$JVM_OPTS -javaagent:${MCAC_ROOT}/lib/datastax-mcac-agent.jar"' }

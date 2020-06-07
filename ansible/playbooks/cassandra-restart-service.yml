@@ -1,0 +1,27 @@
+- hosts: cassandra
+  any_errors_fatal: true
+  become: true
+  become_method: sudo
+  serial: 1
+  tasks:
+    - name: re-starting cassandra service
+      command: "{{ cassandra_restart_command }}"
+      tags: ["restart"]
+
+    - name: waiting for cassandra on 9042
+      wait_for:
+        host: "{{ private_ip }}"
+        port: 9042
+        delay: 5
+        timeout: 300
+
+###    - name: waiting for cassandra on 9103
+###      uri:
+###        url: "http://{{ private_ip }}:9103"
+###        status_code: 200
+###        validate_certs: no
+###      register: result
+###      until: result.status == 200
+###      retries: 20
+###      delay: 5
+###      tags: ["restart"]

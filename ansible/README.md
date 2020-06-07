@@ -1,3 +1,19 @@
+- [Cassandra Tools](#cassandra-tools)
+- [What is it?](#what-is-it)
+- [Install](#install)
+    - [Step 1.1 - list all hosts in hosts.ini](#step-11---list-all-hosts-in-hostsini)
+    - [Step 1.2 - provide a few variables specific to your cassandra deployment](#step-12---provide-a-few-variables-specific-to-your-cassandra-deployment)
+    - [Step 2 - access verification](#step-2---access-verification)
+    - [Step 3 - installation](#step-3---installation)
+    - [Step 3 - note](#step-3---note)
+    - [Step 4 - docker compose](#step-4---docker-compose)
+- [AWS S3 backups](#aws-s3-backups)
+- [Install tablesnap for AWS S3 backups](#install-tablesnap-for-aws-s3-backups)
+- [Install cassandra-medusa for AWS S3 backups](#install-cassandra-medusa-for-aws-s3-backups)
+- [Metrics to prometheus server](#metrics-to-prometheus-server)
+- [Metrics using Datastax Metrics Collector for Apache Cassandra (MCAC)](#metrics-using-datastax-metrics-collector-for-apache-cassandra-mcac)
+- [Resources](#resources)
+
 # Cassandra Tools
 Tested on **CentOS Linux release 7.7.1908 (Core)** with 
 - apache-cassandra-3.11.x
@@ -70,6 +86,7 @@ By default they are `False`.
 - `enable_jmx`
 - `create_reaper_db` - create a keyspace named `reaper_db` used by cassandra_reaper to store its metadata
 - `install_medusa`
+- `install_datastax_mcac` - if `True`, make sure `install_cassandra_exporter=False`
 
 You can also enable the above variable in the cli when the playbook is executed as shown in **Example B**. 
 
@@ -90,16 +107,24 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.
 ```
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e "install_tablesnap=True" -e "install_cassandra_exporter=True" -e "install_filebeat=True" -e "enable_jmx=True" -e 'create_reaper_db=True' -e 'install_medusa=True'
 ```
-
-The next tools will be installed on cassandra nodes:
-- tablesnap
-- filebeat
-- cassandra_exporter
-- prometheus
+- Example C (using Datastax MCAC)
+```
+ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e "install_tablesnap=True" -e "install_cassandra_exporter=True" -e "install_filebeat=True" -e "enable_jmx=True" -e 'create_reaper_db=True' -e 'install_medusa=True'
+```
+With the correct ansible varables set, the next tools will be installed on cassandra nodes:
+- tablesnap (when `install_tablesnap=True`)
+- filebeat (when `install_filebeat=True`)
+- cassandra_exporter (when `install_cassandra_exporter=True`)
+- prometheus (when `install_cassandra_exporter=True`)
+- cassandra-medusa (when `install_medusa=True`)
+- datastax-mcac (when `install_datastax_mcac=True`)
  
  
 ##### Step 3 - note
 If installation has run with `enable_jmx=True` then cassandra cluster has to be restarted to allow new jmx configs to be enabled.
+```
+ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-restart-service.yml
+```
  
 ##### Step 4 - docker compose
 Run the next command 
@@ -167,6 +192,36 @@ In case `node_exporter` is also needed, execute the next command to install it.
 ```
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-node_exporter-install.yml
 ```
+
+### Metrics using Datastax Metrics Collector for Apache Cassandra (MCAC)
+A better alternative to the above prometheus, grafana installation is [Metrics Collector for Apache Cassandra](https://github.com/datastax/metric-collector-for-apache-cassandra)
+
+Metric Collector for Apache Cassandra (MCAC) aggregates OS and C* metrics along with diagnostic events to facilitate problem resolution and remediation. It supports existing Apache Cassandra clusters and is a self contained drop in agent.
+
+- https://github.com/datastax/metric-collector-for-apache-cassandra/releases/download/v0.1.10/datastax-mcac-dashboards-0.1.10.zip
+- https://github.com/datastax/metric-collector-for-apache-cassandra/releases/download/v0.1.10/datastax-mcac-agent-0.1.10.zip
+
+```
+ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e install_datastax_mcac=True
+```
+
+Restart cassandra service on all nodes
+```
+ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-restart-service.yml
+```
+
+Launch prometheus and grafana docker containers
+```
+docker-compose -f ./artifacts/datastax-mcac/datastax-mcac-dashboards-0.1.10/docker-compose.yaml up
+```
+
+Open a browser 
+- `http://localhost:3000/` - grafana (admin:admin)
+- `http://localhost:9090/` - prometheus 
+
+<img src="https://github.com/Anant/cassandra.toolkit/blob/master/doc/assets/mcac-01.png"
+     alt="deployment"
+     style="float: left; margin-right: 10px;" />
 
 ### Resources
 - https://github.com/criteo/cassandra_exporter

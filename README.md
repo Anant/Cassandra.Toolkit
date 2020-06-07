@@ -15,7 +15,7 @@ A curated + created set of useful Cassandra compatible tools for building, manag
 Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra.
 
 ## Cassandra Toolkit
-<img src="https://github.com/Anant/cassandra.toolkit/blob/dev/deployment.png"
+<img src="https://github.com/Anant/cassandra.toolkit/blob/master/deployment.png"
      alt="deployment"
      style="float: left; margin-right: 10px;" />
 
@@ -45,7 +45,7 @@ The `hosts.ini` file used the in scenarios above can be reused in the [Existing 
 
 #### Existing cassandra cluster
 
-Populate the `hosts.ini` file with all the needed cassandra hosts as described in https://github.com/Anant/cassandra.toolkit/tree/dev/ansible#step-11---list-all-hosts-in-hostsini 
+Populate the `hosts.ini` file with all the needed cassandra hosts as described in https://github.com/Anant/cassandra.toolkit/tree/master/ansible#step-11---list-all-hosts-in-hostsini 
 
 #### Install cassandra toolkit
 To install cassandra toolkit, follow instructions under current `ansible` folder. 
