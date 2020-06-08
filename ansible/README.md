@@ -11,7 +11,9 @@
 - [Install tablesnap for AWS S3 backups](#install-tablesnap-for-aws-s3-backups)
 - [Install cassandra-medusa for AWS S3 backups](#install-cassandra-medusa-for-aws-s3-backups)
 - [Metrics to prometheus server](#metrics-to-prometheus-server)
-- [Metrics using Datastax Metrics Collector for Apache Cassandra (MCAC)](#metrics-using-datastax-metrics-collector-for-apache-cassandra-mcac)
+- [Datastax Metrics Collector](#datastax-metrics-collector)
+    - [Metrics using Datastax Metrics Collector for Apache Cassandra (MCAC)](#metrics-using-datastax-metrics-collector-for-apache-cassandra-mcac)
+    - [DSE Metrics Collector Dashboards](#dse-metrics-collector-dashboards)
 - [Resources](#resources)
 
 # Cassandra Tools
@@ -194,7 +196,9 @@ In case `node_exporter` is also needed, execute the next command to install it.
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-node_exporter-install.yml
 ```
 
-### Metrics using Datastax Metrics Collector for Apache Cassandra (MCAC)
+### Datastax Metrics Collector
+
+#### Metrics using Datastax Metrics Collector for Apache Cassandra (MCAC)
 A better alternative to the above prometheus, grafana installation is [Metrics Collector for Apache Cassandra](https://github.com/datastax/metric-collector-for-apache-cassandra)
 
 Metric Collector for Apache Cassandra (MCAC) aggregates OS and C* metrics along with diagnostic events to facilitate problem resolution and remediation. It supports existing Apache Cassandra clusters and is a self contained drop in agent.
@@ -223,6 +227,10 @@ Open a browser
 <img src="https://github.com/Anant/cassandra.toolkit/blob/master/doc/assets/mcac-01.png"
      alt="deployment"
      style="float: left; margin-right: 10px;" />
+
+#### DSE Metrics Collector Dashboards
+
+**ToDo** 
 
 ### Resources
 - https://github.com/criteo/cassandra_exporter
