@@ -130,14 +130,14 @@ processors:
       tokenizer: "%{loglevel} [%{component}] %{timestamp} %{+timestamp},%{} %{class}.%{}:%{} - %{message}"
       field: "message"
       target_prefix: "ingest"
-  - dissect:
-      tokenizer: "%{componentname}:%{}"
-      field: "ingest.component"
-      target_prefix: "ingest"
-  - dissect:
-      tokenizer: "%{streamdirection}/%{streamvector}"
-      field: "ingest.component"
-      target_prefix: "ingest"
+  #- dissect:
+  #    tokenizer: "%{componentname}:%{}"
+  #    field: "ingest.component"
+  #    target_prefix: "ingest"
+  #- dissect:
+  #    tokenizer: "%{streamdirection}/%{streamvector}"
+  #    field: "ingest.component"
+  #    target_prefix: "ingest"
   - dissect:
       tokenizer: "/%{}/%{}/%{}/%{}/%{}/cass.stat.%{incident-id}/%{host-name}/cassandra/"
       field: "log.file.path"
