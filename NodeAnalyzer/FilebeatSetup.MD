@@ -132,6 +132,10 @@ processors:
       field: "message"
       target_prefix: "ingest"
   - dissect:
+      tokenizer: "%{loglevel} [%{component}/%{}] %{timestamp} %{+timestamp},%{} %{class}.%{}:%{} - %{message}"
+      field: "message"
+      target_prefix: "ingest"
+  - dissect:
       tokenizer: "/%{}/%{}/%{}/%{}/%{}/incident.%{incident-id}/%{host-name}/cassandra/"
       field: "log.file.path"
       target_prefix: "ingest"
