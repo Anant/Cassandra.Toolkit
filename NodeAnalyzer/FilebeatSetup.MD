@@ -125,18 +125,21 @@ processors:
   #- add_cloud_metadata: ~
   #- add_docker_metadata: ~ 
   #- add_kubernetes_metadata: 
-  
-  
+ 
   - dissect:
-      tokenizer: "%{loglevel} [%{component}:%{}] %{timestamp} %{+timestamp},%{} %{class}.%{}:%{} - %{message}"
+      tokenizer: "%{loglevel} [%{component}] %{timestamp} %{+timestamp},%{} %{class}.%{}:%{} - %{message}"
       field: "message"
       target_prefix: "ingest"
   - dissect:
-      tokenizer: "%{loglevel} [%{component}/%{}] %{timestamp} %{+timestamp},%{} %{class}.%{}:%{} - %{message}"
-      field: "message"
+      tokenizer: "%{componentname}:%{}"
+      field: "ingest.component"
       target_prefix: "ingest"
   - dissect:
-      tokenizer: "/%{}/%{}/%{}/%{}/%{}/incident.%{incident-id}/%{host-name}/cassandra/"
+      tokenizer: "%{streamdirection}/%{streamvector}"
+      field: "ingest.component"
+      target_prefix: "ingest"
+  - dissect:
+      tokenizer: "/%{}/%{}/%{}/%{}/%{}/cass.stat.%{incident-id}/%{host-name}/cassandra/"
       field: "log.file.path"
       target_prefix: "ingest"
   - timestamp:
