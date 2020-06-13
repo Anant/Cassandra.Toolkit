@@ -5,6 +5,17 @@ for this type of dump.
 
 This doc does not show you how to setup Filebeat / Kibana / Elastic but assumes you know how to do that. This is just focused on configuring filebeat.
 
+## prepare by unzipping the files 
+
+In the main directory with the host names as different folders , this bash script will unzip everything if it is rolled up. 
+
+```
+for z in * ; do echo $z ; cd $z/cassandra ; unzip '*.zip' ; cd ../../ ; done
+```
+
+May have to enter "A" or "Y" to override, etc. 
+
+
 ## fields.yml (usually sits in /etc/filebeat/)
 This was added to the fields.yml but probably don't need it. 
 ```
