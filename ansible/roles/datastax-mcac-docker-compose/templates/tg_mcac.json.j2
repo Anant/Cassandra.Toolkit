@@ -1,0 +1,11 @@
+{% set nodes_ip_list = []  %}
+{% for node in groups['cassandra'] %}
+{% set ignored_var = nodes_ip_list.append( "\"" + hostvars[node].private_ip + ":9103\"") %}
+{% endfor %}
+[
+  {
+    "targets": [{{ nodes_ip_list|join(', ') }}],
+    "labels": {
+    }
+  }
+]

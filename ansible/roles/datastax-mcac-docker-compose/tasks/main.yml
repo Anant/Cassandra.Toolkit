@@ -1,0 +1,25 @@
+---
+- name: create datastax mcac folders
+  file:
+    path: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "{{ playbook_dir }}/../artifacts/datastax-mcac"
+  tags: ["mcac"]
+
+- name: download datastax mcac
+  get_url:
+    url: "{{ datastax_mcac_grafana_dashboards }}"
+    dest: "{{ playbook_dir }}/../artifacts/datastax-mcac/"
+  tags: ["mcac"]
+
+- name: un-archiving datastax mcac grafana dashboars {{ playbook_dir }}/../artifacts/datastax-mcac/
+  unarchive:
+    remote_src: yes
+    src: "{{ playbook_dir }}/../artifacts/datastax-mcac/{{ datastax_mcac_grafana_dashboards_file_name }}{{ datastax_mcac_grafana_dashboards_file_ext }}"
+    dest: "{{ playbook_dir }}/../artifacts/datastax-mcac/"
+  tags: ["mcac"]
+
+- name: generate tg_mcac.json file
+  template: src=tg_mcac.json.j2 dest={{ playbook_dir }}/../artifacts/datastax-mcac/{{ datastax_mcac_grafana_dashboards_file_name }}/prometheus/tg_mcac.json
+  tags: ["mcac"]

@@ -5,14 +5,21 @@
   roles:
     - role: cassandra-exporter-install
       when: install_cassandra_exporter | default(False)
+
     - role: tablesnap-install
       when: install_tablesnap | default(False)
+
     - role: filebeat
       when: install_filebeat | default(False)
+
     - role: enable-jmx
       when: enable_jmx | default(False)
+
     - role: cassandra-medusa-install
       when: install_medusa | default(False)
+
+    - role: datastax-mcac-install
+      when: install_datastax_mcac | default(False)
 
 ###
 ### GENERATE DOCKER ARTIFACTS, GATHER CLUSTER INFO
@@ -68,6 +75,14 @@
 - hosts: localhost
   roles:
       ### keep "docker-compose" on top because it sets facts needed by the others
-    - docker-compose
-    - prometheus
-    - grafana
+    - role: docker-compose
+      when: install_cassandra_exporter | default(False)
+
+    - role: prometheus
+      when: install_cassandra_exporter | default(False)
+
+    - role: grafana
+      when: install_cassandra_exporter | default(False)
+
+    - role: datastax-mcac-docker-compose
+      when: install_datastax_mcac | default(False)
