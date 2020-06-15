@@ -5,6 +5,8 @@ for this type of dump.
 
 This doc does not show you how to setup Filebeat / Kibana / Elastic but assumes you know how to do that. This is just focused on configuring filebeat.
 
+
+
 ## prepare by unzipping the files 
 
 In the main directory with the host names as different folders , this bash script will unzip everything if it is rolled up. 
@@ -157,3 +159,36 @@ processors:
 
  
 ```
+
+### using scripted fields to extract numbers from the message post ingestion
+
+https://www.elastic.co/guide/en/kibana/current/scripted-fields.html
+https://stackoverflow.com/questions/32998228/elasticsearch-extract-number-from-a-field
+
+enable painless regex support by putting the following in your elasticsearch.yaml:
+```script.painless.regex.enabled: true```
+
+restart elasticsearch
+create a new scripted field in Kibana through Management -> Index Patterns -> Scripted Fields
+select painless as the language and number as the type
+create the actual script, for example:
+
+
+```
+def logMsg = params['_source']['message'];
+
+if(logMsg == null) {
+ return -10000;
+}
+
+def m = /\shas ([0-9]+) dropped hints,\s/.matcher(logMsg);
+if ( m.find() ) {
+   return Integer.parseInt(m.group(1))
+} else {
+   return -10000
+}
+```
+
+
+you must reload the website completely for the new fields to be executed, simply re-doing a search on an open discover site will not pick up the new fields. (This almost made me quit trying to get this working -.-)
+use the script in discover or visualizations
