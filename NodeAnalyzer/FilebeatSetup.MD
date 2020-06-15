@@ -178,14 +178,14 @@ create the actual script, for example:
 def logMsg = params['_source']['message'];
 
 if(logMsg == null) {
- return -10000;
+ return 0;
 }
 
 def m = /\shas ([0-9]+) dropped hints,\s/.matcher(logMsg);
 if ( m.find() ) {
    return Integer.parseInt(m.group(1))
 } else {
-   return -10000
+   return 0
 }
 ```
 
