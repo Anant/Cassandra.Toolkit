@@ -141,7 +141,7 @@ processors:
   
 #------------------------------------- system messages 
   - dissect:
-      tokenizer: "%{timestamp} %{+timestamp->} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}."
+      tokenizer: "%{timestamp} %{+timestamp->} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}"
       field: "message"
       target_prefix: "ingest"
 
@@ -184,6 +184,29 @@ processors:
 
 
  
+```
+
+### repeated testing / debugging 
+Use this site to debug dissect statements first. https://dissect-tester.jorgelbg.me/
+Then use the output.console to see that it dissects properly. 
+
+Then and only then add to elasticsearch. 
+
+If it gets bungled, you can always delete the filebeat index altogether or if you have gigabytes of data, you can do a selective delete. 
+This is where tagging the inputs is useful. 
+
+You can go to the kibana console at http://localhost:5601/app/kibana#/dev_tools/console and do something like this 
+
+```
+POST filebeat-7.7.1-2020.06.13-000001/_delete_by_query?conflicts=proceed
+{
+  "query": {
+    "match": {
+      "tags": "system"
+    }
+  }
+}
+
 ```
 
 ### using scripted fields to extract numbers from the message post ingestion
