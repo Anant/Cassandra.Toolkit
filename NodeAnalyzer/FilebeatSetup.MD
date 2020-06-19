@@ -54,6 +54,13 @@ This was added to the fields.yml but probably don't need it.
 
 filebeat.inputs:
   - type: log
+    tags: ["system","messages"]
+    enabled: true
+    paths:
+      - /home/anant/Projects/Client/Vital/cass.stat.2020060919/c7v-vitvccdb01/system/*.test
+      #- /home/anant/Projects/Client/Vital/cass.stat.2020060919/c7v-vitvccdb02/system/*
+  - type: log
+    tags: ["cassandra","main"]
     enabled: true
     paths:
       - /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname1/cassandra/system.log*
@@ -63,6 +70,7 @@ filebeat.inputs:
     multiline.negate: true
     multiline.match: after
   - type: log
+    tags: ["cassandra","java","gc"]
     enabled: true
     paths:
       - /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname1/cassandra/gc.log*
@@ -103,6 +111,9 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
+# to debug comment out output.elasticseaarch and uncomment this
+# output.console.pretty: true
+
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
@@ -127,7 +138,19 @@ processors:
   #- add_cloud_metadata: ~
   #- add_docker_metadata: ~ 
   #- add_kubernetes_metadata: 
- 
+  
+#------------------------------------- system messages 
+  - dissect:
+      tokenizer: "%{timestamp} %{+timestamp} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}."
+      field: "message"
+      target_prefix: "ingest"
+
+  - dissect:
+      tokenizer: "/%{}/%{}/%{}/%{}/%{}/cass.stat.%{incident-id}/%{host-name}/system/"
+      field: "log.file.path"
+      target_prefix: "ingest"
+
+#-#------------------------------------ cassandra   
   - dissect:
       tokenizer: "%{loglevel} [%{component}] %{timestamp} %{+timestamp},%{} %{class}.%{}:%{} - %{message}"
       field: "message"
@@ -147,8 +170,11 @@ processors:
   - timestamp:
       field: "ingest.timestamp"
       layouts:
+        - '2006 Jan _2 15:04:05'
         - '2006-01-02 15:04:05'
       test:
+        - '2020 Jun  8 02:40:01'
+        - '2001 Jan 17 15:04:01'
         - '2019-06-22 16:33:51'
         - '2020-06-13 12:57:30'
       ignore_failure: true
