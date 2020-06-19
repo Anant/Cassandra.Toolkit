@@ -141,7 +141,7 @@ processors:
   
 #------------------------------------- system messages 
   - dissect:
-      tokenizer: "%{timestamp} %{+timestamp} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}."
+      tokenizer: "%{timestamp} %{+timestamp->} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}."
       field: "message"
       target_prefix: "ingest"
 
