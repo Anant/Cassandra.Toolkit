@@ -57,8 +57,8 @@ filebeat.inputs:
     tags: ["system","messages"]
     enabled: true
     paths:
-      - /home/anant/Projects/Client/Vital/cass.stat.2020060919/c7v-vitvccdb01/system/*.test
-      #- /home/anant/Projects/Client/Vital/cass.stat.2020060919/c7v-vitvccdb02/system/*
+      - /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname/system/*.test
+      #- /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname/system/*
   - type: log
     tags: ["cassandra","main"]
     enabled: true
