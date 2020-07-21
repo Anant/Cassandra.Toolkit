@@ -1,0 +1,104 @@
+- hosts: elk
+  any_errors_fatal: true
+  become: true
+  become_method: sudo
+  tasks:
+    - name: install updates
+      command: "{{ item }}"
+      with_items:
+        - "apt-get update"
+        - "apt-get install openjdk-8-jre-headless"
+
+    - name: verify java version
+      command: "java -version"
+      register: java_version
+
+    - name: java version
+      debug:
+        msg: "{{ java_version }}"
+
+    - name: install elasticsearch apt-key
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+
+    - name: create es sources file
+      file:
+        path: "/etc/apt/sources.list.d/elastic-7.x.list"
+        state: touch
+
+    - name: add es sources
+      lineinfile:
+        name: "/etc/apt/sources.list.d/elastic-7.x.list"
+        line: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+
+    - name: install es and packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - "apt-transport-https"
+        - "elasticsearch"
+
+    - name: enable es logging to journalctl
+      lineinfile:
+        name: "/usr/lib/systemd/system/elasticsearch.service"
+        regexp: "^ExecStart="
+        line: "ExecStart=/usr/share/elasticsearch/bin/systemd-entrypoint -p ${PID_DIR}/elasticsearch.pid"
+
+    - name: enable es 0.0.0.0 interface
+      lineinfile:
+        name: "/etc/elasticsearch/elasticsearch.yml"
+        line: "{{ item }}"
+      with_items:
+        - "network.host: 0.0.0.0"
+        - "discovery.seed_hosts: [{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}]"
+
+    - name: systemctl daemon-reload
+      command: "systemctl daemon-reload"
+
+    - name: start and enable es service
+      service:
+        name: elasticsearch
+        state: restarted
+        enabled: yes
+
+    - name: verify elasticsearch service
+      command: "systemctl status elasticsearch"
+      register: elasticsearch_status
+
+    - name: elasticsearch status
+      debug:
+        msg: "{{ elasticsearch_status.stdout.split('\n') }}"
+
+    - name: install kibana
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - "kibana"
+
+    - name: add es host to kibana
+      lineinfile:
+        name: "/etc/kibana/kibana.yml"
+        line: "{{ item }}"
+      with_items:
+        - "elasticsearch.hosts: ['http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:9200']"
+        - "server.host: '0.0.0.0'"
+
+    - name: systemctl daemon-reload
+      command: "systemctl daemon-reload"
+
+    - name: start and enable kibana service
+      service:
+        name: kibana
+        state: restarted
+        enabled: yes
+
+    - name: install logstash
+      debug:
+        msg: install logstasj
+
+    - name: install filebeat
+      debug:
+        msg: install filebeat
