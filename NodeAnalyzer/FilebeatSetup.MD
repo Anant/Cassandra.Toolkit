@@ -241,3 +241,11 @@ if ( m.find() ) {
 
 you must reload the website completely for the new fields to be executed, simply re-doing a search on an open discover site will not pick up the new fields. (This almost made me quit trying to get this working -.-)
 use the script in discover or visualizations
+
+
+sometimes you have to clean out the filebeat registry 
+```
+/var/lib/filebeat/registry/filebeat
+```
+
+https://discuss.elastic.co/t/solved-force-filebeat-to-reship-file/44415
