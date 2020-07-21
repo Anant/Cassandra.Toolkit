@@ -282,5 +282,9 @@ rm -rf /var/lib/filebeat/registry/filebeat/*
 
 After its working, you need to revert back the elastic search output otherwise it wont go into elasticsearch
 
+Sometimes you need to delete all the indexes because you fubarred the kibana / index pattern / meta data config. 
 
+```
+curl -X DELETE 'http://localhost:9200/_all'
+```
 
