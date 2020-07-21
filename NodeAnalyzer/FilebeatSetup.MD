@@ -242,6 +242,7 @@ if ( m.find() ) {
 you must reload the website completely for the new fields to be executed, simply re-doing a search on an open discover site will not pick up the new fields. (This almost made me quit trying to get this working -.-)
 use the script in discover or visualizations
 
+### cleaning up the registry after testing
 
 sometimes you have to clean out the filebeat registry 
 ```
@@ -249,3 +250,34 @@ sometimes you have to clean out the filebeat registry
 ```
 
 https://discuss.elastic.co/t/solved-force-filebeat-to-reship-file/44415
+
+### testing with output to console 
+
+Sometime it is useful to see that everything is parsing properly before you send to elastic search. 
+
+To do this in filebeats.yml  comment out 
+
+```
+#output.elasticsearch:
+  # Array of hosts to connect to.
+  #hosts: ["localhost:9200"]
+```
+
+and uncomment
+
+```
+output.console.pretty: true
+```
+
+and then run ````````` 
+until you see that its parsing properly, you can continue deleting the index / cleaning the registry. 
+
+```
+curl -XDELETE 'http://localhost:9200/filebeat-*'
+rm -rf /var/lib/filebeat/registry/filebeat/*
+```
+
+After its working, you need to revert back the elastic search output otherwise it wont go into elasticsearch
+
+
+
