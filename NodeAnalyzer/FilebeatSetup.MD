@@ -47,6 +47,9 @@ This was added to the fields.yml but probably don't need it.
  ```
 
 ## filebeat.yml (usually sits in /etc/filebeat/)
+
+Pay attention to all of the items under the inputs.. if you dont have the multiline / exclude files config it wont work right. 
+
 ```
 ###################### Filebeat Configuration Example #########################
 
