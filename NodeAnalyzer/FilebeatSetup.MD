@@ -288,3 +288,12 @@ Sometimes you need to delete all the indexes because you fubarred the kibana / i
 curl -X DELETE 'http://localhost:9200/_all'
 ```
 
+
+After fixing the filebeat.yml you can then run 
+
+```
+filebeat -e -d "*"
+```
+
+
+
