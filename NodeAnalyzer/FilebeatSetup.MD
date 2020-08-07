@@ -149,7 +149,7 @@ processors:
       target_prefix: "ingest"
 
   - dissect:
-      tokenizer: "/%{}/%{}/%{}/%{}/%{}/cass.stat.%{incident-id}/%{host-name}/system/"
+      tokenizer: "/%{}/%{}/%{}/%{}/%{}/incident.%{incident-id}/%{host-name}/system/"
       field: "log.file.path"
       target_prefix: "ingest"
 
@@ -167,7 +167,7 @@ processors:
   #    field: "ingest.component"
   #    target_prefix: "ingest"
   - dissect:
-      tokenizer: "/%{}/%{}/%{}/%{}/%{}/cass.stat.%{incident-id}/%{host-name}/cassandra/"
+      tokenizer: "/%{}/%{}/%{}/%{}/%{}/incident.%{incident-id}/%{host-name}/cassandra/"
       field: "log.file.path"
       target_prefix: "ingest"
   - timestamp:
