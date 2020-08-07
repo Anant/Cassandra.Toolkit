@@ -1,4 +1,9 @@
 import argparse
+import os
+import shutil
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+tarballs_to_ingest_dir_path = f"{dir_path}/log-tarballs-to-ingest"
 
 class IngestTarball:
     """
@@ -13,35 +18,37 @@ class IngestTarball:
 
     def __init__(self, tarball_filename, client_name, hostname):
         self.tarball_filename = tarball_filename
+
+        # absolute path to the tar ball
+        self.tarball_path = f"{tarballs_to_ingest_dir_path}/{self.tarball_filename}"
+
+        # the name of the client (or some sort of human readable identifier for them), e.g., example-company
         self.client_name = client_name
+
+        # original hostname where the logs were genereated. Can be domain name or ip addr. Used to identify that C* node and distinguish it from other nodes in the client's cluster
         self.hostname = hostname
 
-    ###################################################
-    # some getters
-    ###################################################
-    def get_incident_id(self):
         """
         We generate the incident time and use it as an incident_id
         - We want it to be unique for this file but ideally the same for everytime the file runs (ie idempotent)
         - Consequently we will grab metadata from the tarball itself and use as the incident_id
         """
-        pass
+        tarball_modified_time = os.path.getmtime(self.tarball_path)
+        self.incident_id = tarball_modified_time
 
-    def get_base_filepath(self):
-        pass
+        # where we will extract all the logs too
+        # modified time will be something like 1596785608.063104
+        self.base_filepath_for_logs = f"{dir_path}/logs-for-client/{self.client_name}/incident-{self.incident_id}/{self.hostname}"
 
     ###################################################
     # the operations we run when ingesting the tarball
     ###################################################
 
-    def load_file(self):
-        pass
-
     def extract_tarball(self):
         """
-        unzip the tar ball
+        unzip the tar ball to tmp folder, before we place files where they need to go
         """
-        pass
+        shutil.unpack_archive(self.tarball_path, self.base_filepath_for_logs)
 
     def position_log_files(self):
         """
@@ -75,7 +82,6 @@ class IngestTarball:
     # do it all
     ###################################################
     def run(self):
-        self.load_file()
         self.extract_tarball()
         self.generate_filebeat_yml()
         self.run_filebeat()
@@ -84,7 +90,7 @@ class IngestTarball:
 if __name__ == '__main__':
     """
     Instructions:
-    1) Place a log tarball in `./log-tarballs-to-ingest/` (currently not automating, you have to do this)
+    1) Place a log tarball in `./log-tarballs-to-ingest/` (currently not automating, you have to do this manually)
 
     2)- Run script passing in args to provide metadata about the tarball
         Args:
