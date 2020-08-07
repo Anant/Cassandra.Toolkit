@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# don't save example tarball into our tarball ingestion dir
+**/log-tarballs-to-ingest/example-logs.tar.gz
+**/tarball-archive/example-logs.tar.gz
