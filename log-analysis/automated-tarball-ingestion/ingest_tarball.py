@@ -1,6 +1,7 @@
 import argparse
 import os
 import shutil
+import yaml
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 tarballs_to_ingest_dir_path = f"{dir_path}/log-tarballs-to-ingest"
@@ -15,8 +16,9 @@ class IngestTarball:
     hostname = ""
     tarball_filename = ""
     logfiles = []
+    debug_mode = False
 
-    def __init__(self, tarball_filename, client_name, hostname, log_type):
+    def __init__(self, tarball_filename, client_name, hostname, log_type, **kwargs):
         self.tarball_filename = tarball_filename
 
         # absolute path to the tar ball
@@ -47,6 +49,13 @@ class IngestTarball:
         # where we will extract the tarball to (temporarily)
         self.extract_dest_path = f"{self.base_filepath_for_logs}/tmp"
 
+        ##################
+        # other options
+        ##################
+        if kwargs.get("debug_mode", False):
+            # does things such as setting filebeat.yml so we don't output to ES, but to console instead
+            self.debug_mode = True
+
     ###################################################
     # the operations we run when ingesting the tarball
     ###################################################
@@ -68,6 +77,7 @@ class IngestTarball:
         put to each individual log files that were extracted from the tarball into the place they should go
         - recursively loops through directories, starting with where files were extracted into. 
         - if they are in a subdirectory, the subdirectories will be flattened out so all files will be in same directory: self.base_filepath_for_logs
+        - At the end, since we're not moving the whole directory over but each file, there will be one dir only, tmp/, and all the *.log or gc.log.* files in there.
         - better than doing shutil.copytree, since this is idempotent (we could probably implement shutil.copytree to be as well, but that one requires that the dest dir didn't exist before running)
         """
         # now we want to move them from original_dir to where filebeat will find them
@@ -83,18 +93,92 @@ class IngestTarball:
             print("filename", filename)
             source_path = os.path.join(original_dir, filename)
             if os.path.isdir(source_path):
-                # this is a dir, so recursively loop through this dir
+                # this is a dir, so recursively loop through
                 self.position_log_files(source_path)
+
             else:
                 # move this file to where it needs to be
                 shutil.move(source_path, self.base_filepath_for_logs)
 
-    def generate_filebeat_yml(self):
+    def generate_filebeat_yml(self, **kwargs):
         """
-        - generates a filebeat.yml file
+        generates a filebeat.yml file for this tarball's logs
         - sets the filename on this IngestTarball instance
+        - converts our base yml file to dict, then adds fields, then converts back.
+        - That way, we have something that's easy to test and query against (a dict) in the middle
+        - Also allows us to maintain a single yml template that matches what filebeat.ymls normally look like (filebeat.template.yml) as our starting point
+
+        Options:
+        - debug_mode : Boolean. If True, won't output to es, will output to console
         """
-        pass
+        template_path = os.path.join(dir_path, "config-templates/filebeat.template.yml")
+
+        template_yaml_as_dict = None
+        with open(template_path, 'r') as stream:
+            try:
+                # convert to dict
+                # no need to load, so just safe_load
+                template_yaml_as_dict = yaml.safe_load(stream)
+
+
+            except yaml.YAMLError as e:
+                print(e)
+                raise e
+
+        # add the paths to the dict
+        filebeat_inputs = template_yaml_as_dict["filebeat.inputs"]
+
+        for fb_input in filebeat_inputs:
+            if "system" in fb_input["tags"]:
+                # This is for a system log, not a cassandra log
+                if self.log_type == "cassandra":
+                    # don't set this, we are only looking at cassandra logs for this run
+                    # it doesn't hurt though...but for now, let's make things explicit and raise errors when it's not right
+                    continue
+
+                fb_input["paths"] = [
+                    f"{self.base_filepath_for_logs}/*.test"
+                ]
+
+            elif "gc" in fb_input["tags"]:
+                # this should be our cassandra garbace collection logs
+                if self.log_type == "system":
+                    # don't set this, we are only looking at system logs for this run
+                    continue
+
+                fb_input["paths"] = [
+                    f"{self.base_filepath_for_logs}/system.log*"
+                ]
+
+            elif "main" in fb_input["tags"]:
+                # this should be our main cassandra logs
+                if self.log_type == "system":
+                    # don't set this, we are only looking at system logs for this run
+                    continue
+
+                fb_input["paths"] = [
+                    f"{self.base_filepath_for_logs}/gc.log*"
+                ]
+
+        if self.debug_mode:
+            # won't output to es, will output to console
+            del template_yaml_as_dict['output.elasticsearch']
+            template_yaml_as_dict["output.console.pretty"] = True
+
+        print(template_yaml_as_dict)
+        # currently putting in with all the logs. Helps namespace these filebeat ymls. Might be better somewhere else though
+        output_path = os.path.join(self.base_filepath_for_logs, 'tmp', 'filebeat.yaml')
+
+        with open(output_path, 'w', encoding='utf8') as outfile:
+            try:
+                # convert back to yml, and save as a file
+                print("writing to", output_path)
+                yaml.dump(template_yaml_as_dict, outfile, default_flow_style=False)
+
+            except yaml.YAMLError as e:
+                print(e)
+                raise e
+
 
     def run_filebeat(self):
         """

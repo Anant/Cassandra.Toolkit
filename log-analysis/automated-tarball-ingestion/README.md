@@ -1,4 +1,5 @@
 # What we do step-by-step
+- `pip3 install -r requirements.txt`
 - Place a log tarball in `./log-tarballs-to-ingest/` (currently not automating, you have to do this)
     * Having a directory like this gives us modularity and makes it easy to change. We can manually do this (`mv my.tgz ./log-tarballs-to-ingest/`) for now, and easily later add a script that does this for us, or even expose a web GUI for uploading it in. Then whatever we do, we place these tars in this directory
 - Receive certain metadata about the tarball

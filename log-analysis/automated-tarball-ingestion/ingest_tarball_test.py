@@ -28,7 +28,7 @@ if __name__ == '__main__':
     copyfile(f"{dir_path}/test-tarballs/example-logs.tar.gz", tarball_dest_path)
 
     # run the ingester with example company_name and hostname
-    ingestTarball = IngestTarball(tarball_filename="example-logs.tar.gz", client_name="test-client", hostname="123.456.789.101", log_type="cassandra")
+    ingestTarball = IngestTarball(tarball_filename="example-logs.tar.gz", client_name="test-client", hostname="123.456.789.101", log_type="cassandra", debug_mode=True)
 
     ingestTarball.run()
     print("Success.")
