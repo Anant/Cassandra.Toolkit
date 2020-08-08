@@ -2,7 +2,11 @@ import argparse
 import os
 import shutil
 import yaml
+import subprocess
 from pathlib import Path
+
+from elasticsearch import Elasticsearch
+es = Elasticsearch()
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 tarballs_to_ingest_dir_path = f"{dir_path}/log-tarballs-to-ingest"
@@ -28,6 +32,9 @@ class IngestTarball:
 
     debug_mode = False
 
+    # set to true if you want to clear out all filebeat-* indices in ES AND rm -rf the filebeat registry at /var/lib/filebeat/registry/filebeat/*
+    clean_out_filebeat = False
+
     def __init__(self, tarball_filename, client_name, **kwargs):
         self.tarball_filename = tarball_filename
 
@@ -49,6 +56,9 @@ class IngestTarball:
 
         # where we will put all the logs into
         self.base_filepath_for_logs = f"{dir_path}/logs-for-client/{self.client_name}/incident-{self.incident_id}" # /{self.hostname}/{self.log_type}"
+
+        # where the filebeat.yml will go
+        self.filebeat_yml_path = os.path.join(self.base_filepath_for_logs, 'tmp', 'filebeat.yaml')
 
         # where we will extract the tarball to (temporarily)
         self.extract_dest_path = f"{self.base_filepath_for_logs}/tmp"
@@ -133,7 +143,6 @@ class IngestTarball:
                 # TODO add logic to detect if these are cassandra logs or system logs, and then run once per hostname/logtype permutation (ie, for each node, run position_log_files_for_node once per log_type, or multiple times for log_type if it's easier. 
                 # for now, just assume all are cassandra logs (which is probably wrong)
                 cassandra_logs_dir = os.path.join(nodes_dir, self.path_to_logs[log_type].replace("<hostname>", hostname))
-                print("these logs are found at", cassandra_logs_dir)
 
                 # move the files for this node and log_type
                 self.position_log_files_for_node(cassandra_logs_dir, hostname, log_type)
@@ -155,13 +164,14 @@ class IngestTarball:
         - NOTE make sure logs don't overwrite each other if they have the same name, but from different dir!
         """
         # now we want to move them from original_dir to where filebeat will find them
-        print("getting all from", source_dir)
 
         # all the files in the tmp directory we just made will be moved, and 
         all_files = os.listdir(source_dir)
         for filename in all_files:
             # filename should be str, e.g., `gc.log.0.current` 
-            print("filename", filename)
+
+            # filter out filenames that don't match our regex
+            #
             source_path = os.path.join(source_dir, filename)
             if kwargs.get("recursive", False) and os.path.isdir(source_path):
                 # this is a dir, so recursively loop through
@@ -173,10 +183,11 @@ class IngestTarball:
                 # make sure the directory exists
                 Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
 
-                print(f"moving {source_path} to", dest_dir_path)
+                # if specify the filename, then will overwrite what's there, which is what we want for idempotency
+                dest_path = os.path.join(dest_dir_path, filename)
 
                 # move it
-                shutil.move(source_path, dest_dir_path)
+                shutil.move(source_path, dest_path)
 
     def generate_filebeat_yml(self, **kwargs):
         """
@@ -212,7 +223,6 @@ class IngestTarball:
                 fb_input["paths"] = []
 
             for hostname in self.hostnames:
-                print("one host", hostname)
                 if "system" in fb_input["tags"]:
                     # This is for a finding system logs, not cassandra logs
 
@@ -237,28 +247,80 @@ class IngestTarball:
             del template_yaml_as_dict['output.elasticsearch']
             template_yaml_as_dict["output.console.pretty"] = True
 
-        # currently putting in with all the logs. Helps namespace these filebeat ymls. Might be better somewhere else though
-        output_path = os.path.join(self.base_filepath_for_logs, 'tmp', 'filebeat.yaml')
 
-        with open(output_path, 'w', encoding='utf8') as outfile:
+
+        # remove old filebeat.yml. Can't just overwrite, since we removed write permissions
+        print("removing old filebeat yml if exists")
+        os.remove(self.filebeat_yml_path)
+
+        with open(self.filebeat_yml_path, 'w', encoding='utf8') as outfile:
+            # currently putting all the logs from a single host into a single dir. Helps namespace these filebeat ymls. Might be better somewhere else though
+
             try:
                 # convert back to yml, and save as a file
-                print("writing to", output_path)
+                print("writing to", self.filebeat_yml_path)
                 yaml.dump(template_yaml_as_dict, outfile, default_flow_style=False)
+
+                # change permissions, or else we get error:
+                # "Exiting: error loading config file: config file <filebeat.yml path> can only be writable by the owner but the permissions are "-rw-rw-r--" (to fix the permissions use: 'chmod go-w <filebeat.yml path>)"
+                # this is equivalent of chmod go-w
+                chmod_cmd = f'chmod go-w {self.filebeat_yml_path}'
+                print(f"Running chmod command: {chmod_cmd}")
+                chmod_cmd_result = subprocess.run(chmod_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if len(chmod_cmd_result.stderr) == 0:
+                    print(chmod_cmd_result.stdout)
+                else:
+                    print(chmod_cmd_result.stderr)
+                    raise Exception(chmod_cmd_result.stderr)
+
+                # make root the owner. https://www.elastic.co/guide/en/beats/libbeat/master/config-file-permissions.html
+                chown_cmd = f'sudo chown root {self.filebeat_yml_path}'
+                print(f"Running chown command: {chown_cmd}")
+                chown_cmd_result = subprocess.run(chown_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if len(chown_cmd_result.stderr) == 0:
+                    print(chown_cmd_result.stdout)
+                else:
+                    print(chown_cmd_result.stderr)
+                    raise Exception(chown_cmd_result.stderr)
+
 
             except yaml.YAMLError as e:
                 print(e)
                 raise e
 
+    def clear_filebeat_indices_and_registry(self):
+        # ignore 404 and 400
+        # es.indices.delete(index='filebeat-*', ignore=[400, 404])
 
-    def run_filebeat(self):
+        if self.clean_out_filebeat:
+            print("clearing filebeat indices")
+            es.indices.delete(index='filebeat-*')
+
+            # this makes sure filebeat will re-ingest all files when it runs again
+            print("clearing filebeat registry")
+            # check=True means throw errors if they happen
+            subprocess.run("sudo rm -rf /var/lib/filebeat/registry/filebeat", shell=True, check=True)
+
+        else:
+            print("Option to clear filebeat indices and registry not set, continuing on.")
+
+    def run_filebeat(self, **kwargs):
         """
-        Probably do this assuming that rest of ELK stack is already running
+        NOTE assumes that rest of ELK stack is already running
         """
-        pass
+        if kwargs.get("run_with_docker", False):
+            # TODO currently not supported
+            pass
+        else:
+            start_filebeat_cmd = f'sudo filebeat -e -d "*" --c {self.filebeat_yml_path}'
+            print(f"Running filebeat command: {start_filebeat_cmd}")
+
+            os.system(start_filebeat_cmd)
+
 
     def archive_tarball(self):
         """
+        TODO
         Having extracted and positioned log files to where they need to go, and ran filebeat, we now archive the tarball so we don't run this again on this tarball. 
         Unless we want to of course, so don't delete it. Archive it.
         """
@@ -283,9 +345,15 @@ class IngestTarball:
     def run(self):
         successful = False
         try:
+            print("=== Extracting tarball ===")
             self.extract_tarball()
+            print("=== Positioning Log files ===")
             self.position_log_files()
+            print("=== Generating filebeat yml ===")
             self.generate_filebeat_yml()
+            print("=== Clearing Filebeat data (?) ===")
+            self.clear_filebeat_indices_and_registry()
+            print("=== Running Filebeat ===")
             self.run_filebeat()
             successful = True
 
@@ -295,7 +363,11 @@ class IngestTarball:
             raise e
 
         # no matter what, cleanup
+        print("=== Cleaning up ===")
         self.cleanup(successful)
+
+        if successful:
+            print("Success.")
 
 if __name__ == '__main__':
     """
@@ -319,5 +391,3 @@ if __name__ == '__main__':
 
     ingestTarball = IngestTarball(args.tarball_filename, args.client_name)
     ingestTarball.run()
-
-    print("Success.")
