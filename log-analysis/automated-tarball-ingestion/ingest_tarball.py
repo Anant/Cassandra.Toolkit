@@ -20,7 +20,6 @@ class IngestTarball:
     client_name = ""
     tarball_filename = ""
 
-
     # whether we have to go in and unzip child directories as well (ie they have zips inside of zips)
     # TODO have to handle these
     has_child_zips = False
@@ -33,7 +32,7 @@ class IngestTarball:
     debug_mode = False
 
     # set to true if you want to clear out all filebeat-* indices in ES AND rm -rf the filebeat registry at /var/lib/filebeat/registry/filebeat/*
-    clean_out_filebeat = False
+    clean_out_filebeat_first = False
 
     def __init__(self, tarball_filename, client_name, **kwargs):
         self.tarball_filename = tarball_filename
@@ -54,8 +53,10 @@ class IngestTarball:
         tarball_modified_time = os.path.getmtime(self.tarball_path)
         self.incident_id = tarball_modified_time
 
-        # where we will put all the logs into
-        self.base_filepath_for_logs = f"{dir_path}/logs-for-client/{self.client_name}/incident-{self.incident_id}" # /{self.hostname}/{self.log_type}"
+        # where we will set the logs for this client (so each client has their own dir)
+        self.path_for_client = f"{dir_path}/logs-for-client/{self.client_name}" # /{self.hostname}/{self.log_type}"
+
+        self.base_filepath_for_logs = f"{self.path_for_client}/incident-{self.incident_id}" # /{self.hostname}/{self.log_type}"
 
         # where the filebeat.yml will go
         self.filebeat_yml_path = os.path.join(self.base_filepath_for_logs, 'tmp', 'filebeat.yaml')
@@ -78,6 +79,9 @@ class IngestTarball:
         if kwargs.get("debug_mode", False):
             # does things such as setting filebeat.yml so we don't output to ES, but to console instead
             self.debug_mode = True
+
+        if kwargs.get("clean_out_filebeat_first", False):
+            self.clean_out_filebeat_first = True
 
 
     ###################################################
@@ -247,6 +251,13 @@ class IngestTarball:
             del template_yaml_as_dict['output.elasticsearch']
             template_yaml_as_dict["output.console.pretty"] = True
 
+        # set appropriate amount of leading paths for tokenizing the log.file.path
+        fb_processors = template_yaml_as_dict["processors"]
+        for fb_processor in fb_processors:
+            if fb_processor.get("dissect", False) and fb_processor["dissect"]["field"] == "log.file.path":
+                # replace 
+                fb_processor["dissect"]["tokenizer"] = fb_processor["dissect"]["tokenizer"].replace("<path_for_client>", self.path_for_client)
+
 
 
         # remove old filebeat.yml. Can't just overwrite, since we removed write permissions
@@ -268,7 +279,7 @@ class IngestTarball:
                 print(f"Running chmod command: {chmod_cmd}")
                 chmod_cmd_result = subprocess.run(chmod_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if len(chmod_cmd_result.stderr) == 0:
-                    print(chmod_cmd_result.stdout)
+                    print("stdout from chmod_cmd:", chmod_cmd_result.stdout)
                 else:
                     print(chmod_cmd_result.stderr)
                     raise Exception(chmod_cmd_result.stderr)
@@ -278,7 +289,7 @@ class IngestTarball:
                 print(f"Running chown command: {chown_cmd}")
                 chown_cmd_result = subprocess.run(chown_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if len(chown_cmd_result.stderr) == 0:
-                    print(chown_cmd_result.stdout)
+                    print("stdout from chown_cmd:", chown_cmd_result.stdout)
                 else:
                     print(chown_cmd_result.stderr)
                     raise Exception(chown_cmd_result.stderr)
@@ -292,7 +303,7 @@ class IngestTarball:
         # ignore 404 and 400
         # es.indices.delete(index='filebeat-*', ignore=[400, 404])
 
-        if self.clean_out_filebeat:
+        if self.clean_out_filebeat_first:
             print("clearing filebeat indices")
             es.indices.delete(index='filebeat-*')
 
@@ -312,9 +323,17 @@ class IngestTarball:
             # TODO currently not supported
             pass
         else:
+            # -e        Logs to stderr and disables syslog/file output.
+            # -d "*"    Enable debugging for all components
+            # --c       Specifies the configuration file to use for Filebeat
+
             start_filebeat_cmd = f'sudo filebeat -e -d "*" --c {self.filebeat_yml_path}'
+            # same thing, but more conservative logging
+            # start_filebeat_cmd = f'sudo filebeat -e --c {self.filebeat_yml_path}'
+
             print(f"Running filebeat command: {start_filebeat_cmd}")
 
+            # TODO error handle this
             os.system(start_filebeat_cmd)
 
 
@@ -384,10 +403,20 @@ if __name__ == '__main__':
     """
     parser = argparse.ArgumentParser(
         description='Converting Stats Form TXT TO CSV Format',
-        usage='{tarball_filename} {company_name} {system|cassandra}')
+        usage='{tarball_filename} {company_name}')
     parser.add_argument('tarball_filename', type=str, help='name of tarball file')
     parser.add_argument('client_name', type=str, help='name of client')
+    parser.add_argument('--clean-out-filebeat-first', dest='clean_out_filebeat_first', action='store_true')
+    parser.set_defaults(clean_out_filebeat_first=False)
+    parser.add_argument('--debug-mode', dest='debug_mode', action='store_true')
+    parser.set_defaults(debug_mode=False)
+
     args = parser.parse_args()
 
-    ingestTarball = IngestTarball(args.tarball_filename, args.client_name)
+    options = {
+        "clean_out_filebeat_first": args.clean_out_filebeat_first,
+        "debug_mode": args.debug_mode,
+    }
+
+    ingestTarball = IngestTarball(args.tarball_filename, args.client_name, **options)
     ingestTarball.run()

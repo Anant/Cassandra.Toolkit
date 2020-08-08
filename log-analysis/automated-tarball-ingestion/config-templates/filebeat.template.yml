@@ -7,14 +7,14 @@ filebeat.inputs:
     tags: ["system","messages"]
     enabled: true
     paths:
-      #- /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname/system/*.test
-      #- /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname/system/*
+      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname/system/*.test
+      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname/system/*
   - type: log
     tags: ["cassandra","main"]
     enabled: true
     paths:
-      #- /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname1/cassandra/system.log*
-      #- /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname2/cassandra/system.log*
+      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname1/cassandra/system.log*
+      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname2/cassandra/system.log*
     exclude_files: ['\.zip$']  
     multiline.pattern: ^TRACE|DEBUG|WARN|INFO|ERROR
     multiline.negate: true
@@ -23,8 +23,8 @@ filebeat.inputs:
     tags: ["cassandra","java","gc"]
     enabled: true
     paths:
-      #- /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname1/cassandra/gc.log*
-      #- /home/anant/Projects/Client/ClientName/incident.2020060919/Hostname2/cassandra/gc.log*
+      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname1/cassandra/gc.log*
+      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname2/cassandra/gc.log*
     exclude_files: ['\.zip$']
     multiline.pattern: ^TRACE|DEBUG|WARN|INFO|ERROR
     multiline.negate: true
@@ -47,11 +47,13 @@ setup.dashboards.enabled: true
 
 #============================== Kibana =====================================
 setup.kibana:
+  host: "http://localhost:5601"
 #================================ Outputs =====================================
 #-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
+#output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  # Currently outputting to logstash instead
+  #hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -65,9 +67,11 @@ output.elasticsearch:
 # output.console.pretty: true
 
 #----------------------------- Logstash output --------------------------------
-#output.logstash:
+output.logstash:
+  enabled: true
   # The Logstash hosts
-  #hosts: ["localhost:5044"]
+  hosts: ["localhost:5044"]
+  timeout: 15
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -96,7 +100,8 @@ processors:
       target_prefix: "ingest"
 
   - dissect:
-      tokenizer: "/%{}/%{}/%{}/%{}/%{}/incident.%{incident-id}/%{host-name}/system/"
+      # <path_for_client> will be replaced by the python script
+      tokenizer: "<path_for_client>/incident-%{incident-id}/%{host-name}/system/"
       field: "log.file.path"
       target_prefix: "ingest"
 
@@ -114,7 +119,8 @@ processors:
   #    field: "ingest.component"
   #    target_prefix: "ingest"
   - dissect:
-      tokenizer: "/%{}/%{}/%{}/%{}/%{}/incident.%{incident-id}/%{host-name}/cassandra/"
+      # <path_for_client> will be replaced by the python script
+      tokenizer: "<path_for_client>/incident-%{incident-id}/%{host-name}/cassandra/"
       field: "log.file.path"
       target_prefix: "ingest"
   - timestamp:
