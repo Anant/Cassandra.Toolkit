@@ -42,7 +42,7 @@ setup.template.settings:
 #  env: staging
 
 #============================== Dashboards =====================================
-setup.dashboards.enabled: true
+setup.dashboards.enabled: false
 #setup.dashboards.url:
 
 #============================== Kibana =====================================
