@@ -4,6 +4,7 @@ import shutil
 import yaml
 import subprocess
 from pathlib import Path
+from copy import deepcopy
 
 from elasticsearch import Elasticsearch
 es = Elasticsearch()
@@ -37,12 +38,12 @@ class IngestTarball:
     """
     all metadata related to a given log 
     - main key:      (e.g., cassandra.main) is arbitrarily chosen for use in this script. Will be referred to generally using var `log_type` in this script.
-    - tags:          should match what we have tagged in filebeat.template.yml filebeat.inputs field exactly, so this definition can find that filebeat.input field
+    - tags:          what we want tagged in filebeat.template.yml filebeat.inputs field to identify these logs
     - path_to_logs_source:  path from base path for this tarball to the direct parent directory that holds these logs (if there are logs nested within subdirectories, make a new log_type_definitions key for those). Will replace all names within <> dynamically.
     - path_to_logs_dest:  path to where we want these so filebeat can find them
     - log_regex:     regex to use to find all these logs that we want from that parent directory
 
-    To not do a certain kind of log, just put None in the path_to_logs and we'll skip it. Or comment the whole thing out of course.
+    To not do a certain kind of log, just put None in the path_to_logs_source and we'll skip it. Or comment the whole thing out of course.
 
     ADDING A NEW LOG TYPE
     - add a definition here with all the keys
@@ -57,15 +58,27 @@ class IngestTarball:
         },
         "system": {
             # NOTE: This is for a finding system logs, not cassandra logs
-            "path_to_logs": None, # TODO set this when we have a path
+            "path_to_logs_source": None, # TODO set this when we have a path
             "tags": ["system","messages"],
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/system/*.test",
         },
         "spark": {
-            "path_to_logs": None, # TODO
+            "path_to_logs_source": None, # TODO
             "tags": [],
             "log_regex": "",
         },
+    }
+
+    # base dict for filebeat.inputs in our yml
+    # for now all have the same for all these. If they don't we'll have to add more to our log_type_definitions dict above and then set using those
+    filebeat_input_template = {
+        "enabled": "true",
+        "exclude_files": ["\.zip$"],
+        "multiline.match": "after",
+        "multiline.negate": "true",
+        "multiline.pattern": "^TRACE|DEBUG|WARN|INFO|ERROR",
+        "type": "log",
+        "paths": [],
     }
 
     def __init__(self, tarball_filename, client_name, **kwargs):
@@ -168,31 +181,20 @@ class IngestTarball:
             # iterate over our log_type_definitions, and set all the paths we need into our yml
 
             for key, log_type_def in self.log_type_definitions.items():
-                if log_type_def.get("path_to_logs", None) is None:
+                if log_type_def.get("path_to_logs_source", None) is None:
                     # we're not supporting yet
                     continue
 
                 # for now, just assume all are cassandra logs (which is probably wrong)
-                log_type = key
-
                 # move the files for this node and log_type
-                self.position_log_files_for_node(logs_dir, hostname, log_type)
+                self.position_log_files_for_node(hostname, log_type_def, nodes_dir)
 
     # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
-    def position_log_files_for_node(self, hostname, log_type_def, **kwargs):
+    def position_log_files_for_node(self, hostname, log_type_def, nodes_dir, **kwargs):
         """
         For a directory that contains logs for a single node and a single log_type_def of that node:
         put to each individual log files that were extracted from the tarball into the place they should go
-        IF DOING TARGETTED (default)
         - just goes into <node_hostname>/logs/cassandra (or whatever our self.path_to_cassandra_logs is) and grabs those logs
-
-
-        IF DOING RECURSIVELY (pass in recursive=True)
-        - recursively loops through directories, starting with where files were extracted into.
-        - if they are in a subdirectory, the subdirectories will be flattened out so all files will be in same directory: <self.base_filepath_for_logs>/<hostname>/<log_type>
-        - At the end, since we're not moving the whole directory over but each file, there will be one dir only, tmp/, and all the *.log or gc.log.* files in there.
-        - For first loop, source_dir will be the node's root dir. After that, it will be each subdirectory recursively
-        - NOTE make sure logs don't overwrite each other if they have the same name, but from different dir!
         """
         # now we want to move them from original_dir to where filebeat will find them
 
@@ -243,27 +245,29 @@ class IngestTarball:
                 raise e
 
         # add the paths to the dict
+        template_yaml_as_dict["filebeat.inputs"] = []
         filebeat_inputs = template_yaml_as_dict["filebeat.inputs"]
 
-        # iterate over the input definitions we have in our filebeat.template.yml
-        # eventually we could build the whle filebeat_input in here and not rely on the template so much, but not doing that yet
-        for fb_input in filebeat_inputs:
-            # add one path per hostname
-            if fb_input["paths"] is None:
-                fb_input["paths"] = []
+        # iterate over our log_type_definitions, and set all the paths we need into our yml
+        for key, log_type_def in self.log_type_definitions.items():
+            print("for this one", log_type_def)
+            if log_type_def.get("path_to_logs_source", None) is None:
+                # we're not supporting yet
+                continue
 
+            print("appending a base")
+            filebeat_inputs.append(deepcopy(self.filebeat_input_template))
+
+            fb_input = filebeat_inputs[-1]
+            # add tags for this log type
+            fb_input["tags"] = log_type_def["tags"]
+
+            # add one path per host
             for hostname in self.hostnames:
-                print("one is", hostname)
-                # iterate over our log_type_definitions, and set all the paths we need into our yml
-                for key, log_type_def in self.log_type_definitions.items():
-                    if fb_input["tags"] == log_type_def["tags"]:
-                        # then this is the right log_type_def, so let's use it
+                fb_input["paths"].append(
+                    log_type_def["log_regex"].replace("<self.base_filepath_for_logs>", self.base_filepath_for_logs).replace("<hostname>", hostname)
+                )
 
-                        fb_input["paths"].append(
-                            log_type_def["log_regex"].replace("<self.base_filepath_for_logs>", self.base_filepath_for_logs).replace("<hostname>", hostname)
-                        )
-                    else:
-                        print(fb_input["tags"], "is not the same as", log_type_def["tags"])
 
         if self.debug_mode:
             # won't output to es, will output to console
