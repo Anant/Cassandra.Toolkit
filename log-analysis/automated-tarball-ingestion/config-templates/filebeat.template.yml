@@ -4,34 +4,8 @@
 
 #=========================== Filebeat inputs =============================
 
-filebeat.inputs:
-  - type: log
-    tags: ["cassandra","main"]
-    enabled: true
-    paths:
-      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname1/cassandra/system.log*
-      #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname2/cassandra/system.log*
-    exclude_files: ['\.zip$']  
-    multiline.pattern: ^TRACE|DEBUG|WARN|INFO|ERROR
-    multiline.negate: true
-    multiline.match: after
-  # temporarily removing gc logs and system logs until we can consistently get them in our log tarballs
-  # - type: log
-  #   tags: ["cassandra","java","gc"]
-  #   enabled: true
-  #   paths:
-  #     #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname1/cassandra/gc.log*
-  #     #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname2/cassandra/gc.log*
-  #   exclude_files: ['\.zip$']
-  #   multiline.pattern: ^TRACE|DEBUG|WARN|INFO|ERROR
-  #   multiline.negate: true
-  #   multiline.match: after
-  # - type: log
-  #   tags: ["system","messages"]
-  #   enabled: true
-  #   paths:
-  #     #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname/system/*.test
-  #     #- /home/anant/Projects/Client/ClientName/incident-2020060919/Hostname/system/*
+#filebeat.inputs:
+  # set in the python script
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
@@ -95,4 +69,4 @@ processors:
       ignore_failure: true
       target_field: "@timestamp"
   - include_fields:
-      fields: [ "ingest", "message","log","input" ]
+      fields: [ "ingest", "message","log","input", "tags" ]
