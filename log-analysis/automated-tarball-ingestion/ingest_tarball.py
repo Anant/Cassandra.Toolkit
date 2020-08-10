@@ -4,6 +4,10 @@ import shutil
 import yaml
 import subprocess
 from pathlib import Path
+from copy import deepcopy
+import zipfile
+import tarfile
+import fnmatch
 
 from elasticsearch import Elasticsearch
 es = Elasticsearch()
@@ -33,6 +37,63 @@ class IngestTarball:
 
     # set to true if you want to clear out all filebeat-* indices in ES AND rm -rf the filebeat registry at /var/lib/filebeat/registry/filebeat/*
     clean_out_filebeat_first = False
+
+    """
+    all metadata related to a given log 
+    - main key:      (e.g., cassandra.main) is arbitrarily chosen for use in this script. Will be referred to generally using var `log_type` in this script.
+    - tags:          what we want tagged in filebeat.template.yml filebeat.inputs field to identify these logs
+    - path_to_logs_source:  path from base path for this tarball to the direct parent directory that holds these logs (if there are logs nested within subdirectories, make a new log_type_definitions key for those). Will replace all names within <> dynamically.
+    - path_to_logs_dest:  path to where we want these so filebeat can find them
+    - log_regex:     regex to use to find all these logs that we want from that parent directory
+
+    To not do a certain kind of log, just put None in the path_to_logs_source and we'll skip it. Or comment the whole thing out of course.
+
+    ADDING A NEW LOG TYPE
+    - add a definition here with all the keys
+    - add the fields in filebeat.template.yml as well
+    """
+    log_type_definitions = {
+        "cassandra.main": {
+            "path_to_logs_source": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/cassandra",
+            "tags": ["cassandra","main"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/system.log*",
+        },
+        "system": {
+            # NOTE: This is for a finding system logs, not cassandra logs
+            "path_to_logs_source": None, # TODO set this when we have a path
+            "tags": ["system","messages"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/system/*.test",
+        },
+        "spark.master": {
+            "path_to_logs_source": "<hostname>/logs/spark/master",
+            "path_to_logs_dest": "<hostname>/spark/master",
+            "tags": ["spark","master"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/spark/master/master.*",
+            # at the path_to_logs_source at least some are zipped
+            "zipped": True,
+            "zip_format": "zip", # ie not tar.gz
+        },
+        "spark.worker": {
+            "path_to_logs_source": "<hostname>/logs/spark/worker",
+            "path_to_logs_dest": "<hostname>/spark/worker",
+            "tags": ["spark","worker"],
+            # so far only seeing "worker.log" and only one file
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/spark/worker/worker.log*",
+        },
+    }
+
+    # base dict for filebeat.inputs in our yml
+    # for now all have the same for all these. If they don't we'll have to add more to our log_type_definitions dict above and then set using those
+    filebeat_input_template = {
+        "enabled": "true",
+        "exclude_files": ["\.zip$"],
+        "multiline.match": "after",
+        "multiline.negate": "true",
+        "multiline.pattern": "^TRACE|DEBUG|WARN|INFO|ERROR",
+        "type": "log",
+        "paths": [],
+    }
 
     def __init__(self, tarball_filename, client_name, **kwargs):
         self.tarball_filename = tarball_filename
@@ -68,10 +129,6 @@ class IngestTarball:
         self.path_to_nodes_dir = "nodes"
 
         # how to get from the nodes dir to our logs. Hopefully there's only one per node...
-        self.path_to_logs = {
-            "cassandra": "<hostname>/logs/cassandra",
-            "system": None
-        }
 
         ##################
         # other options
@@ -131,67 +188,82 @@ class IngestTarball:
                 # not a directory, skip it. there must be some random files in here
                 continue
 
-            # whether these are system logs or Cassandra logs
-            for log_type in ["cassandra", "system"]:
-                if self.path_to_logs.get(log_type, None) is None:
-                    # this tarball doesn't have this type of logs, or we're just not getting them
-                    print("no path for log_type", log_type, "...skipping.")
+            # get node's hostname from the directory name (ie the final part of the path)
+            hostname = os.path.basename(os.path.normpath(dir_for_node))
+            self.hostnames.append(hostname)
+
+            # iterate over our log_type_definitions, and set all the paths we need into our yml
+
+            for key, log_type_def in self.log_type_definitions.items():
+                if log_type_def.get("path_to_logs_source", None) is None:
+                    # we're not supporting yet
                     continue
 
-                # get node's hostname from the directory name (ie the final part of the path)
-                hostname = os.path.basename(os.path.normpath(dir_for_node))
-
-                # add this hostname to list of all hostnames in tarball
-                self.hostnames.append(hostname)
-
-                # TODO add logic to detect if these are cassandra logs or system logs, and then run once per hostname/logtype permutation (ie, for each node, run position_log_files_for_node once per log_type, or multiple times for log_type if it's easier. 
                 # for now, just assume all are cassandra logs (which is probably wrong)
-                cassandra_logs_dir = os.path.join(nodes_dir, self.path_to_logs[log_type].replace("<hostname>", hostname))
-
                 # move the files for this node and log_type
-                self.position_log_files_for_node(cassandra_logs_dir, hostname, log_type)
+                self.position_log_files_for_node(hostname, log_type_def, nodes_dir)
 
     # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
-    def position_log_files_for_node(self, source_dir, hostname, log_type, **kwargs):
+    def position_log_files_for_node(self, hostname, log_type_def, nodes_dir, **kwargs):
         """
-        For a directory that contains logs for a single node and a single log_type of that node:
+        For a directory that contains logs for a single node and a single log_type_def of that node:
         put to each individual log files that were extracted from the tarball into the place they should go
-        IF DOING TARGETTED (default)
         - just goes into <node_hostname>/logs/cassandra (or whatever our self.path_to_cassandra_logs is) and grabs those logs
-
-
-        IF DOING RECURSIVELY (pass in recursive=True)
-        - recursively loops through directories, starting with where files were extracted into.
-        - if they are in a subdirectory, the subdirectories will be flattened out so all files will be in same directory: <self.base_filepath_for_logs>/<hostname>/<log_type>
-        - At the end, since we're not moving the whole directory over but each file, there will be one dir only, tmp/, and all the *.log or gc.log.* files in there.
-        - For first loop, source_dir will be the node's root dir. After that, it will be each subdirectory recursively
-        - NOTE make sure logs don't overwrite each other if they have the same name, but from different dir!
         """
         # now we want to move them from original_dir to where filebeat will find them
 
-        # all the files in the tmp directory we just made will be moved, and 
+        # all the files in the tmp directory we just made will be moved from source to dest
+        source_dir = os.path.join(nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
+        dest_dir_path = os.path.join(
+            self.base_filepath_for_logs,
+            log_type_def["path_to_logs_dest"].replace("<hostname>", hostname)
+        )
+
+        # make sure dir exists, especially important for spark and solr logs
+        if not os.path.isdir(source_dir):
+            print("host", hostname, "doesn't have directory so skipping", source_dir)
+            # continue
+            return
+
+        # if zipped, unzip
+        if log_type_def.get("zipped", False):
+            all_files = os.listdir(source_dir)
+            # Not necessarily zipped, since often zipped files are mixed in with unzipped in these dirs. 
+            if log_type_def["zip_format"] == "zip":
+                pattern = log_type_def.get("zip_extension_regex", "*.zip")
+                unzipper = zipfile.ZipFile
+
+            elif log_type_def["zip_format"] == "tar":
+                unzipper = tarfile.TarFile
+                # might need to add just .tars and others here too TODO
+                pattern = log_type_def.get("zip_extension_regex", "*.tar.gz")
+
+            # unzip all zipped files
+            # https://stackoverflow.com/a/30591949/6952495
+            # TODO if we need to, could go recursive right here. But if we do, make sure all logs still end up in source_dir so they're easy to grab in the next step
+            for filename in fnmatch.filter(all_files, pattern):
+                zipfile_path = os.path.join(source_dir, filename)
+                with unzipper(zipfile_path, 'r') as zip_ref:
+
+                    # just putting in the parent dir, so all logs will end up in one place
+                    zip_ref.extractall(source_dir)
+
+        # these should all be unzipped at this point
         all_files = os.listdir(source_dir)
+
+        # TODO filter out filenames that don't match our regex ?? doesn't seem super necessary, since filebeat will filter. This would only save diskspace for us
         for filename in all_files:
-            # filename should be str, e.g., `gc.log.0.current` 
-
-            # filter out filenames that don't match our regex
-            #
+            # filename should be str and not include path, e.g., `gc.log.0.current` 
             source_path = os.path.join(source_dir, filename)
-            if kwargs.get("recursive", False) and os.path.isdir(source_path):
-                # this is a dir, so recursively loop through
-                self.position_log_files(source_path)
 
-            else:
-                # moving this file to where it needs to be:
-                dest_dir_path = os.path.join(self.base_filepath_for_logs, hostname, log_type)
-                # make sure the directory exists
-                Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
+            # make sure the directory exists
+            Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
 
-                # if specify the filename, then will overwrite what's there, which is what we want for idempotency
-                dest_path = os.path.join(dest_dir_path, filename)
+            # if specify the filename, then will overwrite what's there, which is what we want for idempotency
+            dest_path = os.path.join(dest_dir_path, filename)
 
-                # move it
-                shutil.move(source_path, dest_path)
+            # move it
+            shutil.move(source_path, dest_path)
 
     def generate_filebeat_yml(self, **kwargs):
         """
@@ -218,37 +290,31 @@ class IngestTarball:
                 raise e
 
         # add the paths to the dict
+        template_yaml_as_dict["filebeat.inputs"] = []
         filebeat_inputs = template_yaml_as_dict["filebeat.inputs"]
 
-        # iterate over the input definitions we have in our filebeat.template.yml
-        for fb_input in filebeat_inputs:
-            # add one path per hostname
-            if fb_input["paths"] is None:
-                fb_input["paths"] = []
+        # iterate over our log_type_definitions, and set all the paths we need into our yml
+        for key, log_type_def in self.log_type_definitions.items():
+            if log_type_def.get("path_to_logs_source", None) is None:
+                # we're not supporting yet
+                continue
 
+            filebeat_inputs.append(deepcopy(self.filebeat_input_template))
+
+            fb_input = filebeat_inputs[-1]
+            # add tags for this log type
+            fb_input["tags"] = log_type_def["tags"]
+
+            # add one path per host
             for hostname in self.hostnames:
-                if "system" in fb_input["tags"]:
-                    # This is for a finding system logs, not cassandra logs
+                fb_input["paths"].append(
+                    log_type_def["log_regex"].replace("<self.base_filepath_for_logs>", self.base_filepath_for_logs).replace("<hostname>", hostname)
+                )
 
-                    fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/system/*.test"
-                    )
-
-                elif "gc" in fb_input["tags"]:
-                    # this should be to find our cassandra garbage collection logs
-                    fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/system.log*"
-                    )
-
-                elif "main" in fb_input["tags"]:
-                    # this should be to find our main cassandra logs
-                    fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/gc.log*"
-                    )
 
         if self.debug_mode:
             # won't output to es, will output to console
-            del template_yaml_as_dict['output.elasticsearch']
+            del template_yaml_as_dict['output.logstash']
             template_yaml_as_dict["output.console.pretty"] = True
 
         # set appropriate amount of leading paths for tokenizing the log.file.path
@@ -262,7 +328,8 @@ class IngestTarball:
 
         # remove old filebeat.yml. Can't just overwrite, since we removed write permissions
         print("removing old filebeat yml if exists")
-        os.remove(self.filebeat_yml_path)
+        if os.path.isfile(self.filebeat_yml_path):
+            os.remove(self.filebeat_yml_path)
 
         with open(self.filebeat_yml_path, 'w', encoding='utf8') as outfile:
             # currently putting all the logs from a single host into a single dir. Helps namespace these filebeat ymls. Might be better somewhere else though
