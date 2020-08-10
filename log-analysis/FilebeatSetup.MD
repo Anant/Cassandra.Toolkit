@@ -1,3 +1,4 @@
+# THIS IS A WORK IN PROGRESS 
 # How to Analyze on offline BEK (Beats/Filebeat ElasticSearch Kibana) Setup
 
 When you get a dump of the logs after unzipping all of the gc and log files, use this filebeat template to ingest the logs using a parser that is specialized
@@ -95,16 +96,17 @@ setup.template.settings:
 #  env: staging
 
 #============================== Dashboards =====================================
-setup.dashboards.enabled: true
+#setup.dashboards.enabled: true
 #setup.dashboards.url:
 
 #============================== Kibana =====================================
 setup.kibana:
+  host: "http://localhost:5601"
 #================================ Outputs =====================================
 #-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
+#output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  # hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -118,9 +120,9 @@ output.elasticsearch:
 # output.console.pretty: true
 
 #----------------------------- Logstash output --------------------------------
-#output.logstash:
+output.logstash:
   # The Logstash hosts
-  #hosts: ["localhost:5044"]
+  hosts: ["localhost:5044"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -183,7 +185,7 @@ processors:
       ignore_failure: true
       target_field: "@timestamp"
   - include_fields:
-      fields: [ "ingest", "message","log","input" ]
+      fields: [ "ingest", "message","log", "input", "tags" ]
 
 
  
