@@ -248,7 +248,7 @@ class IngestTarball:
 
         if self.debug_mode:
             # won't output to es, will output to console
-            del template_yaml_as_dict['output.elasticsearch']
+            del template_yaml_as_dict['output.logstash']
             template_yaml_as_dict["output.console.pretty"] = True
 
         # set appropriate amount of leading paths for tokenizing the log.file.path

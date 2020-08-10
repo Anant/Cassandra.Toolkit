@@ -43,7 +43,6 @@ setup.template.settings:
 
 #============================== Dashboards =====================================
 setup.dashboards.enabled: false
-#setup.dashboards.url:
 
 #============================== Kibana =====================================
 setup.kibana:
@@ -63,7 +62,7 @@ setup.kibana:
   #username: "elastic"
   #password: "changeme"
 
-# to debug comment out output.elasticseaarch and uncomment this
+# to debug comment out output.logstash and uncomment this. We're using logstash not Elasticsearch for ingestion
 # output.console.pretty: true
 
 #----------------------------- Logstash output --------------------------------
