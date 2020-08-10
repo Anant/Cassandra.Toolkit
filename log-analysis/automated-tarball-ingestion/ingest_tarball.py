@@ -47,16 +47,16 @@ class IngestTarball:
         We generate the incident time and use it as an incident_id
         - We want it to be unique for this file but ideally the same for everytime the file runs (ie idempotent)
         - Consequently we will grab metadata from the tarball itself and use as the incident_id
+        - modified time will be something like 1596785608.063104 (unix timestamp)
+        - since moving counts as modifying, will be when we put the tarball into the log-tarballs-to-ingest folder
         """
-        # modified time will be something like 1596785608.063104 (unix timestamp)
-        # since moving counts as modifying, will be when we put the tarball into the log-tarballs-to-ingest folder
         tarball_modified_time = os.path.getmtime(self.tarball_path)
         self.incident_id = tarball_modified_time
 
         # where we will set the logs for this client (so each client has their own dir)
         self.path_for_client = f"{dir_path}/logs-for-client/{self.client_name}" # /{self.hostname}/{self.log_type}"
 
-        self.base_filepath_for_logs = f"{self.path_for_client}/incident-{self.incident_id}" # /{self.hostname}/{self.log_type}"
+        self.base_filepath_for_logs = f"{self.path_for_client}/incident-{self.incident_id}"
 
         # where the filebeat.yml will go
         self.filebeat_yml_path = os.path.join(self.base_filepath_for_logs, 'tmp', 'filebeat.yaml')

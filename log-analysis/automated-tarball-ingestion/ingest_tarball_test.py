@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
     # run the ingester with example company_name and hostname
     # TODO reformat the example tarball to match our new format (ie has multiple nodes per tarball, so has a parent directory that has ip addrs of nodes, and then logs can be buried in there)
+    # currently does not work until this gets fixed
     ingestTarball = IngestTarball(tarball_filename="example-logs.tar.gz", client_name="test-client", debug_mode=True)
 
     ingestTarball.run()
