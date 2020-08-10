@@ -237,13 +237,13 @@ class IngestTarball:
                 elif "gc" in fb_input["tags"]:
                     # this should be to find our cassandra garbage collection logs
                     fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/system.log*"
+                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/gc.log*"
                     )
 
                 elif "main" in fb_input["tags"]:
                     # this should be to find our main cassandra logs
                     fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/gc.log*"
+                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/system.log*"
                     )
 
         if self.debug_mode:
