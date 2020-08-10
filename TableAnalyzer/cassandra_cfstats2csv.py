@@ -31,7 +31,7 @@ def generate(path, save, version):
     data = []
     ks = ''
     #cf = ''
-    exclude_ks = ["dse_insights_local","system_distributed","system", "cfs", "cfs_archive","dse_insights","system_schema", "HiveMetaStore", "OpsCenter", "dse_perf", "dse_system", "system_traces", "dsefs", "dse_leases", "dse_analytics","system_auth"]
+    exclude_ks = ["system", "cfs", "cfs_archive", "HiveMetaStore", "OpsCenter", "dse_perf", "dse_security","solr_admin","dse_insights_local","dse_system", "system_traces", "dsefs", "dse_leases", "dse_analytics","system_schema","dse_insights","system_distributed","dse_system_local","system_auth"]
     mapper={} 
     try:
          
@@ -56,32 +56,30 @@ def generate(path, save, version):
         # here we go
        cf=[]
        
-       if ("Keyspace :" or "Keyspace:") in line:
+       if "Keyspace :" in line or "Keyspace:" in line:
             #print("keyspace found")
             # if it's a new keyspace, reset cf name
             ks1 = (line.split(":")[1]).split("\n")[0].strip()
     
             if ks1 not in exclude_ks:   #condition to check if the keyspace is not in exclude_ks list
                 print("keyspace not in exclude list")
-                if "Table:" in line:    #get the table name from each keyspace
+                if "Table:" in line or "Table (index)" in line:    #get the table name from each keyspace
                     for i in (line.split("\n\t\t")):
-                        if 'Table' == (i.split(":")[0]):
+                        if ('Table'  == (i.split(":")[0]) or 'Table (index)'  == (i.split(":")[0])):
                             cf.append (i.split(":")[1].strip()) # list of tables in each keyspace
+                            cf1=i.split(":")[1].strip() # for current table in progress in each keyspace
             
-                    for key, val in mapper.items():
+                        for key, val in mapper.items():
                         
-                            for i in (line.split("\n\t\t")):
-                                line_key = (i.split(":")[0].strip())  #key 
-                                line_val = (i.split(":")[1].strip())  #value
+                            line_key = (i.split(":")[0].strip())  #key 
+                            line_val = (i.split(":")[1].strip())  #value
                         
-                                if key.lower() in line_key.lower():
-                                    if "NaN" in line_val:
-                                        line_val = 0
-                                    else:
-                                        line_val = find_numbers(line_val)[0]
-                            
-                                    for j in cf:
-                                        data.append([hostname, ks1, j, val, line_val, timestamp])
+                            if key.lower() in line_key.lower():
+                               if "NaN" in line_val:
+                                   line_val = 0
+                               else:
+                                   line_val = find_numbers(line_val)[0]
+                               data.append([hostname, ks1, cf1, val, line_val, timestamp])
                                  
 
                                          
