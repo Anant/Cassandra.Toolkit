@@ -199,7 +199,6 @@ class IngestTarball:
         # all the files in the tmp directory we just made will be moved from source to dest
         source_dir = os.path.join(nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
         dest_dir_path = os.path.join(self.base_filepath_for_logs, log_type_def["path_to_logs_dest"])
-        source_dir = os.path.join(nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
 
         all_files = os.listdir(source_dir)
 
