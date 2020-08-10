@@ -5,6 +5,9 @@ import yaml
 import subprocess
 from pathlib import Path
 from copy import deepcopy
+import zipfile
+import tarfile
+import fnmatch
 
 from elasticsearch import Elasticsearch
 es = Elasticsearch()
@@ -52,7 +55,7 @@ class IngestTarball:
     log_type_definitions = {
         "cassandra.main": {
             "path_to_logs_source": "<hostname>/logs/cassandra",
-            "path_to_logs_dest": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/cassandra",
             "tags": ["cassandra","main"],
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/system.log*",
         },
@@ -62,10 +65,14 @@ class IngestTarball:
             "tags": ["system","messages"],
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/system/*.test",
         },
-        "spark": {
-            "path_to_logs_source": None, # TODO
-            "tags": [],
-            "log_regex": "",
+        "spark.master": {
+            "path_to_logs_source": "<hostname>/logs/spark/master",
+            "path_to_logs_dest": "<hostname>/spark/master",
+            "tags": ["spark","master"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/spark/master/master.*",
+            # at the path_to_logs_source at least some are zipped
+            "zipped": True,
+            "zip_format": "zip", # ie not tar.gz
         },
     }
 
@@ -200,15 +207,46 @@ class IngestTarball:
 
         # all the files in the tmp directory we just made will be moved from source to dest
         source_dir = os.path.join(nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
-        dest_dir_path = os.path.join(self.base_filepath_for_logs, log_type_def["path_to_logs_dest"])
+        dest_dir_path = os.path.join(
+            self.base_filepath_for_logs,
+            log_type_def["path_to_logs_dest"].replace("<hostname>", hostname)
+        )
 
+        # make sure dir exists, especially important for spark and solr logs
+        if not os.path.isdir(source_dir):
+            print("host", hostname, "doesn't have directory so skipping", source_dir)
+            # continue
+            return
+
+        # if zipped, unzip
+        if log_type_def.get("zipped", False):
+            all_files = os.listdir(source_dir)
+            # Not necessarily zipped, since often zipped files are mixed in with unzipped in these dirs. 
+            if log_type_def["zip_format"] == "zip":
+                pattern = log_type_def.get("zip_extension_regex", "*.zip")
+                unzipper = zipfile.ZipFile
+
+            elif log_type_def["zip_format"] == "tar":
+                unzipper = tarfile.TarFile
+                # might need to add just .tars and others here too TODO
+                pattern = log_type_def.get("zip_extension_regex", "*.tar.gz")
+
+            # unzip all zipped files
+            # https://stackoverflow.com/a/30591949/6952495
+            # TODO if we need to, could go recursive right here. But if we do, make sure all logs still end up in source_dir so they're easy to grab in the next step
+            for filename in fnmatch.filter(all_files, pattern):
+                zipfile_path = os.path.join(source_dir, filename)
+                with unzipper(zipfile_path, 'r') as zip_ref:
+
+                    # just putting in the parent dir, so all logs will end up in one place
+                    zip_ref.extractall(source_dir)
+
+        # these should all be unzipped at this point
         all_files = os.listdir(source_dir)
 
+        # TODO filter out filenames that don't match our regex ?? doesn't seem super necessary, since filebeat will filter. This would only save diskspace for us
         for filename in all_files:
-            # filename should be str, e.g., `gc.log.0.current` 
-
-            # filter out filenames that don't match our regex
-            #
+            # filename should be str and not include path, e.g., `gc.log.0.current` 
             source_path = os.path.join(source_dir, filename)
 
             # make sure the directory exists
@@ -250,12 +288,10 @@ class IngestTarball:
 
         # iterate over our log_type_definitions, and set all the paths we need into our yml
         for key, log_type_def in self.log_type_definitions.items():
-            print("for this one", log_type_def)
             if log_type_def.get("path_to_logs_source", None) is None:
                 # we're not supporting yet
                 continue
 
-            print("appending a base")
             filebeat_inputs.append(deepcopy(self.filebeat_input_template))
 
             fb_input = filebeat_inputs[-1]
