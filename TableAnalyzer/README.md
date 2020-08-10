@@ -32,7 +32,7 @@ The very original original original code came from "https://github.com/thejaspm/
 4. Jagannath Bilgi - Refactoring, Testing
 5. Shridhar Nandeshwar - Testing, User Feedback
 6. Senthilvel Palaniappan - Testing, User Feedback
-7. Ameer Ajmal Baig - Testing, User Feedback
+7. Ameer Ajmal Baig - Refactoring, Testing, Documentation User Feedback
 8. Pramod Pottimuthu - Testing, User Feedback
 9. Clyde Clark - Testing, Documentation, User Feedback
 
