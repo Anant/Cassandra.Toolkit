@@ -34,6 +34,40 @@ class IngestTarball:
     # set to true if you want to clear out all filebeat-* indices in ES AND rm -rf the filebeat registry at /var/lib/filebeat/registry/filebeat/*
     clean_out_filebeat_first = False
 
+    """
+    all metadata related to a given log 
+    - main key:      (e.g., cassandra.main) is arbitrarily chosen for use in this script. Will be referred to generally using var `log_type` in this script.
+    - tags:          should match what we have tagged in filebeat.template.yml filebeat.inputs field exactly, so this definition can find that filebeat.input field
+    - path_to_logs_source:  path from base path for this tarball to the direct parent directory that holds these logs (if there are logs nested within subdirectories, make a new log_type_definitions key for those). Will replace all names within <> dynamically.
+    - path_to_logs_dest:  path to where we want these so filebeat can find them
+    - log_regex:     regex to use to find all these logs that we want from that parent directory
+
+    To not do a certain kind of log, just put None in the path_to_logs and we'll skip it. Or comment the whole thing out of course.
+
+    ADDING A NEW LOG TYPE
+    - add a definition here with all the keys
+    - add the fields in filebeat.template.yml as well
+    """
+    log_type_definitions = {
+        "cassandra.main": {
+            "path_to_logs_source": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/logs/cassandra",
+            "tags": ["cassandra","main"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/system.log*",
+        },
+        "system": {
+            # NOTE: This is for a finding system logs, not cassandra logs
+            "path_to_logs": None, # TODO set this when we have a path
+            "tags": ["system","messages"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/system/*.test",
+        },
+        "spark": {
+            "path_to_logs": None, # TODO
+            "tags": [],
+            "log_regex": "",
+        },
+    }
+
     def __init__(self, tarball_filename, client_name, **kwargs):
         self.tarball_filename = tarball_filename
 
@@ -68,10 +102,6 @@ class IngestTarball:
         self.path_to_nodes_dir = "nodes"
 
         # how to get from the nodes dir to our logs. Hopefully there's only one per node...
-        self.path_to_logs = {
-            "cassandra": "<hostname>/logs/cassandra",
-            "system": None
-        }
 
         ##################
         # other options
@@ -131,30 +161,27 @@ class IngestTarball:
                 # not a directory, skip it. there must be some random files in here
                 continue
 
-            # whether these are system logs or Cassandra logs
-            for log_type in ["cassandra", "system"]:
-                if self.path_to_logs.get(log_type, None) is None:
-                    # this tarball doesn't have this type of logs, or we're just not getting them
-                    print("no path for log_type", log_type, "...skipping.")
+            # get node's hostname from the directory name (ie the final part of the path)
+            hostname = os.path.basename(os.path.normpath(dir_for_node))
+            self.hostnames.append(hostname)
+
+            # iterate over our log_type_definitions, and set all the paths we need into our yml
+
+            for key, log_type_def in self.log_type_definitions.items():
+                if log_type_def.get("path_to_logs", None) is None:
+                    # we're not supporting yet
                     continue
 
-                # get node's hostname from the directory name (ie the final part of the path)
-                hostname = os.path.basename(os.path.normpath(dir_for_node))
-
-                # add this hostname to list of all hostnames in tarball
-                self.hostnames.append(hostname)
-
-                # TODO add logic to detect if these are cassandra logs or system logs, and then run once per hostname/logtype permutation (ie, for each node, run position_log_files_for_node once per log_type, or multiple times for log_type if it's easier. 
                 # for now, just assume all are cassandra logs (which is probably wrong)
-                cassandra_logs_dir = os.path.join(nodes_dir, self.path_to_logs[log_type].replace("<hostname>", hostname))
+                log_type = key
 
                 # move the files for this node and log_type
-                self.position_log_files_for_node(cassandra_logs_dir, hostname, log_type)
+                self.position_log_files_for_node(logs_dir, hostname, log_type)
 
     # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
-    def position_log_files_for_node(self, source_dir, hostname, log_type, **kwargs):
+    def position_log_files_for_node(self, hostname, log_type_def, **kwargs):
         """
-        For a directory that contains logs for a single node and a single log_type of that node:
+        For a directory that contains logs for a single node and a single log_type_def of that node:
         put to each individual log files that were extracted from the tarball into the place they should go
         IF DOING TARGETTED (default)
         - just goes into <node_hostname>/logs/cassandra (or whatever our self.path_to_cassandra_logs is) and grabs those logs
@@ -169,29 +196,28 @@ class IngestTarball:
         """
         # now we want to move them from original_dir to where filebeat will find them
 
-        # all the files in the tmp directory we just made will be moved, and 
+        # all the files in the tmp directory we just made will be moved from source to dest
+        source_dir = os.path.join(nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
+        dest_dir_path = os.path.join(self.base_filepath_for_logs, log_type_def["path_to_logs_dest"])
+        source_dir = os.path.join(nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
+
         all_files = os.listdir(source_dir)
+
         for filename in all_files:
             # filename should be str, e.g., `gc.log.0.current` 
 
             # filter out filenames that don't match our regex
             #
             source_path = os.path.join(source_dir, filename)
-            if kwargs.get("recursive", False) and os.path.isdir(source_path):
-                # this is a dir, so recursively loop through
-                self.position_log_files(source_path)
 
-            else:
-                # moving this file to where it needs to be:
-                dest_dir_path = os.path.join(self.base_filepath_for_logs, hostname, log_type)
-                # make sure the directory exists
-                Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
+            # make sure the directory exists
+            Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
 
-                # if specify the filename, then will overwrite what's there, which is what we want for idempotency
-                dest_path = os.path.join(dest_dir_path, filename)
+            # if specify the filename, then will overwrite what's there, which is what we want for idempotency
+            dest_path = os.path.join(dest_dir_path, filename)
 
-                # move it
-                shutil.move(source_path, dest_path)
+            # move it
+            shutil.move(source_path, dest_path)
 
     def generate_filebeat_yml(self, **kwargs):
         """
@@ -221,30 +247,24 @@ class IngestTarball:
         filebeat_inputs = template_yaml_as_dict["filebeat.inputs"]
 
         # iterate over the input definitions we have in our filebeat.template.yml
+        # eventually we could build the whle filebeat_input in here and not rely on the template so much, but not doing that yet
         for fb_input in filebeat_inputs:
             # add one path per hostname
             if fb_input["paths"] is None:
                 fb_input["paths"] = []
 
             for hostname in self.hostnames:
-                if "system" in fb_input["tags"]:
-                    # This is for a finding system logs, not cassandra logs
+                print("one is", hostname)
+                # iterate over our log_type_definitions, and set all the paths we need into our yml
+                for key, log_type_def in self.log_type_definitions.items():
+                    if fb_input["tags"] == log_type_def["tags"]:
+                        # then this is the right log_type_def, so let's use it
 
-                    fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/system/*.test"
-                    )
-
-                elif "gc" in fb_input["tags"]:
-                    # this should be to find our cassandra garbage collection logs
-                    fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/gc.log*"
-                    )
-
-                elif "main" in fb_input["tags"]:
-                    # this should be to find our main cassandra logs
-                    fb_input["paths"].append(
-                        f"{self.base_filepath_for_logs}/{hostname}/cassandra/system.log*"
-                    )
+                        fb_input["paths"].append(
+                            log_type_def["log_regex"].replace("<self.base_filepath_for_logs>", self.base_filepath_for_logs).replace("<hostname>", hostname)
+                        )
+                    else:
+                        print(fb_input["tags"], "is not the same as", log_type_def["tags"])
 
         if self.debug_mode:
             # won't output to es, will output to console
