@@ -74,6 +74,13 @@ class IngestTarball:
             "zipped": True,
             "zip_format": "zip", # ie not tar.gz
         },
+        "spark.worker": {
+            "path_to_logs_source": "<hostname>/logs/spark/worker",
+            "path_to_logs_dest": "<hostname>/spark/worker",
+            "tags": ["spark","worker"],
+            # so far only seeing "worker.log" and only one file
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/spark/worker/worker.log*",
+        },
     }
 
     # base dict for filebeat.inputs in our yml
@@ -321,7 +328,8 @@ class IngestTarball:
 
         # remove old filebeat.yml. Can't just overwrite, since we removed write permissions
         print("removing old filebeat yml if exists")
-        os.remove(self.filebeat_yml_path)
+        if os.path.isfile(self.filebeat_yml_path):
+            os.remove(self.filebeat_yml_path)
 
         with open(self.filebeat_yml_path, 'w', encoding='utf8') as outfile:
             # currently putting all the logs from a single host into a single dir. Helps namespace these filebeat ymls. Might be better somewhere else though
