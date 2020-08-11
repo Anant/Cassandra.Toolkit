@@ -247,6 +247,8 @@ class FilebeatYML:
                     # if key not set yet, initialize it based on what is next
                     if base.get(key, "None") is None:
                         base[key] = key_value() # e.g., will be dict() or list()
+                    else:
+                        print("key found", key, "on base", base)
 
                     # set new base and iterate over again
                     base = base[key]
@@ -254,6 +256,8 @@ class FilebeatYML:
                 else:
                     # this is the final leaf of the chain, so set as value and we're done
                     base[key] = value
+                    base = base[key]
+
 
     def remove_old_filebeat_yml(self):
         """

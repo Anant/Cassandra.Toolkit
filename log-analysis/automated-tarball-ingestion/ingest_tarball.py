@@ -66,6 +66,10 @@ class IngestTarball:
         # relative path from parent dir (the root of the tarball) to the nodes
         self.path_to_nodes_dir = "nodes"
 
+        # there should be a parent directory called "nodes" where all hte nodes live
+        # will set this once we know the directory name of the extracted archive
+        self.nodes_dir = None
+
         self.filebeat_yml = FilebeatYML(project_root_path=project_root_path, base_filepath_for_logs=self.base_filepath_for_logs, path_for_client=self.path_for_client, **kwargs)
 
         ##################
@@ -89,7 +93,11 @@ class IngestTarball:
         # tmp folder before positioning them where we want them
         shutil.unpack_archive(self.tarball_path, self.extract_dest_path)
 
-        # get the archived directory's name
+    def set_archived_dir_name(self):
+        """
+        get the archived directory's name
+        not always (or ever?) directly related to the tarball's name
+        """
         print("self.extract_dest_path", self.extract_dest_path)
         for child in os.listdir(self.extract_dest_path):
             # there should only be one, the archived directory. If ran before, also maybe a filebeat.yml
@@ -100,30 +108,43 @@ class IngestTarball:
                 continue
 
             self.archived_dir_name = child
+            self.nodes_dir = os.path.join(self.extract_dest_path, self.archived_dir_name, self.path_to_nodes_dir)
             break
 
         print("self.archived_dir_name is:", self.archived_dir_name)
 
-    def position_log_files(self):
+    def set_hostnames(self):
         """
-        put all log files where we want them
+        get hostnames from the directories in the nodes_dir
         """
-        # there should be a parent directory called "nodes"
-        nodes_dir = os.path.join(self.extract_dest_path, self.archived_dir_name, self.path_to_nodes_dir)
+        all_dirs_for_nodes = os.listdir(self.nodes_dir)
 
-        # "nodes" has several subdirectories, one directory per node in their cluster
-        all_dirs_for_nodes = os.listdir(nodes_dir)
-
-        # iterate over each node's directory and put their logs where they should go
         for dir_for_node in all_dirs_for_nodes:
             # original hostname where the logs were genereated. Can be domain name or ip addr. Used to identify that C* node and distinguish it from other nodes in the client's cluster
-            if not os.path.isdir(os.path.join(nodes_dir, dir_for_node)):
+            if not os.path.isdir(os.path.join(self.nodes_dir, dir_for_node)):
                 # not a directory, skip it. there must be some random files in here
                 continue
 
             # get node's hostname from the directory name (ie the final part of the path)
             hostname = os.path.basename(os.path.normpath(dir_for_node))
             self.hostnames.append(hostname)
+
+        self.filebeat_yml.hostnames = self.hostnames
+
+    def position_log_files(self):
+        """
+        put all log files where we want them
+        """
+
+        # "nodes" has several subdirectories, one directory per node in their cluster
+        all_dirs_for_nodes = os.listdir(self.nodes_dir)
+
+        # iterate over each node's directory and put their logs where they should go
+        for dir_for_node in all_dirs_for_nodes:
+            # original hostname where the logs were genereated. Can be domain name or ip addr. Used to identify that C* node and distinguish it from other nodes in the client's cluster
+            if not os.path.isdir(os.path.join(self.nodes_dir, dir_for_node)):
+                # not a directory, skip it. there must be some random files in here
+                continue
 
             # iterate over our log_type_definitions, and set all the paths we need into our yml
 
@@ -134,10 +155,10 @@ class IngestTarball:
 
                 # for now, just assume all are cassandra logs (which is probably wrong)
                 # move the files for this node and log_type
-                self.position_log_files_for_node(hostname, log_type_def, nodes_dir)
+                self.position_log_files_for_node(hostname, log_type_def, self.nodes_dir)
 
     # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
-    def position_log_files_for_node(self, hostname, log_type_def, nodes_dir, **kwargs):
+    def position_log_files_for_node(self, hostname, log_type_def, **kwargs):
         """
         For a directory that contains logs for a single node and a single log_type_def of that node:
         put to each individual log files that were extracted from the tarball into the place they should go
@@ -146,7 +167,7 @@ class IngestTarball:
         # now we want to move them from original_dir to where filebeat will find them
 
         # all the files in the tmp directory we just made will be moved from source to dest
-        source_dir = os.path.join(nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
+        source_dir = os.path.join(self.nodes_dir, log_type_def["path_to_logs_source"].replace("<hostname>", hostname))
         dest_dir_path = os.path.join(
             self.base_filepath_for_logs,
             log_type_def["path_to_logs_dest"].replace("<hostname>", hostname)
@@ -204,7 +225,6 @@ class IngestTarball:
         generates a filebeat.yml file for this tarball's logs
         See docs on filebeat_yml.generate for more
         """
-        self.filebeat_yml.hostnames = self.hostnames
         self.filebeat_yml.generate()
 
     def clear_filebeat_indices_and_registry(self):
@@ -267,9 +287,13 @@ class IngestTarball:
         successful = False
         try:
             print("\n=== Extracting tarball ===")
-            self.extract_tarball()
+            #self.extract_tarball()
             print("\n=== Positioning Log files ===")
-            self.position_log_files()
+            #self.position_log_files()
+            print("\n=== setting archived dir var ===")
+            self.set_archived_dir_name()
+            print("\n=== Determining hostnames from directories ===")
+            self.set_hostnames()
             print("\n=== Generating filebeat yml ===")
             self.generate_filebeat_yml()
             print("\n=== Clearing Filebeat data (?) ===")
