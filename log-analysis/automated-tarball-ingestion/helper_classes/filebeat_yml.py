@@ -242,10 +242,11 @@ class FilebeatYML:
                         # if no exception, it's a list index
                         key_value = list
                     except:
-                        print("it is a key, not a list index")
+                        print(key, "is a key, not a list index")
 
                     # if key not set yet, initialize it based on what is next
-                    if base.get(key, "None") is None:
+                    if base.get(key, None) == None:
+                        print("setting key", key, "on base", base)
                         base[key] = key_value() # e.g., will be dict() or list()
                     else:
                         print("key found", key, "on base", base)
