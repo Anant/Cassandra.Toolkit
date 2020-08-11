@@ -69,4 +69,4 @@ processors:
       ignore_failure: true
       target_field: "@timestamp"
   - include_fields:
-      fields: [ "ingest", "message","log","input", "tags" ]
+      fields: [ "ingest", "message","log", "input", "tags"]

@@ -9,11 +9,13 @@ import zipfile
 import tarfile
 import fnmatch
 
+from helper_classes.filebeat_yml import FilebeatYML
+
 from elasticsearch import Elasticsearch
 es = Elasticsearch()
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-tarballs_to_ingest_dir_path = f"{dir_path}/log-tarballs-to-ingest"
+project_root_path = os.path.dirname(os.path.realpath(__file__))
+tarballs_to_ingest_dir_path = f"{project_root_path}/log-tarballs-to-ingest"
 
 class IngestTarball:
     """
@@ -24,10 +26,6 @@ class IngestTarball:
     client_name = ""
     tarball_filename = ""
 
-    # whether we have to go in and unzip child directories as well (ie they have zips inside of zips)
-    # TODO have to handle these
-    has_child_zips = False
-
     hostnames = []
 
     # whatever directory was archived
@@ -37,63 +35,6 @@ class IngestTarball:
 
     # set to true if you want to clear out all filebeat-* indices in ES AND rm -rf the filebeat registry at /var/lib/filebeat/registry/filebeat/*
     clean_out_filebeat_first = False
-
-    """
-    all metadata related to a given log 
-    - main key:      (e.g., cassandra.main) is arbitrarily chosen for use in this script. Will be referred to generally using var `log_type` in this script.
-    - tags:          what we want tagged in filebeat.template.yml filebeat.inputs field to identify these logs
-    - path_to_logs_source:  path from base path for this tarball to the direct parent directory that holds these logs (if there are logs nested within subdirectories, make a new log_type_definitions key for those). Will replace all names within <> dynamically.
-    - path_to_logs_dest:  path to where we want these so filebeat can find them
-    - log_regex:     regex to use to find all these logs that we want from that parent directory
-
-    To not do a certain kind of log, just put None in the path_to_logs_source and we'll skip it. Or comment the whole thing out of course.
-
-    ADDING A NEW LOG TYPE
-    - add a definition here with all the keys
-    - add the fields in filebeat.template.yml as well
-    """
-    log_type_definitions = {
-        "cassandra.main": {
-            "path_to_logs_source": "<hostname>/logs/cassandra",
-            "path_to_logs_dest": "<hostname>/cassandra",
-            "tags": ["cassandra","main"],
-            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/system.log*",
-        },
-        "system": {
-            # NOTE: This is for a finding system logs, not cassandra logs
-            "path_to_logs_source": None, # TODO set this when we have a path
-            "tags": ["system","messages"],
-            "log_regex": "<self.base_filepath_for_logs>/<hostname>/system/*.test",
-        },
-        "spark.master": {
-            "path_to_logs_source": "<hostname>/logs/spark/master",
-            "path_to_logs_dest": "<hostname>/spark/master",
-            "tags": ["spark","master"],
-            "log_regex": "<self.base_filepath_for_logs>/<hostname>/spark/master/master.*",
-            # at the path_to_logs_source at least some are zipped
-            "zipped": True,
-            "zip_format": "zip", # ie not tar.gz
-        },
-        "spark.worker": {
-            "path_to_logs_source": "<hostname>/logs/spark/worker",
-            "path_to_logs_dest": "<hostname>/spark/worker",
-            "tags": ["spark","worker"],
-            # so far only seeing "worker.log" and only one file
-            "log_regex": "<self.base_filepath_for_logs>/<hostname>/spark/worker/worker.log*",
-        },
-    }
-
-    # base dict for filebeat.inputs in our yml
-    # for now all have the same for all these. If they don't we'll have to add more to our log_type_definitions dict above and then set using those
-    filebeat_input_template = {
-        "enabled": "true",
-        "exclude_files": ["\.zip$"],
-        "multiline.match": "after",
-        "multiline.negate": "true",
-        "multiline.pattern": "^TRACE|DEBUG|WARN|INFO|ERROR",
-        "type": "log",
-        "paths": [],
-    }
 
     def __init__(self, tarball_filename, client_name, **kwargs):
         self.tarball_filename = tarball_filename
@@ -115,12 +56,9 @@ class IngestTarball:
         self.incident_id = tarball_modified_time
 
         # where we will set the logs for this client (so each client has their own dir)
-        self.path_for_client = f"{dir_path}/logs-for-client/{self.client_name}" # /{self.hostname}/{self.log_type}"
+        self.path_for_client = f"{project_root_path}/logs-for-client/{self.client_name}" 
 
         self.base_filepath_for_logs = f"{self.path_for_client}/incident-{self.incident_id}"
-
-        # where the filebeat.yml will go
-        self.filebeat_yml_path = os.path.join(self.base_filepath_for_logs, 'tmp', 'filebeat.yaml')
 
         # where we will extract the tarball to (temporarily)
         self.extract_dest_path = f"{self.base_filepath_for_logs}/tmp"
@@ -128,18 +66,13 @@ class IngestTarball:
         # relative path from parent dir (the root of the tarball) to the nodes
         self.path_to_nodes_dir = "nodes"
 
-        # how to get from the nodes dir to our logs. Hopefully there's only one per node...
+        self.filebeat_yml = FilebeatYML(project_root_path=project_root_path, base_filepath_for_logs=self.base_filepath_for_logs, path_for_client=self.path_for_client, **kwargs)
 
         ##################
         # other options
         ##################
-        if kwargs.get("debug_mode", False):
-            # does things such as setting filebeat.yml so we don't output to ES, but to console instead
-            self.debug_mode = True
-
         if kwargs.get("clean_out_filebeat_first", False):
             self.clean_out_filebeat_first = True
-
 
     ###################################################
     # the operations we run when ingesting the tarball
@@ -194,7 +127,7 @@ class IngestTarball:
 
             # iterate over our log_type_definitions, and set all the paths we need into our yml
 
-            for key, log_type_def in self.log_type_definitions.items():
+            for key, log_type_def in self.filebeat_yml.log_type_definitions.items():
                 if log_type_def.get("path_to_logs_source", None) is None:
                     # we're not supporting yet
                     continue
@@ -226,6 +159,7 @@ class IngestTarball:
             return
 
         # if zipped, unzip
+        # TODO consider using shutil.unpack_archive since it seems to handle all kinds just fine
         if log_type_def.get("zipped", False):
             all_files = os.listdir(source_dir)
             # Not necessarily zipped, since often zipped files are mixed in with unzipped in these dirs. 
@@ -265,106 +199,13 @@ class IngestTarball:
             # move it
             shutil.move(source_path, dest_path)
 
-    def generate_filebeat_yml(self, **kwargs):
+    def generate_filebeat_yml(self):
         """
         generates a filebeat.yml file for this tarball's logs
-        - sets the filename on this IngestTarball instance
-        - converts our base yml file to dict, then adds fields, then converts back.
-        - That way, we have something that's easy to test and query against (a dict) in the middle
-        - Also allows us to maintain a single yml template that matches what filebeat.ymls normally look like (filebeat.template.yml) as our starting point
-
-        Options:
-        - debug_mode : Boolean. If True, won't output to es, will output to console
+        See docs on filebeat_yml.generate for more
         """
-        template_path = os.path.join(dir_path, "config-templates/filebeat.template.yml")
-
-        template_yaml_as_dict = None
-        with open(template_path, 'r') as stream:
-            try:
-                # convert to dict
-                # no need to load, so just safe_load
-                template_yaml_as_dict = yaml.safe_load(stream)
-
-            except yaml.YAMLError as e:
-                print(e)
-                raise e
-
-        # add the paths to the dict
-        template_yaml_as_dict["filebeat.inputs"] = []
-        filebeat_inputs = template_yaml_as_dict["filebeat.inputs"]
-
-        # iterate over our log_type_definitions, and set all the paths we need into our yml
-        for key, log_type_def in self.log_type_definitions.items():
-            if log_type_def.get("path_to_logs_source", None) is None:
-                # we're not supporting yet
-                continue
-
-            filebeat_inputs.append(deepcopy(self.filebeat_input_template))
-
-            fb_input = filebeat_inputs[-1]
-            # add tags for this log type
-            fb_input["tags"] = log_type_def["tags"]
-
-            # add one path per host
-            for hostname in self.hostnames:
-                fb_input["paths"].append(
-                    log_type_def["log_regex"].replace("<self.base_filepath_for_logs>", self.base_filepath_for_logs).replace("<hostname>", hostname)
-                )
-
-
-        if self.debug_mode:
-            # won't output to es, will output to console
-            del template_yaml_as_dict['output.logstash']
-            template_yaml_as_dict["output.console.pretty"] = True
-
-        # set appropriate amount of leading paths for tokenizing the log.file.path
-        fb_processors = template_yaml_as_dict["processors"]
-        for fb_processor in fb_processors:
-            if fb_processor.get("dissect", False) and fb_processor["dissect"]["field"] == "log.file.path":
-                # replace 
-                fb_processor["dissect"]["tokenizer"] = fb_processor["dissect"]["tokenizer"].replace("<path_for_client>", self.path_for_client)
-
-
-
-        # remove old filebeat.yml. Can't just overwrite, since we removed write permissions
-        print("removing old filebeat yml if exists")
-        if os.path.isfile(self.filebeat_yml_path):
-            os.remove(self.filebeat_yml_path)
-
-        with open(self.filebeat_yml_path, 'w', encoding='utf8') as outfile:
-            # currently putting all the logs from a single host into a single dir. Helps namespace these filebeat ymls. Might be better somewhere else though
-
-            try:
-                # convert back to yml, and save as a file
-                print("writing to", self.filebeat_yml_path)
-                yaml.dump(template_yaml_as_dict, outfile, default_flow_style=False)
-
-                # change permissions, or else we get error:
-                # "Exiting: error loading config file: config file <filebeat.yml path> can only be writable by the owner but the permissions are "-rw-rw-r--" (to fix the permissions use: 'chmod go-w <filebeat.yml path>)"
-                # this is equivalent of chmod go-w
-                chmod_cmd = f'chmod go-w {self.filebeat_yml_path}'
-                print(f"Running chmod command: {chmod_cmd}")
-                chmod_cmd_result = subprocess.run(chmod_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                if len(chmod_cmd_result.stderr) == 0:
-                    print("stdout from chmod_cmd:", chmod_cmd_result.stdout)
-                else:
-                    print(chmod_cmd_result.stderr)
-                    raise Exception(chmod_cmd_result.stderr)
-
-                # make root the owner. https://www.elastic.co/guide/en/beats/libbeat/master/config-file-permissions.html
-                chown_cmd = f'sudo chown root {self.filebeat_yml_path}'
-                print(f"Running chown command: {chown_cmd}")
-                chown_cmd_result = subprocess.run(chown_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                if len(chown_cmd_result.stderr) == 0:
-                    print("stdout from chown_cmd:", chown_cmd_result.stdout)
-                else:
-                    print(chown_cmd_result.stderr)
-                    raise Exception(chown_cmd_result.stderr)
-
-
-            except yaml.YAMLError as e:
-                print(e)
-                raise e
+        self.filebeat_yml.hostnames = self.hostnames
+        self.filebeat_yml.generate()
 
     def clear_filebeat_indices_and_registry(self):
         # ignore 404 and 400
@@ -394,9 +235,9 @@ class IngestTarball:
             # -d "*"    Enable debugging for all components
             # --c       Specifies the configuration file to use for Filebeat
 
-            start_filebeat_cmd = f'sudo filebeat -e -d "*" --c {self.filebeat_yml_path}'
+            start_filebeat_cmd = f'sudo filebeat -e -d "*" --c {self.filebeat_yml.file_path}'
             # same thing, but more conservative logging
-            # start_filebeat_cmd = f'sudo filebeat -e --c {self.filebeat_yml_path}'
+            # start_filebeat_cmd = f'sudo filebeat -e --c {self.filebeat_yml.file_path}'
 
             print(f"Running filebeat command: {start_filebeat_cmd}")
 
@@ -431,15 +272,15 @@ class IngestTarball:
     def run(self):
         successful = False
         try:
-            print("=== Extracting tarball ===")
+            print("\n=== Extracting tarball ===")
             self.extract_tarball()
-            print("=== Positioning Log files ===")
+            print("\n=== Positioning Log files ===")
             self.position_log_files()
-            print("=== Generating filebeat yml ===")
+            print("\n=== Generating filebeat yml ===")
             self.generate_filebeat_yml()
-            print("=== Clearing Filebeat data (?) ===")
+            print("\n=== Clearing Filebeat data (?) ===")
             self.clear_filebeat_indices_and_registry()
-            print("=== Running Filebeat ===")
+            print("\n=== Running Filebeat ===")
             self.run_filebeat()
             successful = True
 
@@ -471,18 +312,27 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Converting Stats Form TXT TO CSV Format',
         usage='{tarball_filename} {company_name}')
-    parser.add_argument('tarball_filename', type=str, help='name of tarball file')
+    parser.add_argument('tarball_filename', type=str, help='name of archive file (e.g., tarball-for-my-client.tar.gz). Can be .tar.gz or .zip')
     parser.add_argument('client_name', type=str, help='name of client')
     parser.add_argument('--clean-out-filebeat-first', dest='clean_out_filebeat_first', action='store_true')
     parser.set_defaults(clean_out_filebeat_first=False)
     parser.add_argument('--debug-mode', dest='debug_mode', action='store_true')
     parser.set_defaults(debug_mode=False)
+    parser.add_argument('--custom-config', 
+                        dest='custom_config',
+                        action='append',
+                        nargs=2,
+                        metavar=('config_key', 'config_value'),
+                        help='Add whatever custom config you want for generating the filebeat.yml. Can be used multiple times. E.g., `--custom-config output.elasticsearch.hostname 127.0.0.1 --custom-config kibana.hostname 123.456.789.101 --custom-config output.kibana.enabled false --custom-config processors.2.timestamp.ignore_failure false`. Use integers (as in the example above) for array indices. This will override any other setting, since it sets fields after everything else.'
+                        )
+    parser.set_defaults(custom_config=[])
 
     args = parser.parse_args()
 
     options = {
         "clean_out_filebeat_first": args.clean_out_filebeat_first,
         "debug_mode": args.debug_mode,
+        "custom_config": args.custom_config,
     }
 
     ingestTarball = IngestTarball(args.tarball_filename, args.client_name, **options)
