@@ -56,11 +56,22 @@ processors:
       tokenizer: "<path_for_client>/incident-%{incident-id}/%{host-name}/cassandra/"
       field: "log.file.path"
       target_prefix: "ingest"
+      
+#-------------------------------------- spark  
+  - dissect:
+      tokenizer: "%{loglevel} %{timestamp} %{+timestamp},%{} %{class}.%{}:%{} - %{message}"
+      field: "message"
+      target_prefix: "ingest"
+      # TODO consider adding to other dissect statements as well. Though doesn't seem to be working
+      trim_values: all
+
   - timestamp:
       field: "ingest.timestamp"
       layouts:
         - '2006 Jan _2 15:04:05'
         - '2006-01-02 15:04:05'
+        # in case there is leading whitespace we didn't strip
+        - ' 2006-01-02 15:04:05'
       test:
         - '2020 Jun  8 02:40:01'
         - '2001 Jan 17 15:04:01'
