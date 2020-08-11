@@ -19,6 +19,16 @@
     python3 ingest_tarball.py my-client-logs-tarball.tar.gz my_client --debug-mode
     ```
 
+    To pass in arbitrary config for the filebeat.yml file, send in a key (can be nested) and a value, e.g., 
+    ```
+    --custom-config setup.kibana.host 123.456.345.123:5601
+    ```
+
+    To cleanup all generated files if the script run successfully, pass in:
+    ```
+    --cleanup-on-finish
+    ```
+
     * The tarball metadata:
       * don't count on this being extractable from the filename for now. Prompt user input.
       * What we need:
