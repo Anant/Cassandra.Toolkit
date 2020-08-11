@@ -110,7 +110,7 @@ class FilebeatYML:
         IF this doesn't work for whatever reason, consider this: https://stackoverflow.com/a/39464072/6952495
         """
         new_dict = {}
-        print("starts with:\n", base_dict)
+        #print("starts with:\n", base_dict)
 
 
         # for each item on this dict:
@@ -168,8 +168,8 @@ class FilebeatYML:
         # format the dict so it's easier to use
         self.template_yaml_as_dict = self.breakout_keys_from_yml_dict(self.template_yaml_as_dict)
 
-        print("\nFINAL")
-        print(self.template_yaml_as_dict)
+        #print("\nFINAL")
+        #print(self.template_yaml_as_dict)
 
     def add_filebeat_inputs(self):
         """

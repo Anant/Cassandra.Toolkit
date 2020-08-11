@@ -71,8 +71,8 @@ class IngestTarball:
         ##################
         # other options
         ##################
-        if kwargs.get("clean_out_filebeat_first", False):
-            self.clean_out_filebeat_first = True
+        self.clean_out_filebeat_first = kwargs.get("clean_out_filebeat_first", False)
+        self.clean_up_on_finish = kwargs.get("clean_up_on_finish", False)
 
     ###################################################
     # the operations we run when ingesting the tarball
@@ -245,14 +245,6 @@ class IngestTarball:
             os.system(start_filebeat_cmd)
 
 
-    def archive_tarball(self):
-        """
-        TODO
-        Having extracted and positioned log files to where they need to go, and ran filebeat, we now archive the tarball so we don't run this again on this tarball. 
-        Unless we want to of course, so don't delete it. Archive it.
-        """
-        pass
-
     def cleanup(self, successful):
         """
         Does whatever needs to be done after the job is successful, or after the job failed for that matter
@@ -261,7 +253,9 @@ class IngestTarball:
         - though it might be worth revisiting this; maybe change this and delete these later, especially if client doesn't want us to keep anything. But that would probably be done by another job, after all analysis is completed
         """
         if successful:
-            self.archive_tarball()
+            if self.clean_up_on_finish:
+                # remove everything we generated using this script
+                shutil.rmtree(self.path_for_client)
         else:
             # this is it for now
             print("failed to ingest tarball")
@@ -326,11 +320,14 @@ if __name__ == '__main__':
                         help='Add whatever custom config you want for generating the filebeat.yml. Can be used multiple times. E.g., `--custom-config output.elasticsearch.hostname 127.0.0.1 --custom-config kibana.hostname 123.456.789.101 --custom-config output.kibana.enabled false --custom-config processors.2.timestamp.ignore_failure false`. Use integers (as in the example above) for array indices. This will override any other setting, since it sets fields after everything else.'
                         )
     parser.set_defaults(custom_config=[])
+    parser.add_argument('--cleanup-on-finish', dest='clean_up_on_finish', action='store_true', help="If runs successfully, clears out everything created except for the original tarball")
+    parser.set_defaults(debug_mode=False)
 
     args = parser.parse_args()
 
     options = {
         "clean_out_filebeat_first": args.clean_out_filebeat_first,
+        "clean_up_on_finish": args.clean_up_on_finish,
         "debug_mode": args.debug_mode,
         "custom_config": args.custom_config,
     }
