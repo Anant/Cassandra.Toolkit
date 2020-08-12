@@ -187,8 +187,12 @@ processors:
   - include_fields:
       fields: [ "ingest", "message","log", "input", "tags" ]
 
-
  
+```
+### run file beat setup
+
+```
+sudo filebeat setup
 ```
 
 ### repeated testing / debugging 
