@@ -287,9 +287,9 @@ class IngestTarball:
         successful = False
         try:
             print("\n=== Extracting tarball ===")
-            #self.extract_tarball()
+            self.extract_tarball()
             print("\n=== Positioning Log files ===")
-            #self.position_log_files()
+            self.position_log_files()
             print("\n=== setting archived dir var ===")
             self.set_archived_dir_name()
             print("\n=== Determining hostnames from directories ===")
