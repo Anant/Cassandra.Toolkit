@@ -79,6 +79,12 @@ class IngestTarball:
         self.clean_up_on_finish = kwargs.get("clean_up_on_finish", False)
 
     ###################################################
+    # helpers
+    ###################################################
+    def get_hostname_from_path(self, dir_for_node):
+        return os.path.basename(os.path.normpath(dir_for_node))
+
+    ###################################################
     # the operations we run when ingesting the tarball
     ###################################################
 
@@ -126,7 +132,7 @@ class IngestTarball:
                 continue
 
             # get node's hostname from the directory name (ie the final part of the path)
-            hostname = os.path.basename(os.path.normpath(dir_for_node))
+            hostname = self.get_hostname_from_path(dir_for_node)
             self.hostnames.append(hostname)
 
         self.filebeat_yml.hostnames = self.hostnames
@@ -146,6 +152,8 @@ class IngestTarball:
                 # not a directory, skip it. there must be some random files in here
                 continue
 
+            hostname = self.get_hostname_from_path(dir_for_node)
+
             # iterate over our log_type_definitions, and set all the paths we need into our yml
 
             for key, log_type_def in self.filebeat_yml.log_type_definitions.items():
@@ -155,7 +163,7 @@ class IngestTarball:
 
                 # for now, just assume all are cassandra logs (which is probably wrong)
                 # move the files for this node and log_type
-                self.position_log_files_for_node(hostname, log_type_def, self.nodes_dir)
+                self.position_log_files_for_node(hostname, log_type_def)
 
     # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
     def position_log_files_for_node(self, hostname, log_type_def, **kwargs):
@@ -288,10 +296,10 @@ class IngestTarball:
         try:
             print("\n=== Extracting tarball ===")
             self.extract_tarball()
+            print("\n=== setting archived dir var and nodes_dir name ===")
+            self.set_archived_dir_name()
             print("\n=== Positioning Log files ===")
             self.position_log_files()
-            print("\n=== setting archived dir var ===")
-            self.set_archived_dir_name()
             print("\n=== Determining hostnames from directories ===")
             self.set_hostnames()
             print("\n=== Generating filebeat yml ===")

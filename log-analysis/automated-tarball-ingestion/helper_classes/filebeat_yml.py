@@ -195,7 +195,6 @@ class FilebeatYML:
 
             # add one path per host
             for hostname in self.hostnames:
-                print("hn", hostname)
                 fb_input["paths"].append(
                     log_type_def["log_regex"].replace("<self.base_filepath_for_logs>", self.base_filepath_for_logs).replace("<hostname>", hostname)
                 )

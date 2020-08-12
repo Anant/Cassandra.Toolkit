@@ -13,7 +13,14 @@
     ```
     python3 ingest_tarball.py my-client-logs-tarball.tar.gz my_client --clean-out-filebeat-first
     ```
+## Specifying Kibana endpoint
+By default the script is pointing towards a kibana instance running on localhost. To specify a different kibana host, use the `--custom-config arg`:
+    To pass in arbitrary config for the filebeat.yml file, send in a key (can be nested) and a value, e.g., 
+    ```
+    --custom-config setup.kibana.host 123.456.345.123:5601
+    ```
 
+## Other options
     You can also use `debug_mode` which doesn't write any logs to ES, only outputs to console by using the `--debug-mode` flag:
     ```
     python3 ingest_tarball.py my-client-logs-tarball.tar.gz my_client --debug-mode
