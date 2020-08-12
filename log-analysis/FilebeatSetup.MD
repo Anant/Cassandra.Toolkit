@@ -104,9 +104,9 @@ setup.kibana:
   host: "http://localhost:5601"
 #================================ Outputs =====================================
 #-------------------------- Elasticsearch output ------------------------------
-#output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
-  # hosts: ["localhost:9200"]
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -120,9 +120,10 @@ setup.kibana:
 # output.console.pretty: true
 
 #----------------------------- Logstash output --------------------------------
-output.logstash:
+# We're sending directly to ES
+# output.logstash:
   # The Logstash hosts
-  hosts: ["localhost:5044"]
+  # hosts: ["localhost:5044"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
