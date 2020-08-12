@@ -26,7 +26,7 @@ By default the script is pointing towards a kibana instance running on localhost
     python3 ingest_tarball.py my-client-logs-tarball.tar.gz my_client --debug-mode
     ```
 
-    To pass in arbitrary config for the filebeat.yml file, send in a key (can be nested) and a value, e.g., 
+    To pass in arbitrary config for the filebeat.yml file, use the `--custom-config` flag  send in a key (can be nested) and a value, e.g., 
     ```
     --custom-config setup.kibana.host 123.456.345.123:5601
     ```
@@ -50,9 +50,13 @@ By default the script is pointing towards a kibana instance running on localhost
   - start filebeat for one-off batch job that ingests these files into ELK 
       * Perhaps later we will just have filebeat running continually on our server, watching  whatever gets placed in
 
-# Debugging the filebeat generator
+# Debugging
+## Debugging the filebeat generator
   - If you want to make some manual changes to the filebeat.yml that was generated and try again, you can run:
       ```
       sudo filebeat -e -d "*" --c $PWD/logs-for-client/my_client/incident-159687225/tmp/filebeat.yaml
       ```
       (substituting in the real path for the filebeat.yaml that was generated)
+## Debugging ES
+### Try sudo filebeat setup
+Sometimes filebeat will process logs correctly (which you will be able to see in the filebeat log output, since it will show a log (level DEBUG) for event "Publish event"that shows all the fields. However, it won't get into kibana correctly. Sometimes all it takes is running `sudo filebeat setup` so that filebeat configures for the current elasticsearch setup

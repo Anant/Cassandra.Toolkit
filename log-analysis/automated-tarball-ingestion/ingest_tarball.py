@@ -296,18 +296,26 @@ class IngestTarball:
         try:
             print("\n=== Extracting tarball ===")
             self.extract_tarball()
+
             print("\n=== setting archived dir var and nodes_dir name ===")
             self.set_archived_dir_name()
+
             print("\n=== Positioning Log files ===")
             self.position_log_files()
+
             print("\n=== Determining hostnames from directories ===")
             self.set_hostnames()
+
             print("\n=== Generating filebeat yml ===")
             self.generate_filebeat_yml()
+
             print("\n=== Clearing Filebeat data (?) ===")
             self.clear_filebeat_indices_and_registry()
+
             print("\n=== Running Filebeat ===")
             self.run_filebeat()
+
+            # NOTE this will be successful even if you ctrl+c in the middle of filebeat running
             successful = True
 
         except Exception as e:
