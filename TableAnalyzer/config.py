@@ -16,9 +16,13 @@ def get_keys(region, environ, key, imp="True"):
             if inputArray[2] in doc[inputArray[0]][inputArray[1]]:
                 item = doc[inputArray[0]][inputArray[1]][inputArray[2]]
                 if type(item) == list:
+                    # this makes data a list with single item, which is a list. 
+                    # used if key is e.g., "cassandra" or "spark"
                     data.append(doc[inputArray[0]][inputArray[1]][inputArray[2]])
                     if not imp: print (','.join(doc[inputArray[0]][inputArray[1]][inputArray[2]]))
                 else:
+                    # used if key is "key", (ie ssh keh). 
+                    # data is now a tuple with a single item, so data[0] return just the ssh key
                     data = (doc[inputArray[0]][inputArray[1]][inputArray[2]])
                     if not imp: print (doc[inputArray[0]][inputArray[1]][inputArray[2]])
             else:

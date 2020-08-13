@@ -9,7 +9,7 @@ import re
 
 parser = argparse.ArgumentParser(
     description='Collecting config varibales from environments.yaml and Start receiving stats',
-    usage=' {region} {environment} {datacenter} {0|1} [-k] [-t]')
+    usage=' {region} {environment} {db} {0|1} [-k] [-t]')
 parser.add_argument('region', type=str, help='Region {us-east-1|usw|us|aws}')
 parser.add_argument('environ', type=str, help='Environment {dev|stage|prod}')
 parser.add_argument('db', type=str, help='Database {cassandra|spark}')
@@ -69,7 +69,7 @@ def main():
         print("settings.json File Not Found OR Error While Getting Setting Parameters, Applying Default Settings")
 
     if detectTopology:
-        if args.debug: print("Detechting Nodes")
+        if args.debug: print("Detecting Nodes")
         command = str("nodetool -h `hostname -i` status")
         try:
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
