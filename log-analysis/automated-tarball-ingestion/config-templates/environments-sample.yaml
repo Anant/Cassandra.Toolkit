@@ -1,0 +1,43 @@
+#region:
+#  environment:
+#    datacenter:
+#
+#    Note that you only have to specify some of the nodes; we will get the rest using nodetool
+us:
+  prod:
+    cassandra:
+      - 192.168.0.1
+      - 192.168.0.2
+      - 192.168.0.3
+    spark:
+      - 192.168.0.4
+    key: keyfile.pem
+  prod2:
+    cassandra:
+      - 192.168.0.11
+      - 192.168.0.12
+      - 192.168.0.13
+    spark:
+      - 192.168.0.14
+    key: keyfile.pem 
+  stage:
+    cassandra:
+      - 192.168.1.1
+      - 192.168.1.2
+      - 192.168.1.3
+    spark:
+      - 192.168.1.4
+    key: keyfile.pem 
+
+paths_to_confs: 
+  # list all paths to logs that you use in this region. A path specified below should match a node's log directory at least once
+  # if left blank, will use default for OSS C* if using C* or default for DSE if using DSE
+  - /var/log/cassandra
+
+paths_to_logs: 
+  # list all paths to logs that you use in this region. A path specified below should match a node's log directory at least once
+  # if left blank, will use default for OSS C* if using C* or default for DSE if using DSE
+  - /var/log/cassandra
+
+# or can say "dse". Not supporting other flavors for now
+cassandra_distribution: oss 
