@@ -1,0 +1,7 @@
+settings:
+  path_to_logs: 
+    # list all paths to logs that you use in this region. A path specified below should match a node's log directory at least once
+    - /var/log/cassandra
+  # TODO can get using nodetool like is done in TableAnalyzer/cfstats.receive.py#42, `nodetool version`
+  cassandra_distribution: dse
+

@@ -12,6 +12,8 @@ class Node:
         self.hostname = hostname
         self.datacenter_name = datacenter_name
         self.ssh_key = ssh_key
+        self.has_spark = False
+        self.has_cassandra = False
 
     def find_log_dir(self, all_log_paths):
         """
@@ -28,7 +30,7 @@ class Node:
         match = None
         self.config_dir = match
 
-    def run_node_analyzer(self, node_analyzer_path):
+    def run_node_analyzer(self, node_analyzer_path, useSSH=False):
         """
         Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug)
         note though that datacentername never gets used
@@ -36,6 +38,11 @@ class Node:
         cmd_base = f"sudo bash {node_analyzer_path}/nodetool.receive.sh"
 
         # defaulting to debug mode for verbose output
-        cmd_with_args = f"{cmd_base} {self.log_dir} {self.conf_dir} {self.datacenter_name} 1""
-        os.system(cmd_with_args)
+        cmd_with_args = f"{cmd_base} {self.log_dir} {self.conf_dir} {self.datacenter_name} 1"
+        print("now running Node Analyzer:", cmd_with_args)
+        if useSSH:
+            # TODO
+            pass
+        else:
+            os.system(cmd_with_args)
 

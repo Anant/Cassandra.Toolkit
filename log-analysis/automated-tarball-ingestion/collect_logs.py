@@ -9,6 +9,8 @@ import zipfile
 import tarfile
 import fnmatch
 from datetime import datetime
+import sys
+from helper_classes.node import Node
 
 from elasticsearch import Elasticsearch
 es = Elasticsearch()
@@ -17,12 +19,13 @@ project_root_path = os.path.dirname(os.path.realpath(__file__))
 repo_path = f"{project_root_path}/../.."
 node_analyzer_path = f"{repo_path}/NodeAnalyzer"
 table_analyzer_path = f"{repo_path}/TableAnalyzer"
-HOME = str(Path.home())
 
-# access TableAnalyzer class
+# access TableAnalyzer class and related helpers
+sys.path.insert(0, table_analyzer_path)
 # not using for now, just running as a command line script for easy args sending
-# sys.path.insert(0, table_analyzer_path) 
-# from cfstats.receive.py import main as run_table_analyzer_main
+# from cfstats.receive import main as run_table_analyzer_main
+# gets ssh key or cassandra/spark hosts from our environments.yml file
+from config import get_keys
 
 tarballs_to_ingest_dir_path = f"{project_root_path}/log-tarballs-to-ingest"
 
@@ -37,7 +40,12 @@ class CollectLogs:
     client_name = ""
     tarball_filename = ""
 
-    hostnames = []
+    # list of strings extracted from environments.yaml
+    regions = []
+    # dict, with keys being regions, and values list of strings extracted from environments.yaml
+    datacenters_by_region = {}
+
+    all_nodes = []
 
     # whatever directory was archived
     archived_dir_name = ""
@@ -53,7 +61,7 @@ class CollectLogs:
         self.client_name = client_name
 
         # where the environments.yaml can be found
-        self.environments_yml = f"{HOME}/config/environments.yaml"
+        self.environments_yml = f"{project_root_path}/config/environments.yaml"
 
         # where we will set the logs for this client (so each client has their own dir)
         time_for_dir = datetime.now().strftime("%m%d%YTH%M%S")
@@ -80,27 +88,33 @@ class CollectLogs:
     # helpers
     ###################################################
 
-    def run_table_analyzer(self):
+    def run_table_analyzer(self, region, environment, node_type):
         """
         runs table analyzer to get data we need
-        instantiates a Node instance for each ip addr
-        usage: python3 cfstats.receive.py {region} {environment} {datacenter} {0|1} (debug) [-k] (keyspace) [-t] (table)
+        - instantiates a Node instance for each ip addr
+        - usage: python3 cfstats.receive.py {region} {environment} {db} {0|1} (debug) [-k] (keyspace) [-t] (table)
+            * However, `db` var is either "spark" or "cassandra", so calling that node_type here
+            * `environment` is something like a datacenter name
+        - after running, will have a file in {project_root}/data/{region}/{environment}/ for each node, called "<ip_addr>.txt" (e.g., 1.2.3.4.txt)
         """
-        # TODO iterate over regions
-        region = "local"
-        environment = "dev"
-        # I think same thing as "db" in NodeAnalyzer
-        datacenter = "cassandra"
 
-        cmd_base = f"python3 {table_analyzer_path}/cfstats.receive.py" 
-        cmd_with_args = f"{cmd_base} {region} {environment} {datacenter} 1" 
-        print("Now running:", cmd_with_args)
+        # is either cassandra or spark. Note that TableAnalyzer sometimes calls db "db" and sometimes "datacenter"
+
+        cmd_base = f"python3 {table_analyzer_path}/cfstats.receive.py"
+        cmd_with_args = f"{cmd_base} {region} {environment} {node_type} 1"
+        print("Now running TableAnalyzer:", cmd_with_args)
+        print("--- TableAnalyzer output ---")
         os.system(cmd_with_args)
+        print("--- (end of TableAnalyzer output) ---")
 
-    def run_node_analyzer(self):
-        for node in self.all_nodes:
-            node.run_node_analyzer(node_analyzer_path)
-
+    # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
+    def position_log_files_for_node(self, hostname, log_type_def, **kwargs):
+        """
+        For a directory that contains logs for a single node and a single log_type_def of that node:
+        put to each individual log files that were extracted from the tarball into the place they should go
+        - just goes into <node_hostname>/logs/cassandra (or whatever our self.path_to_cassandra_logs is) and grabs those logs
+        """
+              
     ###################################################
     # the operations we run when ingesting the tarball
     ###################################################
@@ -108,7 +122,7 @@ class CollectLogs:
     def read_environments_yml(self):
         """
         reads environments.yaml file and extracts information about the hosts and ssh keys to access them
-        - Currently only supports a file at $HOME/config/environments.yaml (following the convention set by TableAnalyzer tool)
+        - Currently only supports a file at {project_root}/config/environments.yaml (following the convention set by TableAnalyzer tool)
         - TODO add support for specifying a different path/filename
         """
         with open(self.environments_yml, 'r') as stream:
@@ -122,8 +136,63 @@ class CollectLogs:
                 # for now just throwing anyways. If it doesn't generate, we don't want it to run
                 raise e
 
-    def analyze_tables(self):
-        self.run_table_analyzer()
+
+        # iterate over the yml and get out the data we want
+        print(self.environments_yml_dict)
+        for region, datacenters in self.environments_yml_dict.items():
+            self.regions.append(region)
+
+            # db should be "spark" or "cassandra"
+            for datacenter_name, data_for_datacenter in datacenters.items():
+                if self.datacenters_by_region.get(region, None) is None:
+                    self.datacenters_by_region[region] = []
+
+                self.datacenters_by_region[region].append(datacenter_name)
+
+                # this is filename of ssh key for this environment in this region
+                # for TableAnalyzer to work, needs to be in ./keys/<filename>, relative to PWD (so in this directory actually)
+                ssh_key_for_dc = data_for_datacenter.get("key", "")
+
+                nodes_by_hostname = {}
+
+                # iterate over cassandra and spark nodes. Note that if one node has both, this script will overwrite the same data/<region>/<environment>/<ip_addr>.txt file on the 2nd call, but that's ok, the info should be identical. 
+                # this is to make sure that all nodes have nodetool ran on them
+                for node_type in ["cassandra", "spark"]:
+                    hostnames = data_for_datacenter.get(node_type, [])
+                    print("hostnames for region ", region, "and datacenter", datacenter_name)
+                    print(hostnames)
+
+                    for hostname in hostnames:
+                        # set to existing node if exists
+                        node = nodes_by_hostname.get(hostname, None)
+                        if node is None:
+                            # if not, make one
+                            node = Node(hostname, datacenter_name, ssh_key_for_dc)
+                            self.all_nodes.append(node)
+
+
+                        if node_type == "spark":
+                            node.has_spark = True
+
+                        elif node_type == "cassandra":
+                            node.has_cassandra = True
+
+
+
+    def analyze_tables_for_cluster(self):
+        for region in self.regions:
+            for datacenter_name in self.datacenters_by_region[region]:
+                for node_type in ["cassandra", "spark"]:
+                    self.run_table_analyzer(region, datacenter_name, node_type)
+
+    def analyze_each_node(self):
+        """
+        iterate over each node in the cluster, and run NodeAnalyzer tool
+        Will write files to ./data dir also
+        """
+        for node in self.all_nodes:
+            print("getting logs and nodetool data from", node.hostname)
+            node.run_node_analyzer(node_analyzer_path)
 
     def create_dirs_for_hosts(self):
         """
@@ -140,14 +209,6 @@ class CollectLogs:
         put all log files where we want them so they're ready to be archived
         """
 
-
-    # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
-    def position_log_files_for_node(self, hostname, log_type_def, **kwargs):
-        """
-        For a directory that contains logs for a single node and a single log_type_def of that node:
-        put to each individual log files that were extracted from the tarball into the place they should go
-        - just goes into <node_hostname>/logs/cassandra (or whatever our self.path_to_cassandra_logs is) and grabs those logs
-        """
 
     def compress_into_tarball(self):
         """
@@ -180,7 +241,10 @@ class CollectLogs:
             self.read_environments_yml()
 
             print("\n=== Get table stats ===")
-            self.analyze_tables()
+            self.analyze_tables_for_cluster()
+
+            print("\n=== Get logs and nodetool data from each node ===")
+            self.analyze_each_node()
 
             print("\n=== Creating directory for each host ===")
             self.create_dirs_for_hosts()
@@ -213,8 +277,12 @@ if __name__ == '__main__':
     Instructions:
 
     1) specify your hosts and ssh keys in a `environments.yaml` file
-        - Find template at: https://github.com/Anant/cassandra.toolkit/blob/dev/log-analysis/automated-tarball-ingestion/config-templates/environments-sample.yaml
-        - Template should be identical to TableAnalyzer yaml, unless cassandra logs are anywhere besides the defaults given below. 
+        - Find template at: ./config-templates/environments-sample.yaml
+        - Template should be identical to TableAnalyzer yaml. Note that currently we are currently calling TableAnalyzer/cfstats.receive.py in this script, so to maintain compatibility need to use exact same format for the environments_yml. 
+
+    2) unless cassandra logs are anywhere besides the defaults (see below) specify environment settings in environment-settings.yaml
+        - find template for environment-settings.yaml at ./config-templates/environments-settings.sample.yaml
+        - Defaults:
             * FOR DSE:
                 - see https://docs.datastax.com/en/dse/6.8/dse-admin/datastax_enterprise/config/chgLogLocations.html
             * FOR OSS Cassandra: 
@@ -223,7 +291,7 @@ if __name__ == '__main__':
                 Seems to indicate default is /var/lib/cassandra/logs (?) TODO make sure to test
         - In that case, specify the path to your logs directory, as shown in the environments-sample.yaml file. 
             * If all hosts have files in the same place, you can specify by using
-    2) name file and place at default location, $HOME/config/environments.yaml
+    2) name file and place at default location, {project_root_path}/config/environments.yaml
     3) Pass in arbitrary string to call your company. Call like:
         python3 collect_logs.py my-company
     """
