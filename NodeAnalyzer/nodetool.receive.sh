@@ -2,7 +2,7 @@
 
 if [ -z "$1" ]
     then 
-        echo $"Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug)"
+        echo $"Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug) {data_dest_path}"
         exit 1;
 fi
 
@@ -10,26 +10,33 @@ logdirectory=$1
 confdirectory=$2
 datacentername=$3
 debug=$4
+# defaults to data directory, relative to where this script was called from
+data_dest_path=${5:-./data}
 
 echo $key
 
 receive_nodetool_command() {
-    node_command="nodetool ${1} > data/nodetool/${1}.txt"
+    node_command="nodetool ${1} > $data_dest_path/nodetool/${1}.txt"
     echo $node_command
 }
 
 receive_copy_config_log() {
-    copy_command="cp -r ${logdirectory}/* data/log/ && cp -r ${confdirectory}/* data/conf/"
+    copy_command="cp -r ${logdirectory}/* $data_dest_path/log/ && cp -r ${confdirectory}/* $data_dest_path/conf/"
     echo $copy_command
 }
 
 receive_compress() {
-    compress_command="tar cvfz `hostname -i`.tar.gz ./data"
+    compress_command="tar cvfz `hostname -i`.tar.gz ./$data_dest_path"
     echo $compress_command
 }
 
 
-if [ "${debug}" -eq 1 ] ; then echo $receive_copy_config_log ; fi
+# make dirs for where our data goes, if doesn't exist yet
+mkdir -p $data_dest_path/log
+mkdir -p $data_dest_path/conf
+mkdir -p $data_dest_path/nodetool/
+
+if [ "${debug}" -eq 1 ] ; then echo $(receive_copy_config_log); fi
 `eval $(receive_copy_config_log)`
 
 commands=$(cat nodetool.commands.txt | tr "," "\n")
