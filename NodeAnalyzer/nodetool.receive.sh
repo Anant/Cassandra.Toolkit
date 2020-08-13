@@ -2,7 +2,7 @@
 
 if [ -z "$1" ]
     then 
-        echo $"Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug) {data_dest_path}"
+        echo $"Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug) {data_dest_path} {skip_archiving}"
         exit 1;
 fi
 
@@ -12,6 +12,10 @@ datacentername=$3
 debug=$4
 # defaults to data directory, relative to where this script was called from
 data_dest_path=${5:-./data}
+skip_archiving=${6:-false}
+
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+
 
 echo $key
 
@@ -39,7 +43,7 @@ mkdir -p $data_dest_path/nodetool/
 if [ "${debug}" -eq 1 ] ; then echo $(receive_copy_config_log); fi
 `eval $(receive_copy_config_log)`
 
-commands=$(cat nodetool.commands.txt | tr "," "\n")
+commands=$(cat $parent_path/nodetool.commands.txt | tr "," "\n")
 if [ "${debug}" -eq 1 ] ; then echo $commands ; fi
 
 # Run through each of the commands and save them 
@@ -70,5 +74,7 @@ do
         echo $result
 done
 
-if [ "${debug}" -eq 1 ] ; then echo $receive_compress ; fi
-`eval $(receive_compress)`
+if [ $skip_archiving == false ]; then
+  if [ "${debug}" -eq 1 ] ; then echo $(receive_compress) ; fi
+  `eval $(receive_compress)`
+fi

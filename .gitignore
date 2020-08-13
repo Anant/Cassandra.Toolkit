@@ -112,4 +112,5 @@ venv.bak/
 # TableAnalyzer (and collect_logs.py by way of TableAnalyzer) both create data dirs when ran. don't commit those
 **/data
 # TableAnalyzer (and collect_logs.py by way of TableAnalyzer) both have users create a file at config/environments.yml. We want to commit the template, not this file though
-**/config/environments.yml
+**/config/environments.yaml
+**/config/environments-settings.yaml

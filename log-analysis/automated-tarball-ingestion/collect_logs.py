@@ -19,6 +19,7 @@ project_root_path = os.path.dirname(os.path.realpath(__file__))
 repo_path = f"{project_root_path}/../.."
 node_analyzer_path = f"{repo_path}/NodeAnalyzer"
 table_analyzer_path = f"{repo_path}/TableAnalyzer"
+settings_yml_path = os.path.join(project_root_path, "config/environments-settings.yaml")
 
 # access TableAnalyzer class and related helpers
 sys.path.insert(0, table_analyzer_path)
@@ -28,6 +29,21 @@ sys.path.insert(0, table_analyzer_path)
 from config import get_keys
 
 tarballs_to_ingest_dir_path = f"{project_root_path}/log-tarballs-to-ingest"
+
+config_path_defaults = {
+    "dse": "/etc/dse/cassandra/",
+    # https://cassandra.apache.org/doc/latest/getting_started/configuring.html
+    # depends on installation type:
+    # - tarball: `conf` directory within the tarball install location
+    # - package: /etc/cassandra directory
+    # we'll use package defaults
+    "cassandra": "/etc/cassandra"
+}
+
+log_path_defaults = {
+    "dse": "/var/log/cassandra/",
+    "cassandra":  "/var/log/cassandra/",
+}
 
 class CollectLogs:
     """
@@ -104,7 +120,12 @@ class CollectLogs:
         cmd_with_args = f"{cmd_base} {region} {environment} {node_type} 1"
         print("Now running TableAnalyzer:", cmd_with_args)
         print("--- TableAnalyzer output ---")
-        os.system(cmd_with_args)
+        try:
+            subprocess.run(cmd_with_args, shell=True, check = True)
+        except subprocess.CalledProcessError as e:
+            # throwing anyways
+            raise e
+
         print("--- (end of TableAnalyzer output) ---")
 
     # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
@@ -115,13 +136,42 @@ class CollectLogs:
         - just goes into <node_hostname>/logs/cassandra (or whatever our self.path_to_cassandra_logs is) and grabs those logs
         """
               
-    ###################################################
-    # the operations we run when ingesting the tarball
-    ###################################################
+    def read_environments_settings_yml(self):
+        """
+        parses out the environments-settings.yaml File
+        """
+        settings_yml_dict = {} 
+        try:
+            with open(settings_yml_path, 'r') as stream:
+                # convert to dict
+                # no need to load, so just safe_load
+                settings_yml_dict = yaml.safe_load(stream)
+
+        except FileNotFoundError as e:
+            print(e)
+            print("No environments-settings.yaml found; using defaults")
+
+        except yaml.YAMLError as e:
+            print(e)
+            print("bad yaml, raise this one")
+            raise e
+
+        # support setting some of these paths and not others. E.g., if they set log paths and not configs
+        settings = settings_yml_dict.get("settings", {})
+
+        # default to oss cassandra
+        self.cassandra_distribution = settings.get("cassandra_distribution", "cassandra")
+
+        default_log_path = log_path_defaults[self.cassandra_distribution]
+        default_config_path = config_path_defaults[self.cassandra_distribution]
+
+        print("setting log and config paths")
+        self.all_log_paths = settings.get("paths_to_logs", [default_log_path])
+        self.all_config_paths = settings.get("paths_to_configs", [default_config_path])
 
     def read_environments_yml(self):
         """
-        reads environments.yaml file and extracts information about the hosts and ssh keys to access them
+        reads environments.yaml file and extracts information about the hosts and ssh keys to access them. Also instantiates our Node class for each node
         - Currently only supports a file at {project_root}/config/environments.yaml (following the convention set by TableAnalyzer tool)
         - TODO add support for specifying a different path/filename
         """
@@ -167,7 +217,14 @@ class CollectLogs:
                         node = nodes_by_hostname.get(hostname, None)
                         if node is None:
                             # if not, make one
-                            node = Node(hostname, datacenter_name, ssh_key_for_dc)
+                            node = Node(
+                                region=region,
+                                hostname=hostname, 
+                                datacenter_name=datacenter_name,
+                                ssh_key=ssh_key_for_dc,
+                                all_log_paths=self.all_log_paths,
+                                all_config_paths=self.all_config_paths
+                            )
                             self.all_nodes.append(node)
 
 
@@ -176,10 +233,28 @@ class CollectLogs:
 
                         elif node_type == "cassandra":
                             node.has_cassandra = True
+    ###################################################
+    # the operations we run when ingesting the tarball
+    ###################################################
 
 
+    def parse_settings(self):
+        """
+        reads the yaml files and gathers the settings we need. 
+        - if there is no environments settings yaml, uses defaults. 
+        - environments.yaml is required though
+        """
+        # do this one first, so paths are initialized
+        self.read_environments_settings_yml()
+
+        self.read_environments_yml()
 
     def analyze_tables_for_cluster(self):
+        """
+        iterate over each region, and each datacenter within each region, and each node within each data center
+        for each, run TableAnalyzer's nodetool.receive.sh script
+        """
+
         for region in self.regions:
             for datacenter_name in self.datacenters_by_region[region]:
                 for node_type in ["cassandra", "spark"]:
@@ -237,8 +312,8 @@ class CollectLogs:
     def run(self):
         successful = False
         try:
-            print("\n=== reading environments yml ===")
-            self.read_environments_yml()
+            print("\n=== Parsing Settings ===")
+            self.parse_settings()
 
             print("\n=== Get table stats ===")
             self.analyze_tables_for_cluster()
@@ -282,13 +357,6 @@ if __name__ == '__main__':
 
     2) unless cassandra logs are anywhere besides the defaults (see below) specify environment settings in environment-settings.yaml
         - find template for environment-settings.yaml at ./config-templates/environments-settings.sample.yaml
-        - Defaults:
-            * FOR DSE:
-                - see https://docs.datastax.com/en/dse/6.8/dse-admin/datastax_enterprise/config/chgLogLocations.html
-            * FOR OSS Cassandra: 
-                - see https://thelastpickle.com/blog/2016/02/10/locking-down-apache-cassandra-logging.html
-                - also https://github.com/apache/cassandra/blob/cassandra-3.11/conf/logback.xml#L36 and https://github.com/apache/cassandra/blob/cassandra-3.11/conf/cassandra-env.sh#L126. 
-                Seems to indicate default is /var/lib/cassandra/logs (?) TODO make sure to test
         - In that case, specify the path to your logs directory, as shown in the environments-sample.yaml file. 
             * If all hosts have files in the same place, you can specify by using
     2) name file and place at default location, {project_root_path}/config/environments.yaml
