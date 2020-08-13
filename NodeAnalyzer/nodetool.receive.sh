@@ -26,7 +26,7 @@ receive_copy_config_log() {
 }
 
 receive_compress() {
-    compress_command="tar cvfz `hostname -i`.tar.gz ./$data_dest_path"
+    compress_command="tar cvfz `hostname -i`.tar.gz $data_dest_path"
     echo $compress_command
 }
 
