@@ -225,6 +225,7 @@ class CollectLogs:
                                 all_log_paths=self.all_log_paths,
                                 all_config_paths=self.all_config_paths
                             )
+                            nodes_by_hostname[hostname] = node
                             self.all_nodes.append(node)
 
 
