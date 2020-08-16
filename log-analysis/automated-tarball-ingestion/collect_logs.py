@@ -62,6 +62,8 @@ class CollectLogs:
     datacenters_by_region = {}
 
     all_nodes = []
+    cassandra_nodes = []
+    spark_nodes = []
 
     # whatever directory was archived
     archived_dir_name = ""
@@ -69,9 +71,6 @@ class CollectLogs:
     debug_mode = False
 
     def __init__(self, client_name, **kwargs):
-
-        # absolute path to the tar ball
-        self.tarball_path = f"{tarballs_to_ingest_dir_path}/{self.tarball_filename}"
 
         # the name of the client (or some sort of human readable identifier for them), e.g., example-company
         self.client_name = client_name
@@ -82,14 +81,22 @@ class CollectLogs:
         # where we will set the logs for this client (so each client has their own dir)
         time_for_dir = datetime.now().strftime("%m%d%YTH%M%S")
 
-        # name of the directory that will be archived
-        self.archived_dir_name = f"{self.client_name}_{time_for_dir}"
-
         # where we will stage the directory that will be archived before archiving it
         self.base_filepath_for_logs = f"{tarballs_to_ingest_dir_path}/tmp/"
 
-        #
-        self.tarball_filename = kwargs.get("tarball_filename", self.archived_dir_name.replace(".tar.gz", "").replace(".zip", ""))
+        # name of the directory that will be archived
+        self.archived_dir_name = f"{self.client_name}_{time_for_dir}"
+
+        self.archived_dir = os.path.join(self.base_filepath_for_logs, self.archived_dir_name)
+
+        # wha the tarball will be called
+        self.tarball_filename = kwargs.get("tarball_filename", f"{self.archived_dir_name}.tar.gz")
+        if self.tarball_filename is None:
+            self.tarball_filename = f"{self.archived_dir_name}.tar.gz"
+
+        # absolute path to the tar ball
+        self.tarball_path = f"{tarballs_to_ingest_dir_path}/{self.tarball_filename}"
+
 
         #
         # there should be a parent directory called "nodes" where all the nodes live
@@ -107,7 +114,6 @@ class CollectLogs:
     def run_table_analyzer(self, region, environment, node_type):
         """
         runs table analyzer to get data we need
-        - instantiates a Node instance for each ip addr
         - usage: python3 cfstats.receive.py {region} {environment} {db} {0|1} (debug) [-k] (keyspace) [-t] (table)
             * However, `db` var is either "spark" or "cassandra", so calling that node_type here
             * `environment` is something like a datacenter name
@@ -223,7 +229,9 @@ class CollectLogs:
                                 datacenter_name=datacenter_name,
                                 ssh_key=ssh_key_for_dc,
                                 all_log_paths=self.all_log_paths,
-                                all_config_paths=self.all_config_paths
+                                all_config_paths=self.all_config_paths,
+                                job_archived_dir=self.archived_dir,
+                                project_root_path=project_root_path
                             )
                             nodes_by_hostname[hostname] = node
                             self.all_nodes.append(node)
@@ -231,9 +239,12 @@ class CollectLogs:
 
                         if node_type == "spark":
                             node.has_spark = True
+                            self.spark_nodes.append(node)
 
                         elif node_type == "cassandra":
                             node.has_cassandra = True
+                            self.cassandra_nodes.append(node)
+
     ###################################################
     # the operations we run when ingesting the tarball
     ###################################################
@@ -250,48 +261,70 @@ class CollectLogs:
 
         self.read_environments_yml()
 
-    def analyze_tables_for_cluster(self):
+    def analyze_cluster(self):
         """
         iterate over each region, and each datacenter within each region, and each node within each data center
         for each, run TableAnalyzer's nodetool.receive.sh script
         """
 
+        # run TableAnalyzer on each datacenter in each region
         for region in self.regions:
             for datacenter_name in self.datacenters_by_region[region]:
                 for node_type in ["cassandra", "spark"]:
                     self.run_table_analyzer(region, datacenter_name, node_type)
 
+    def add_additional_nodes(self):
+        """
+        if nodetool status found other ip addresses, add those nodes to our self.all_nodes and self.cassandra_nodes
+        first, parse <hostname>.txt file that TableAnalyzer made
+        """
+        # TODO checkout detectTopology flag in TableAnalyzer/cfstats.receive.py for what is already ran. Maybe just get output from there somehow. Could write a file from within TableAnalyzer, so can access that file. Or make the detectToplogy part a method and import that method using python directly
+        pass
+
+
     def analyze_each_node(self):
         """
         iterate over each node in the cluster, and run NodeAnalyzer tool
         Will write files to ./data dir also
+        TODO do for Spark also
         """
-        for node in self.all_nodes:
+        for node in self.cassandra_nodes:
             print("getting logs and nodetool data from", node.hostname)
             node.run_node_analyzer(node_analyzer_path)
 
+        # node analyzer seems to make the data dir owned by root. need to chown TODO
+
     def create_dirs_for_hosts(self):
         """
-        iterate over all hostnames, and create one directory for each
-        """
+        iterate over all hostnames, and create one directory for each in the directory that we're going to archive
+        - Only doing cassandra for now; add spark logs later
 
-    def position_nodetool_output_files(self):
+        TODO do for Spark also
         """
-        put all log files where we want them so they're ready to be archived
-        """
+        for node in self.cassandra_nodes:
+            # make sure the directory exists
+            Path(f"{node.final_position_dir}").mkdir(parents=True, exist_ok=True)
+            Path(f"{node.final_position_dir}/table-analyzer-output").mkdir(parents=True, exist_ok=True)
 
-    def position_log_files(self):
+    def position_files(self):
         """
-        put all log files where we want them so they're ready to be archived
-        """
+        put all log, conf, nodetool output, and tableanalyzer files where we want them so they're ready to be archived
+        - copies from the dir where we outputted all of our data gathering to the directory that will be archived
 
+        TODO do for Spark also
+        """
+        for node in self.cassandra_nodes:
+            node.copy_files_to_final_destination()
 
     def compress_into_tarball(self):
         """
         compress all data into a single tarball
         place tarball in tarball_path, where it will be ready to be read by IngestTarball class
         """
-        pass
+        with tarfile.open(self.tarball_path, "w:gz") as tar:
+            print("making tarball from", self.archived_dir)
+            print("writing tarball to", self.tarball_path)
+            tar.add(self.archived_dir, arcname=os.path.basename(self.archived_dir))
 
 
 
@@ -316,20 +349,20 @@ class CollectLogs:
             print("\n=== Parsing Settings ===")
             self.parse_settings()
 
-            print("\n=== Get table stats ===")
-            self.analyze_tables_for_cluster()
+            # print("\n=== Get table stats and place in tmp directory ===")
+            #self.analyze_cluster()
 
-            print("\n=== Get logs and nodetool data from each node ===")
-            self.analyze_each_node()
+            # print("\n=== Add nodes found by `nodetool status` ===")
+            self.add_additional_nodes()
+
+            # print("\n=== Get logs and nodetool data from each node and place in tmp directory ===")
+            #self.analyze_each_node()
 
             print("\n=== Creating directory for each host ===")
             self.create_dirs_for_hosts()
 
-            print("\n=== Positioning nodetool output files ===")
-            self.position_nodetool_output_files()
-
-            print("\n=== Positioning Log files ===")
-            self.position_log_files()
+            print("\n=== Positioning files (to get ready to be archived) ===")
+            self.position_files()
 
             print("\n=== Compressing into tarball ===")
             self.compress_into_tarball()

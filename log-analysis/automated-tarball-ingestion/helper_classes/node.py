@@ -2,12 +2,10 @@ import os
 from copy import deepcopy
 import yaml
 import subprocess
-
-
-project_root_path = os.path.dirname(os.path.realpath(__file__))
+import shutil
 
 class Node:
-    def __init__(self, region, hostname, datacenter_name, ssh_key, all_log_paths, all_config_paths, **kwargs):
+    def __init__(self, region, hostname, datacenter_name, ssh_key, all_log_paths, all_config_paths, job_archived_dir, project_root_path, **kwargs):
         """
         These are all derived from the enviroments.yml
         TODO allow setting the log dir or conf dir using kwargs
@@ -22,7 +20,17 @@ class Node:
         self.has_spark = False
         self.has_cassandra = False
 
+        # where this node will send its logs/conf/nodetool files to 
+        # we could position directly into its final destination here, except at least for now we're allowing for the possibility that we will want to run other tasks as as well and keep hostnames within a certain region or datacenter together
+        self.node_analyzer_data_output_dir = f"{project_root_path}/data/{self.region}/{self.datacenter_name}/{self.hostname}"
+
+        # where this node will ultimately have its files in the dir that will be archived
+        self.final_position_dir = f"{job_archived_dir}/nodes/{self.hostname}"
+
+        # find where this node stores its C* logs
         self.find_log_dir(all_log_paths)
+
+        # find where this node stores its C* conf files
         self.find_conf_dir(all_config_paths)
 
     def run_node_analyzer(self, node_analyzer_path, useSSH=False):
@@ -34,7 +42,8 @@ class Node:
 
         # defaulting to debug mode for verbose output
         # write to directory namespaced for this hostname, so as each node runs NodeAnalyzer they don't overwrite each other
-        cmd_with_args = f"{cmd_base} {self.log_dir} {self.conf_dir} {self.datacenter_name} 1 {project_root_path}/data/{self.region}/{self.datacenter_name}/{self.hostname} true"
+        cmd_with_args = f"{cmd_base} {self.log_dir} {self.conf_dir} {self.datacenter_name} 1 {self.node_analyzer_data_output_dir} true"
+
         print("now running Node Analyzer:", cmd_with_args)
         if useSSH:
             # TODO
@@ -45,6 +54,18 @@ class Node:
             except subprocess.CalledProcessError as e:
                 # throwing anyways
                 raise e
+
+    def copy_files_to_final_destination(self):
+        """
+        put all log files where we want them so they're ready to be archived
+        """
+        shutil.copytree(f"{self.node_analyzer_data_output_dir}/log", f"{self.final_position_dir}/logs/cassandra")
+        shutil.copytree(f"{self.node_analyzer_data_output_dir}/conf", f"{self.final_position_dir}/conf")
+        shutil.copytree(f"{self.node_analyzer_data_output_dir}/nodetool", f"{self.final_position_dir}/nodetool")
+
+        # Not sure if we want this here
+        if os.path.isfile(f"{self.node_analyzer_data_output_dir}/../{self.hostname}.txt"):
+            shutil.copyfile(f"{self.node_analyzer_data_output_dir}/../{self.hostname}.txt", f"{self.final_position_dir}/table-analyzer-output/{self.hostname}.txt")
 
     ##########################
     # helpers
@@ -81,4 +102,3 @@ class Node:
         if match == None:
             raise Exception("No matching config path found for node", self.hostname)
         self.conf_dir = match
-
