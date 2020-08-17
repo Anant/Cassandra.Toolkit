@@ -22,3 +22,10 @@ ansible-playbook -i ./envs/elk/hosts.ini ./playbooks/elk-install.yml
 
 ToDo:
 - run elasticsearch with docker
+- playbook for redhat 
+- Redhat on ansible 
+```
+https://www.elastic.co/guide/en/elasticsearch/reference/current/rpm.html
+https://www.elastic.co/guide/en/kibana/current/rpm.html
+https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-installation.html
+```
