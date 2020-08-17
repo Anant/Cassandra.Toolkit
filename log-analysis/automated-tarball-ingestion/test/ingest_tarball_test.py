@@ -3,6 +3,11 @@ import os
 
 from ingest_tarball import IngestTarball
 
+# NOTE not currently working, needs to be updated
+# - since when it worked, have changed dir structure
+# - added additional settings
+# - tarball directory layout is different now as well
+
 class IngestTarballTest:
     """
     tests the python class itself. 

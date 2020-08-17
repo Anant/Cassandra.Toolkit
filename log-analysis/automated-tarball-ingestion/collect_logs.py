@@ -349,14 +349,14 @@ class CollectLogs:
             print("\n=== Parsing Settings ===")
             self.parse_settings()
 
-            # print("\n=== Get table stats and place in tmp directory ===")
-            #self.analyze_cluster()
+            print("\n=== Get table stats and place in tmp directory ===")
+            self.analyze_cluster()
 
-            # print("\n=== Add nodes found by `nodetool status` ===")
+            print("\n=== Add nodes found by `nodetool status` ===")
             self.add_additional_nodes()
 
-            # print("\n=== Get logs and nodetool data from each node and place in tmp directory ===")
-            #self.analyze_each_node()
+            print("\n=== Get logs and nodetool data from each node and place in tmp directory ===")
+            self.analyze_each_node()
 
             print("\n=== Creating directory for each host ===")
             self.create_dirs_for_hosts()
