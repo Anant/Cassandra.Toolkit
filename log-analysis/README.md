@@ -1,7 +1,12 @@
 # Log analysis with filebeat, elasticsearch & kibana
 
 ### Install all
-Say hello to server to make sure ssh works
+Say hello to server to make sure ssh works. If you are running on localhost make an entry like this in your hosts.ini so you can bypass SSH.
+
+```
+localhost ansible_connection=local
+```
+
 ```
 ansible-playbook -i ./envs/elk/hosts.ini ./playbooks/hello.yml
 ```
