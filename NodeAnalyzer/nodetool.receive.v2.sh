@@ -8,23 +8,31 @@ fi
 
 logdirectory=$1
 confdirectory=$2
-debug=$4
+
 # defaults to data directory, relative to where this script was called from
-data_dest_path=${5:-./data}
+data_dest_path=${3:-./data}
+
+debug=$4
 
 # whether or not to skip turning data into tarball at the end
 skip_archiving=${NODE_ANALYZER_SKIP_ARCHIVING:-false}
 
 # what jmx port to use for nodetool
-node_jmx_port=${NODE_ANALYZER_JMX_PORT:-7199}
+node_jmx_port=${NODE_ANALYZER_JMX_PORT}
 
+# set custom command to use to run nodetool. Helpful especially for tarball installations, or for testing over ccm
+cmd_for_nodetool=${NODE_ANALYZER_NODETOOL_CMD:-nodetool}
+
+# get absolute path to parent dir, so script's paths are more stable
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 
 
 echo $key
 
 receive_nodetool_command() {
-    node_command="nodetool ${1} -p ${node_jmx_port} > $data_dest_path/nodetool/${1}.txt"
+    # don't bother sending the -p option if no jmx port specified
+    port_option=$([ "${node_jmx_port}" == "" ] && echo "" || echo "-p ${node_jmx_port}")
+    node_command="${cmd_for_nodetool} ${1} ${port_option} > $data_dest_path/nodetool/${1}.txt"
     echo $node_command
 }
 

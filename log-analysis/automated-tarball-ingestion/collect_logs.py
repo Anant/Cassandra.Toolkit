@@ -11,15 +11,14 @@ import fnmatch
 from datetime import datetime
 import sys
 from helper_classes.node import Node
-
-from elasticsearch import Elasticsearch
-es = Elasticsearch()
+import stat
 
 project_root_path = os.path.dirname(os.path.realpath(__file__))
 repo_path = f"{project_root_path}/../.."
 node_analyzer_path = f"{repo_path}/NodeAnalyzer"
 table_analyzer_path = f"{repo_path}/TableAnalyzer"
-settings_yml_path = os.path.join(project_root_path, "config/environments-settings.yaml")
+default_settings_yml_path = os.path.join(project_root_path, "config/settings.yaml")
+default_environments_yml_path = os.path.join(project_root_path, "config/environments.yaml")
 
 # access TableAnalyzer class and related helpers
 sys.path.insert(0, table_analyzer_path)
@@ -75,11 +74,8 @@ class CollectLogs:
         # the name of the client (or some sort of human readable identifier for them), e.g., example-company
         self.client_name = client_name
 
-        # where the environments.yaml can be found
-        self.environments_yml = f"{project_root_path}/config/environments.yaml"
-
         # where we will set the logs for this client (so each client has their own dir)
-        time_for_dir = datetime.now().strftime("%m%d%YTH%M%S")
+        time_for_dir = datetime.now().strftime("%m%d%YT%H%M%S")
 
         # where we will stage the directory that will be archived before archiving it
         self.base_filepath_for_logs = f"{tarballs_to_ingest_dir_path}/tmp/"
@@ -97,8 +93,6 @@ class CollectLogs:
         # absolute path to the tar ball
         self.tarball_path = f"{tarballs_to_ingest_dir_path}/{self.tarball_filename}"
 
-
-        #
         # there should be a parent directory called "nodes" where all the nodes live
         self.nodes_dir = f"{self.base_filepath_for_logs}/nodes"
 
@@ -106,6 +100,8 @@ class CollectLogs:
         # other options
         ##################
         self.clean_up_on_finish = kwargs.get("clean_up_on_finish", False)
+        self.path_to_settings_file = kwargs.get("path_to_settings_file", default_settings_yml_path)
+        self.path_to_environments_file = kwargs.get("path_to_environments_file", default_environments_yml_path)
 
     ###################################################
     # helpers
@@ -142,20 +138,22 @@ class CollectLogs:
         - just goes into <node_hostname>/logs/cassandra (or whatever our self.path_to_cassandra_logs is) and grabs those logs
         """
               
-    def read_environments_settings_yml(self):
+    def read_settings_yml(self):
         """
-        parses out the environments-settings.yaml File
+        parses out the settings.yaml File
+        - TODOs
+            * if we want more granular control, could allow a path_to_logs and path_to_conf in node_settings as well, so can set per node
         """
         settings_yml_dict = {} 
         try:
-            with open(settings_yml_path, 'r') as stream:
+            with open(self.path_to_settings_file, 'r') as stream:
                 # convert to dict
                 # no need to load, so just safe_load
                 settings_yml_dict = yaml.safe_load(stream)
 
         except FileNotFoundError as e:
             print(e)
-            print("No environments-settings.yaml found; using defaults")
+            print("No settings.yaml found; using defaults")
 
         except yaml.YAMLError as e:
             print(e)
@@ -163,17 +161,22 @@ class CollectLogs:
             raise e
 
         # support setting some of these paths and not others. E.g., if they set log paths and not configs
-        settings = settings_yml_dict.get("settings", {})
+        cluster_settings = settings_yml_dict.get("cluster_settings", {})
 
-        # default to oss cassandra
-        self.cassandra_distribution = settings.get("cassandra_distribution", "cassandra")
+        # default settings for nodes in this cluster
+        self.node_defaults = cluster_settings.get("node_defaults", {})
+
+        # what cassandra distribution this cluster is running. default to oss cassandra
+        self.cassandra_distribution = cluster_settings.get("cassandra_distribution", "cassandra")
 
         default_log_path = log_path_defaults[self.cassandra_distribution]
         default_config_path = config_path_defaults[self.cassandra_distribution]
 
         print("setting log and config paths")
-        self.all_log_paths = settings.get("paths_to_logs", [default_log_path])
-        self.all_config_paths = settings.get("paths_to_configs", [default_config_path])
+        self.all_log_paths = cluster_settings.get("paths_to_logs", [default_log_path])
+        self.all_config_paths = cluster_settings.get("paths_to_configs", [default_config_path])
+
+        self.settings_by_node = settings_yml_dict.get("settings_by_node", {})
 
     def read_environments_yml(self):
         """
@@ -181,7 +184,7 @@ class CollectLogs:
         - Currently only supports a file at {project_root}/config/environments.yaml (following the convention set by TableAnalyzer tool)
         - TODO add support for specifying a different path/filename
         """
-        with open(self.environments_yml, 'r') as stream:
+        with open(self.path_to_environments_file, 'r') as stream:
             try:
                 # convert to dict
                 # no need to load, so just safe_load
@@ -223,6 +226,14 @@ class CollectLogs:
                         node = nodes_by_hostname.get(hostname, None)
                         if node is None:
                             # if not, make one
+
+                            # right now no defaults
+                            defaults = {**self.node_defaults}
+
+                            # merge in settings for node set by settings.yaml
+                            settings_for_node = self.settings_by_node.get(hostname, {})
+                            options = {**defaults, **settings_for_node}
+
                             node = Node(
                                 region=region,
                                 hostname=hostname, 
@@ -231,8 +242,10 @@ class CollectLogs:
                                 all_log_paths=self.all_log_paths,
                                 all_config_paths=self.all_config_paths,
                                 job_archived_dir=self.archived_dir,
-                                project_root_path=project_root_path
+                                project_root_path=project_root_path,
+                                **options
                             )
+
                             nodes_by_hostname[hostname] = node
                             self.all_nodes.append(node)
 
@@ -257,7 +270,7 @@ class CollectLogs:
         - environments.yaml is required though
         """
         # do this one first, so paths are initialized
-        self.read_environments_settings_yml()
+        self.read_settings_yml()
 
         self.read_environments_yml()
 
@@ -332,10 +345,16 @@ class CollectLogs:
         """
         Does whatever needs to be done after the job is successful, or after the job failed for that matter
         """
+
         if successful:
             if self.clean_up_on_finish:
+
                 # remove everything we generated using this script except the tarball
                 shutil.rmtree(self.base_filepath_for_logs)
+
+                # TODO this is owned by root, and giving file permissions errors. Do later
+                # shutil.rmtree(os.path.join(project_root_path, "data"))
+
         else:
             # this is it for now
             print("failed to collect logs and create tarball for logs")
@@ -389,8 +408,8 @@ if __name__ == '__main__':
         - Find template at: ./config-templates/environments-sample.yaml
         - Template should be identical to TableAnalyzer yaml. Note that currently we are currently calling TableAnalyzer/cfstats.receive.py in this script, so to maintain compatibility need to use exact same format for the environments_yml. 
 
-    2) unless cassandra logs are anywhere besides the defaults (see below) specify environment settings in environment-settings.yaml
-        - find template for environment-settings.yaml at ./config-templates/environments-settings.sample.yaml
+    2) unless cassandra logs are anywhere besides the defaults (see below) specify settings in settings.yaml
+        - find template for environment-settings.yaml at ./config-templates/settings.sample.yaml
         - In that case, specify the path to your logs directory, as shown in the environments-sample.yaml file. 
             * If all hosts have files in the same place, you can specify by using
     2) name file and place at default location, {project_root_path}/config/environments.yaml
@@ -406,12 +425,19 @@ if __name__ == '__main__':
     # will just use whatever we name the dir we archive, and it will be a tarball, not a .zip
     parser.set_defaults(tarball_filename=None)
     parser.add_argument('--cleanup-on-finish', dest='clean_up_on_finish', action='store_true', help="If runs successfully, clears out everything created except for the new tarball")
+    parser.add_argument('--settings-file', dest='path_to_settings_file', action='store_true', help="path to settings file. Defaults to config/settings.yaml")
+    parser.set_defaults(path_to_settings_file=default_settings_yml_path)
+
+    parser.add_argument('--environments-file', dest='path_to_environments_file', action='store_true', help="path to environments file. Defaults to config/environments.yaml")
+    parser.set_defaults(path_to_environments_file=default_environments_yml_path)
 
     args = parser.parse_args()
 
     options = {
         "clean_up_on_finish": args.clean_up_on_finish,
         "tarball_filename": args.tarball_filename,
+        "path_to_settings_file": args.path_to_settings_file,
+        "path_to_environments_file": args.path_to_environments_file,
     }
 
     collectLogs = CollectLogs(args.client_name, **options)

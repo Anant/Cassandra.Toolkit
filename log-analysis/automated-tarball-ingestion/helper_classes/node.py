@@ -33,26 +33,41 @@ class Node:
         # find where this node stores its C* conf files
         self.find_conf_dir(all_config_paths)
 
+        # parse kwargs
+        # settings_by_node from settings.yaml will come in through here
+        # send in empty string for jmx port if it's not needed, since ccm will break if we use -p flag with nodetool, and our script will use -p flag if there's a port specified
+        self.jmx_port = kwargs.get("JMX_PORT", "''")
+        self.nodetool_cmd = kwargs.get("nodetool_cmd", "nodetool")
+
     def run_node_analyzer(self, node_analyzer_path, useSSH=False):
         """
         Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug) {data_dest_path} {skip_archiving}
         note though that datacentername never gets used
         """
-        cmd_base = f"sudo bash {node_analyzer_path}/nodetool.receive.v2.sh"
+        cmd_base = f"bash {node_analyzer_path}/nodetool.receive.v2.sh"
 
         # defaulting to debug mode for verbose output
         # write to directory namespaced for this hostname, so as each node runs NodeAnalyzer they don't overwrite each other
         cmd_with_args = f"{cmd_base} {self.log_dir} {self.conf_dir} {self.node_analyzer_data_output_dir} 1"
-        # set some env vars for use with the script
-        os.environ["NODE_ANALYZER_SKIP_ARCHIVING"] = "true"
 
-        print("now running Node Analyzer:", cmd_with_args)
+        # set some env vars for use with the script
+        # use --preserve-env so can send env vars and be preserved over sudo
+        cmd_with_env_vars = f"""
+            export NODE_ANALYZER_NODETOOL_CMD="{self.nodetool_cmd}" && \
+            export NODE_ANALYZER_JMX_PORT={self.jmx_port} && \
+            export NODE_ANALYZER_SKIP_ARCHIVING=true && \
+            sudo --preserve-env {cmd_with_args}
+            """
+        print("JMX PORT for host", self.hostname, self.jmx_port)
+
+        print("now running Node Analyzer v2:", cmd_with_env_vars)
+
         if useSSH:
             # TODO
             pass
         else:
             try:
-                subprocess.run(cmd_with_args, shell=True, check = True)
+                subprocess.run(cmd_with_env_vars, shell=True, check = True)
             except subprocess.CalledProcessError as e:
                 # throwing anyways
                 raise e

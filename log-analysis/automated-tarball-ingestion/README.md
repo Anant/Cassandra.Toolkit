@@ -1,4 +1,24 @@
-# Instructions
+# Instructions for collect_logs.py
+## environments.yaml
+## settings.yaml
+### Options for cluster_settings
+- node_defaults: can set anything that can be set for settings_by_node (see below), and will be applied for any node that does not have that setting set under settings_by_node.
+
+### Options for settings_by_node
+- nodetool_cmd: what command to use to run nodetool. Defaults to `nodetool` (which works for a package installation). For tarball installation, you can use `<path to tarball>/bin/nodetool` for example
+- JMX_PORT: jmx port used by this node
+
+## Testing
+- Requires python3 and pip3
+- Then just run this
+```
+  pip3 install -r requirements.txt
+  pip3 install -r test/requirements.txt
+  cd test
+  python3 collect_logs_test.py
+```
+
+# Instructions for ingest_tarball.py
 - Requires python3 and pip3
 - `pip3 install -r requirements.txt`
 - Place a log tarball in `./log-tarballs-to-ingest/` (currently not automating, you have to do this)
@@ -50,12 +70,12 @@
       ```
       (substituting in the real path for the filebeat.yaml that was generated)
 
-# Testing
-- Requires python3 and pip3
-- Then just run this
+## Testing
+NOTE Currently out of date. 
+Eventually would do
 ```
   pip3 install -r requirements.txt
   pip3 install -r test/requirements.txt
   cd test
-  python3 test/collect_logs_test.py
+  python3 ingest_tarball_test.py
 ```

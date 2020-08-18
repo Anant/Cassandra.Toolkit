@@ -28,16 +28,3 @@ us:
     spark:
       - 192.168.1.4
     key: keyfile.pem 
-
-paths_to_confs: 
-  # list all paths to logs that you use in this region. A path specified below should match a node's log directory at least once
-  # if left blank, will use default for OSS C* if using C* or default for DSE if using DSE
-  - /var/log/cassandra
-
-paths_to_logs: 
-  # list all paths to logs that you use in this region. A path specified below should match a node's log directory at least once
-  # if left blank, will use default for OSS C* if using C* or default for DSE if using DSE
-  - /var/log/cassandra
-
-# or can say "dse". Not supporting other flavors for now
-cassandra_distribution: oss 
