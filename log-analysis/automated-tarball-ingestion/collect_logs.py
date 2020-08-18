@@ -81,7 +81,7 @@ class CollectLogs:
         self.base_filepath_for_logs = f"{tarballs_to_ingest_dir_path}/tmp/"
 
         # name of the directory that will be archived
-        self.archived_dir_name = f"{self.client_name}_{time_for_dir}"
+        self.archived_dir_name = f"{self.client_name}"
 
         self.archived_dir = os.path.join(self.base_filepath_for_logs, self.archived_dir_name)
 

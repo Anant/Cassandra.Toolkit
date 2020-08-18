@@ -68,6 +68,10 @@ When ingesting though, make sure to add the `--ignore-zeros` flag, e.g.,
     python3 ingest_tarball.py my-client-logs-tarball.tar.gz my_client --ignore-zeros
 ```
 
+### Current Assumptions
+- even after concatenating together two tarballs, the final tarball should only have a single root directory. This means that the original directories that were gzipped need to have the same name originally
+- hostnames need to be unique per node. I.e., if hostname -i for each node returns `127.0.0.1` (or anything that will overlap with another node's hostname), then you will have to rename these directories manually before combining. If you don't, logs for one node will overwrite logs for previous nodes that had the same hostname
+
 # Instructions for ingest_tarball.py
 
 - Requires python3 and pip3
@@ -108,7 +112,7 @@ By default the script is pointing towards a kibana instance running on localhost
     --cleanup-on-finish
     ```
 
-    4) ignore zeros in tarball (for when using a combined tarball; see [here](https://www.gnu.org/software/tar/manual/html_node/Ignore-Zeros.html))
+    4) ignore zeros in tarball (for when using a combined tarball; see [here](https://www.gnu.org/software/tar/manual/html_node/Ignore-Zeros.html) for what we do)
     ```
     --ignore-zeros 
     ```
