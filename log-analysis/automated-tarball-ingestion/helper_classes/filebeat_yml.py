@@ -37,6 +37,8 @@ class FilebeatYML:
     """
 
     # TODO maybe this best lives in separate file as a constant, unless we manipulate it 
+    # NOTE path_to_logs_source and path_to_logs_dest should point to the immediate parent directory of the log files. Don't point to parent directories of directories; this does not work recursively. 
+    # e.g., if log is at "<hostname>/logs/cassandra/audit/audit.log", make sure path_to_logs_source is "<hostname>/logs/cassandra/audit", NOT "<hostname>/logs/cassandra"
     log_type_definitions = {
         # found in logs/cassandra
         "cassandra.main": {

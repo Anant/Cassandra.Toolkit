@@ -59,6 +59,7 @@ Follows same format as environments.yaml for TableAnalyzer.
 # Instructions for ingest_tarball.py
 
 - Requires python3 and pip3
+## Setup
 - `pip3 install -r requirements.txt`
 - Place a log tarball in `./log-tarballs-to-ingest/` (currently not automating, you have to do this)
     * Having a directory like this gives us modularity and makes it easy to change. We can manually do this (`mv my.tgz ./log-tarballs-to-ingest/`) for now, and easily later add a script that does this for us, or even expose a web GUI for uploading it in. Then whatever we do, we place these tars in this directory
@@ -109,6 +110,22 @@ By default the script is pointing towards a kibana instance running on localhost
   - Generate a filebeat.yml for this (will be v0.2; v0.1 just write this ourselves)
   - start filebeat for one-off batch job that ingests these files into ELK 
       * Perhaps later we will just have filebeat running continually on our server, watching  whatever gets placed in
+
+## Want to add some logs and run script again with the same config?
+1) Add log files to the directory where similar logs are located: 
+  `{self.base_filepath_for_logs}/<hostname>/<type>`.
+
+  e.g., `{self.base_filepath_for_logs}/{example_hostname}/spark/worker/worker.log` 
+
+2) Run filebeat again:
+
+Replace the client_name and incident_id below and run it again
+```
+sudo filebeat -e -d "*" --c cassandra.toolkit/log-analysis/automated-tarball-ingestion/logs-for-client/{client_name}/incident-{incident_id}/tmp/filebeat.yaml
+```
+
+- filebeat.yaml will be at: cassandra.toolkit/log-analysis/automated-tarball-ingestion/logs-for-client/{client_name}/incident-{incident_id}/tmp/filebeat.yml
+- Alternatively, if filebeat is still running (and is using the filebeat.yaml created by this script), you can just add the separate log files and it will find and ingest them. 
 
 ## Debugging
 ### Debugging the filebeat generator

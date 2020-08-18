@@ -219,6 +219,13 @@ class IngestTarball:
             # filename should be str and not include path, e.g., `gc.log.0.current` 
             source_path = os.path.join(source_dir, filename)
 
+            # if is directory, skip.
+            if os.path.isdir(source_path):
+                continue
+
+            print("moving", filename)
+
+
             # make sure the directory exists
             Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
 
@@ -271,6 +278,10 @@ class IngestTarball:
 
             # TODO error handle this
             os.system(start_filebeat_cmd)
+
+            # give instructions for reusing this 
+            example_hostname = self.hostnames[0]
+            print(f"\n***\nWant to run filebeat with the same configuration?\n 1) Add log files to the directory where similar logs are located: \n`{self.base_filepath_for_logs}/<hostname>/<type>`.\n\n e.g., `{self.base_filepath_for_logs}/{example_hostname}/spark/worker/worker.log` \n\n2) Run filebeat again:\n {start_filebeat_cmd}\n\n - Alternatively, if filebeat is still running (and is using the filebeat.yaml created by this script), you can just add the separate log files and it will find and ingest the new files. \n***\n")
 
 
     def cleanup(self, successful):
