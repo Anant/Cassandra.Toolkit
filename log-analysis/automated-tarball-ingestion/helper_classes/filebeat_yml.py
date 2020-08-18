@@ -38,18 +38,67 @@ class FilebeatYML:
 
     # TODO maybe this best lives in separate file as a constant, unless we manipulate it 
     log_type_definitions = {
+        # found in logs/cassandra
         "cassandra.main": {
             "path_to_logs_source": "<hostname>/logs/cassandra",
             "path_to_logs_dest": "<hostname>/cassandra",
             "tags": ["cassandra","main"],
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/system.log*",
         },
+        "cassandra.debug": {
+            "path_to_logs_source": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/cassandra",
+            "tags": ["cassandra", "debug"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/debug.log*",
+        },
+        "cassandra.output": {
+            "path_to_logs_source": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/cassandra",
+            "tags": ["cassandra", "output"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/output.log*",
+        },
+        "cassandra.gremlin": {
+            "path_to_logs_source": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/cassandra",
+            "tags": ["cassandra", "gremlin"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/gremlin.log*",
+        },
+        # TODO test dissect pattern for these
+        "cassandra.audit": {
+            "path_to_logs_source": "<hostname>/logs/cassandra/audit",
+            "path_to_logs_dest": "<hostname>/cassandra/audit",
+            "tags": ["cassandra", "audit"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/audit/audit.log*",
+        },
+        # TODO test dissect pattern for these
+        "cassandra.dropped_events": {
+            "path_to_logs_source": "<hostname>/logs/cassandra/audit",
+            "path_to_logs_dest": "<hostname>/cassandra/audit",
+            "tags": ["cassandra", "dropped_events"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/audit/dropped_events.log*",
+        },
+        "cassandra.garbage_collection": {
+            "path_to_logs_source": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/cassandra",
+            "tags": ["cassandra", "garbage_collection"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/gc.log*",
+        },
+        "cassandra.dse-collectd": {
+            "path_to_logs_source": "<hostname>/logs/cassandra",
+            "path_to_logs_dest": "<hostname>/cassandra",
+            "tags": ["cassandra", "dse-collectd"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/dse-collectd.log*",
+        },
+
+        # system logs
         "system": {
             # NOTE: This is for a finding system logs, not cassandra logs
             "path_to_logs_source": None, # TODO set this when we have a path
-            "tags": ["system","messages"],
+            "tags": ["system", "messages"],
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/system/*.test",
         },
+
+        # spark logs
         "spark.master": {
             "path_to_logs_source": "<hostname>/logs/spark/master",
             "path_to_logs_dest": "<hostname>/spark/master",
