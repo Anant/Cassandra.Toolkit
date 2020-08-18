@@ -49,3 +49,13 @@
       sudo filebeat -e -d "*" --c $PWD/logs-for-client/my_client/incident-159687225/tmp/filebeat.yaml
       ```
       (substituting in the real path for the filebeat.yaml that was generated)
+
+# Testing
+- Requires python3 and pip3
+- Then just run this
+```
+  pip3 install -r requirements.txt
+  pip3 install -r test/requirements.txt
+  cd test
+  python3 test/collect_logs_test.py
+```
