@@ -1,6 +1,42 @@
 # Instructions for collect_logs.py
+## Setup
+- Requires python3 and pip3
+### Configuration
+- create a config/environments.yaml
+    Should be same format as TableAnalyzer takes
+    ```
+    cp config-templates/environments-sample.yaml config/environments.yaml
+    vim config/environments.yaml
+    # ...
+    ```
+
+    See below for what options to set here.
+
+- create a config/settings.yaml
+    ```
+    cp config-templates/settings.sample.yaml config/settings.yaml
+    vim config/environments.yaml
+    # ...
+    ```
+    See below for what options to set here.
+
+### Run it
+- Then just run this:
+```
+  pip3 install -r requirements.txt
+  python3 collect_logs.py <client_name>
+```
+
+You should now have a tarball in `log-tarballs-to-ingest/<client_name>_<timestamp>.tar.gz`
+
+It is ready to ingest using `ingest_tarball.py <client_name>_<timestamp>.tar.gz <client_name>` (and whatever flags you want to send in, see below for instructions on ingest_tarball.py)
+
 ## environments.yaml
+
+Follows same format as environments.yaml for TableAnalyzer. 
+
 ## settings.yaml
+
 ### Options for cluster_settings
 - node_defaults: can set anything that can be set for settings_by_node (see below), and will be applied for any node that does not have that setting set under settings_by_node.
 
