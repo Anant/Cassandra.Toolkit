@@ -72,6 +72,9 @@ When ingesting though, make sure to add the `--ignore-zeros` flag, e.g.,
 - even after concatenating together two tarballs, the final tarball should only have a single root directory. This means that the original directories that were gzipped need to have the same name originally
 - hostnames need to be unique per node. I.e., if hostname -i for each node returns `127.0.0.1` (or anything that will overlap with another node's hostname), then you will have to rename these directories manually before combining. If you don't, logs for one node will overwrite logs for previous nodes that had the same hostname
 
+### Example: 
+An example of using tarball concatenation with this tool can be found at: `test/test-tarball-concatenation.sh`
+
 # Instructions for ingest_tarball.py
 
 - Requires python3 and pip3
