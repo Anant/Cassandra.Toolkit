@@ -264,7 +264,7 @@ class CollectLogs:
     def analyze_cluster(self):
         """
         iterate over each region, and each datacenter within each region, and each node within each data center
-        for each, run TableAnalyzer's nodetool.receive.sh script
+        for each, run TableAnalyzer's nodetool.receive.v2.sh script
         """
 
         # run TableAnalyzer on each datacenter in each region

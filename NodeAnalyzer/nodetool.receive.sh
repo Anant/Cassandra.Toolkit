@@ -2,7 +2,7 @@
 
 if [ -z "$1" ]
     then 
-        echo $"Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug) {data_dest_path} {skip_archiving}"
+        echo $"Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug)"
         exit 1;
 fi
 
@@ -10,40 +10,29 @@ logdirectory=$1
 confdirectory=$2
 datacentername=$3
 debug=$4
-# defaults to data directory, relative to where this script was called from
-data_dest_path=${5:-./data}
-skip_archiving=${6:-false}
-
-parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-
 
 echo $key
 
 receive_nodetool_command() {
-    node_command="nodetool ${1} > $data_dest_path/nodetool/${1}.txt"
+    node_command="nodetool ${1} > data/nodetool/${1}.txt"
     echo $node_command
 }
 
 receive_copy_config_log() {
-    copy_command="cp -r ${logdirectory}/* $data_dest_path/log/ && cp -r ${confdirectory}/* $data_dest_path/conf/"
+    copy_command="cp -r ${logdirectory}/* data/log/ && cp -r ${confdirectory}/* data/conf/"
     echo $copy_command
 }
 
 receive_compress() {
-    compress_command="tar cvfz `hostname -i`.tar.gz $data_dest_path"
+    compress_command="tar cvfz `hostname -i`.tar.gz ./data"
     echo $compress_command
 }
 
 
-# make dirs for where our data goes, if doesn't exist yet
-mkdir -p $data_dest_path/log
-mkdir -p $data_dest_path/conf
-mkdir -p $data_dest_path/nodetool/
-
-if [ "${debug}" -eq 1 ] ; then echo $(receive_copy_config_log); fi
+if [ "${debug}" -eq 1 ] ; then echo $receive_copy_config_log ; fi
 `eval $(receive_copy_config_log)`
 
-commands=$(cat $parent_path/nodetool.commands.txt | tr "," "\n")
+commands=$(cat nodetool.commands.txt | tr "," "\n")
 if [ "${debug}" -eq 1 ] ; then echo $commands ; fi
 
 # Run through each of the commands and save them 
@@ -74,7 +63,5 @@ do
         echo $result
 done
 
-if [ $skip_archiving == false ]; then
-  if [ "${debug}" -eq 1 ] ; then echo $(receive_compress) ; fi
-  `eval $(receive_compress)`
-fi
+if [ "${debug}" -eq 1 ] ; then echo $receive_compress ; fi
+`eval $(receive_compress)`

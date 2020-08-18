@@ -38,11 +38,13 @@ class Node:
         Usage: $0 {logdirectory} {confdirectory} {datacentername} {0|1} (debug) {data_dest_path} {skip_archiving}
         note though that datacentername never gets used
         """
-        cmd_base = f"sudo bash {node_analyzer_path}/nodetool.receive.sh"
+        cmd_base = f"sudo bash {node_analyzer_path}/nodetool.receive.v2.sh"
 
         # defaulting to debug mode for verbose output
         # write to directory namespaced for this hostname, so as each node runs NodeAnalyzer they don't overwrite each other
-        cmd_with_args = f"{cmd_base} {self.log_dir} {self.conf_dir} {self.datacenter_name} 1 {self.node_analyzer_data_output_dir} true"
+        cmd_with_args = f"{cmd_base} {self.log_dir} {self.conf_dir} {self.node_analyzer_data_output_dir} 1"
+        # set some env vars for use with the script
+        os.environ["NODE_ANALYZER_SKIP_ARCHIVING"] = "true"
 
         print("now running Node Analyzer:", cmd_with_args)
         if useSSH:
