@@ -54,7 +54,19 @@ Follows same format as environments.yaml for TableAnalyzer.
   python3 collect_logs_test.py
 ```
 
+## SSH support
+Running collect_logs.ph using SSH is currently not supported, though it is on our to-do list. In the meantime, you can run the script within separate nodes and combine using the instructions below.
 
+## Combining tarballs
+Sometimes it is necessary to combine several tarballs together.
+See [here](https://superuser.com/a/1122546/654260) for how this works.
+
+cat tar2.tgz tar1.tgz > combined.tgz
+
+When ingesting though, make sure to add the `--ignore-zeros` flag, e.g., 
+```bash
+    python3 ingest_tarball.py my-client-logs-tarball.tar.gz my_client --ignore-zeros
+```
 
 # Instructions for ingest_tarball.py
 
@@ -81,28 +93,26 @@ By default the script is pointing towards a kibana instance running on localhost
     ```
 
 ### Other options
-    You can also use `debug_mode` which doesn't write any logs to ES, only outputs to console by using the `--debug-mode` flag:
+    1) You can also use `debug_mode` which doesn't write any logs to ES, only outputs to console by using the `--debug-mode` flag:
     ```
     python3 ingest_tarball.py my-client-logs-tarball.tar.gz my_client --debug-mode
     ```
 
-    To pass in arbitrary config for the filebeat.yml file, use the `--custom-config` flag  send in a key (can be nested) and a value, e.g., 
+    2) To pass in arbitrary config for the filebeat.yml file, use the `--custom-config` flag  send in a key (can be nested) and a value, e.g., 
     ```
     --custom-config setup.kibana.host 123.456.345.123:5601
     ```
 
-    To cleanup all generated files if the script run successfully, pass in:
+    3) To cleanup all generated files if the script run successfully, pass in:
     ```
     --cleanup-on-finish
     ```
 
-    * The tarball metadata:
-      * don't count on this being extractable from the filename for now. Prompt user input.
-      * What we need:
-          - Company name (make this consistent for the company, for every company there should only be one)
-          - incident time as a tarball id (or some other unique identifier that we can consistently use for this tarball)
-          - hostname - what host this came from. Can be a domain name or IP address, but should stay consistent for that node (don't change back and forth between ip and domain name)
-
+    4) ignore zeros in tarball (for when using a combined tarball; see [here](https://www.gnu.org/software/tar/manual/html_node/Ignore-Zeros.html))
+    ```
+    --ignore-zeros 
+    ```
+    NOTE currently only works with gzipped tarballs (ie file extension tar.gz)
 
 ## What does the script do?
   - unzip the tarball

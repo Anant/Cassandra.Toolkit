@@ -77,6 +77,7 @@ class IngestTarball:
         ##################
         self.clean_out_filebeat_first = kwargs.get("clean_out_filebeat_first", False)
         self.clean_up_on_finish = kwargs.get("clean_up_on_finish", False)
+        self.ignore_zeros_on_extract = kwargs.get("ignore_zeros_on_extract", False)
 
     ###################################################
     # helpers
@@ -97,7 +98,22 @@ class IngestTarball:
         """
 
         # tmp folder before positioning them where we want them
-        shutil.unpack_archive(self.tarball_path, self.extract_dest_path)
+        if self.ignore_zeros_on_extract:
+            # NOTE assumes gzipped tarball
+            try:
+                # running script requires making the dir manually first
+                Path(f"{self.extract_dest_path}").mkdir(parents=True, exist_ok=True)
+
+                cmd_with_args = f"tar zxvfi {self.tarball_path} -C {self.extract_dest_path}"
+                print(f"unarchiving gzipped file ignoring zeros:\n{cmd_with_args}\n")
+                subprocess.run(cmd_with_args, shell=True, check = True)
+            except subprocess.CalledProcessError as e:
+                # throwing anyways
+                raise e
+
+        else:
+            # NOTE works with zip or gzip formats
+            shutil.unpack_archive(self.tarball_path, self.extract_dest_path)
 
     def set_archived_dir_name(self):
         """
@@ -373,6 +389,8 @@ if __name__ == '__main__':
     parser.set_defaults(custom_config=[])
     parser.add_argument('--cleanup-on-finish', dest='clean_up_on_finish', action='store_true', help="If runs successfully, clears out everything created except for the original tarball")
     parser.set_defaults(debug_mode=False)
+    parser.add_argument('--ignore-zeros', dest='ignore_zeros_on_extract', action='store_true', help="ignores zeros when extracting tarball. Especially for when users combine tarballs using something like cat dir1.tar.gz dir2.tar.gz > combined.tar.gz")
+    parser.set_defaults(ignore_zeros_on_extract=False)
 
     args = parser.parse_args()
 
@@ -381,6 +399,7 @@ if __name__ == '__main__':
         "clean_up_on_finish": args.clean_up_on_finish,
         "debug_mode": args.debug_mode,
         "custom_config": args.custom_config,
+        "ignore_zeros_on_extract": args.ignore_zeros_on_extract,
     }
 
     ingestTarball = IngestTarball(args.tarball_filename, args.client_name, **options)
