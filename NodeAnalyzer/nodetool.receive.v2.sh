@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# like the original nodetool.receive.sh, but:
+# - can specify what directory to place the logs/conf/data in
+# - can skip archiving the data folder at the end
+# - can specify the JMX port for a given node
+# - also grabs system logs TODO
+# - optionally grabs Spark logs TODO
+# 
+# Originally written for use with log-analysis (collect_logs.py)
+
 if [ -z "$1" ]
     then 
         echo $"Usage: $0 {logdirectory} {confdirectory} {data_dest_path} {0|1} (debug)"
@@ -41,16 +50,33 @@ receive_copy_config_log() {
     echo $copy_command
 }
 
+# copy linux system logs
+system_logs_array=$(cat $parent_path/nodetool.linux-log-paths.txt | tr "," "\n")
+
+if [ "${debug}" -eq 1 ] ; then printf "\nNow copying linux system logs\n" ; fi
+for system_log_path in $system_logs_array
+do 
+  copy_system_log_command="sudo cp $system_log_path $data_dest_path/linux-system-logs/"
+  
+  if [ "${debug}" -eq 1 ] ; then echo "Running: $copy_system_log_command"; fi
+
+  # run it
+  $copy_system_log_command && \
+  if [ "${debug}" -eq 1 ] ; then echo "linux log $system_log_path succesfully copied!"; fi
+done
+if [ "${debug}" -eq 1 ] ; then printf "Finished copying linux system logs\n\n" ; fi
+
 receive_compress() {
     compress_command="tar cvfz `hostname -i`.tar.gz $data_dest_path"
     echo $compress_command
 }
 
-
 # make dirs for where our data goes, if doesn't exist yet
 mkdir -p $data_dest_path/log
 mkdir -p $data_dest_path/conf
 mkdir -p $data_dest_path/nodetool/
+mkdir -p $data_dest_path/linux-system-logs/
+
 
 if [ "${debug}" -eq 1 ] ; then echo $(receive_copy_config_log); fi
 `eval $(receive_copy_config_log)`
