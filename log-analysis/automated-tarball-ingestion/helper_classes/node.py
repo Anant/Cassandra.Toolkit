@@ -5,10 +5,13 @@ import subprocess
 import shutil
 
 class Node:
+    """
+    Represents a single node in a Cassandra cluster
+    """
     def __init__(self, region, hostname, datacenter_name, ssh_key, all_log_paths, all_config_paths, job_archived_dir, project_root_path, **kwargs):
         """
-        These are all derived from the enviroments.yml
-        TODO allow setting the log dir or conf dir using kwargs
+        - These args are mostly all derived from the enviroments.yml
+        - TODO allow setting the log dir or conf dir using kwargs
         """
         self.region = region
         self.hostname = hostname
@@ -75,12 +78,31 @@ class Node:
     def copy_files_to_final_destination(self):
         """
         put all log files where we want them so they're ready to be archived
+        - first, copies NodeAnalyzer output (logs, configs, and nodetool output), then TableAnalyzer output
+        - note that by default, shutil.copytree will make directories for us (recursively) for the destination path
+        - Also removes anything that existed before
+        - NOTE if get `FileExistsError: [Errno 17] File exists error`, this means that this script was probably ran before but did not clean up correctly. rm -rf the self.final_position_dir and try again
         """
+
+        # copy cassandra and spark logs
+        # first, these are generally owned by root, so make them available to whoever is running this script so that copytree can copy it
+        # NOTE make sure to delete these files after running this python script or these linux logs will just be sitting there with the wrong permissions
+        linux_system_logs_path = f"{self.node_analyzer_data_output_dir}/linux-system-logs"
+        subprocess.run(f"sudo chown -R $USER:$GROUP {linux_system_logs_path}", shell=True, check = True)
+        shutil.copytree(linux_system_logs_path, f"{self.final_position_dir}/logs/linux-system-logs")
+
+        # copy cassandra and spark logs
+        # these logs are at `/log` since that is what NodeAnalyzer was doing originally
         shutil.copytree(f"{self.node_analyzer_data_output_dir}/log", f"{self.final_position_dir}/logs/cassandra")
+
+        # copy configs
         shutil.copytree(f"{self.node_analyzer_data_output_dir}/conf", f"{self.final_position_dir}/conf")
+
+        # copy nodetool output
         shutil.copytree(f"{self.node_analyzer_data_output_dir}/nodetool", f"{self.final_position_dir}/nodetool")
 
-        # Not sure if we want this here
+        # copy TableAnalyzer output in there as well.
+        # Not sure if we want this here, or if we want this at all
         if os.path.isfile(f"{self.node_analyzer_data_output_dir}/../{self.hostname}.txt"):
             shutil.copyfile(f"{self.node_analyzer_data_output_dir}/../{self.hostname}.txt", f"{self.final_position_dir}/table-analyzer-output/{self.hostname}.txt")
 

@@ -1,1 +1,2 @@
+# requirements for testing in addition to the requirements.txt in the main directory
 ccm

@@ -92,12 +92,14 @@ class FilebeatYML:
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/dse-collectd.log*",
         },
 
-        # system logs
+        # linux system logs
         "system": {
             # NOTE: This is for a finding system logs, not cassandra logs
-            "path_to_logs_source": None, # TODO set this when we have a path
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs", # TODO set this when we have a path
+            "path_to_logs_dest": "<hostname>/linux-system",
             "tags": ["system", "messages"],
-            "log_regex": "<self.base_filepath_for_logs>/<hostname>/system/*.test",
+            # just get everything
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/*",
         },
 
         # spark logs

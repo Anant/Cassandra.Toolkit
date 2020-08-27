@@ -45,6 +45,7 @@ Follows same format as environments.yaml for TableAnalyzer.
 - JMX_PORT: jmx port used by this node
 
 ## Testing
+- These are not unit tests per se, but just wrapper around the actual script that sets up a test env first.
 - Requires python3 and pip3
 - Then just run this
 ```
@@ -53,6 +54,16 @@ Follows same format as environments.yaml for TableAnalyzer.
   cd test
   python3 collect_logs_test.py
 ```
+
+### Debugging Tests
+- If you get error `File exists: '$HOME/.ccm/test_cluster'`: 
+    The test did not clean up correctly from last time (`test_cluster` is the name of the cluster we use for testing with ccm). The test script might have already removed the `test_cluster` for you, and you can just run the test again and it should work. If not though, and **ASSUMING YOU DON'T NEED THAT CLUSTER ANYMORE:** Remove the old cluster so you can run test again: 
+    ```
+    ccm test_client remove
+
+    # now run the test again
+    python3 collect_logs_test.py
+    ```
 
 ## SSH support
 Running collect_logs.ph using SSH is currently not supported, though it is on our to-do list. In the meantime, you can run the script within separate nodes and combine using the instructions below.
@@ -75,10 +86,35 @@ When ingesting though, make sure to add the `--ignore-zeros` flag, e.g.,
 ### Example: 
 An example of using tarball concatenation with this tool can be found at: `test/test-tarball-concatenation.sh`
 
-# Instructions for ingest_tarball.py
 
-- Requires python3 and pip3
+## Development
+### Adding more logs to our tarball
+If you want to add more logs from the Cassandra node into the tarball for ingestion:
+
+1) Add another command to `NodeAnalyzer/nodetool.receive.v2.sh` 
+  - `collect_logs.py` calls `NodeAnalyzer/nodetool.receive.v2.sh` on each node to get logs and conf files and nodetool output. So to add more files to that list, edit `NodeAnalyzer/nodetool.receive.v2.sh`.
+  - Make sure to make a directory for it too e.g., something like:
+      ```
+      mkdir -p $data_dest_path/<your new path>
+      ```
+
+2) If `nodetool.receive.v2.sh` doesn't place the files into a directory that already gets copied, you will have to edit `helper_classes/node.py`
+  - `collect_logs.py` will call `helper_classes/node.py` when it is creating the tarball.
+  - See `helper_classes/node.py#copy_files_to_final_destination`, which copies all the files for a given node and creates directories in the destination directory if necessary.
+  - The files you want copied need to be copied in the `node.py#copy_files_to_final_destination` method, or they will not end up in the tarball at the end.
+
+3) Edit `ingest_tarball.py` to ingest these new files that you want added into Kibana
+  - If these are log files that you are adding, Kibana won't see them unless you configure our ingestion tool to do so.
+  - `ingest_tarball.py` actually looks at `helper_classes/filebeat_yml.py#log_type_definitions` for what will end up in your filebeat.yml, as well as for what to ingest into kibana. Add a new item in that list in order to ingest your new logs.
+      * key (e.g., "spark.master") can be anything as long as it's unique, it is more of a label for us really.
+      * `path_to_logs_source` is where the log collection needs to put these logs (corresponds to what you set in `node.py#copy_files_to_final_destination`).
+      * `path_to_logs_dest` is where the log collection will end up after unarchiving and positioning the logs
+      * `tags` is for separating these logs from other logs, so they are searchable in Kibana
+      * `log_regex` is the regex that filebeat.yml will use to find htese logs after they are placed by the ingest_tarball.py script. Will include the `path_to_logs_dest` but the regex should include all files you are copying in and exclude files you don't want filebeat to ingest.
+
+
 ## Setup
+- Requires python3 and pip3
 - `pip3 install -r requirements.txt`
 - Place a log tarball in `./log-tarballs-to-ingest/` (currently not automating, you have to do this)
     * Having a directory like this gives us modularity and makes it easy to change. We can manually do this (`mv my.tgz ./log-tarballs-to-ingest/`) for now, and easily later add a script that does this for us, or even expose a web GUI for uploading it in. Then whatever we do, we place these tars in this directory

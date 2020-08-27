@@ -131,6 +131,7 @@ class CollectLogs:
         print("--- (end of TableAnalyzer output) ---")
 
     # NOTE not using currently. Only if we want all files everywhere. Currently we're just targeting the /logs dir
+    # TODO remove
     def position_log_files_for_node(self, hostname, log_type_def, **kwargs):
         """
         For a directory that contains logs for a single node and a single log_type_def of that node:
@@ -311,6 +312,7 @@ class CollectLogs:
         """
         iterate over all hostnames, and create one directory for each in the directory that we're going to archive
         - Only doing cassandra for now; add spark logs later
+        - NOTE might not be necessary, since we use shutil.copytree later, and that creates directories recursively for us
 
         TODO do for Spark also
         """
