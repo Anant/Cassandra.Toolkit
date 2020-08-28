@@ -106,8 +106,9 @@ class FilebeatYML:
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/kern.log",
             # these are one log per line
             "custom_overwrites": {
-                "multiline.type": "count",
-                "multiline.count_lines: 1
+                "multiline.pattern": None,
+                "multiline.match": None,
+                "multiline.negate": None,
             }
         },
 
@@ -119,7 +120,7 @@ class FilebeatYML:
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/boot.log",
             "custom_overwrites": {
                 # each line begins with a bracket
-                "multiline.pattern": '^\[',
+                "multiline.pattern": '^\[|WARNING',
             }
         },
 
@@ -131,8 +132,9 @@ class FilebeatYML:
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/auth.log",
             # these are one log per line
             "custom_overwrites": {
-                "multiline.type": "count",
-                "multiline.count_lines: 1
+                "multiline.pattern": None,
+                "multiline.match": None,
+                "multiline.negate": None,
             }
         },
 
@@ -141,12 +143,13 @@ class FilebeatYML:
         "linux.system.messages": {
             "path_to_logs_source": "<hostname>/logs/linux-system-logs",
             "path_to_logs_dest": "<hostname>/linux-system",
-            "tags": ["linux-system", "system-messages"],
-            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/sys.log",
+            "tags": ["linux-system", "system-messages", "syslog"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/syslog",
             # these are one log per line
             "custom_overwrites": {
-                "multiline.type": "count",
-                "multiline.count_lines: 1
+                "multiline.pattern": None,
+                "multiline.match": None,
+                "multiline.negate": None,
             }
         },
 
@@ -154,12 +157,13 @@ class FilebeatYML:
         "linux.system.sys": {
             "path_to_logs_source": "<hostname>/logs/linux-system-logs",
             "path_to_logs_dest": "<hostname>/linux-system",
-            "tags": ["linux-system", "system-messages"],
+            "tags": ["linux-system", "system-messages", "messages"],
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/messages",
             # these are one log per line
             "custom_overwrites": {
-                "multiline.type": "count",
-                "multiline.count_lines: 1
+                "multiline.pattern": None,
+                "multiline.match": None,
+                "multiline.negate": None,
             }
         },
 
@@ -188,7 +192,7 @@ class FilebeatYML:
             # these are one log per line
             "custom_overwrites": {
                 "multiline.type": "count",
-                "multiline.count_lines: 1
+                "multiline.count_lines": 1
             }
         },
 
@@ -203,7 +207,7 @@ class FilebeatYML:
             # these are one log per line
             "custom_overwrites": {
                 "multiline.type": "count",
-                "multiline.count_lines: 1
+                "multiline.count_lines": 1
             }
         },
 
@@ -353,11 +357,21 @@ class FilebeatYML:
             # add tags for this log type
             fb_input["tags"] = log_type_def["tags"]
 
+            # overwrite all values from the template if an overwrite is specified
+            for custom_overwrite_key, custom_overwrite_val in log_type_def.get("custom_overwrites", {}).items():
+                print(custom_overwrite_key, "setting as", custom_overwrite_val)
+                if custom_overwrite_val == None:
+                    del fb_input[custom_overwrite_key]
+                else:
+                    fb_input[custom_overwrite_key] = custom_overwrite_val
+
             # add one path per host
             for hostname in self.hostnames:
                 fb_input["paths"].append(
                     log_type_def["log_regex"].replace("<self.base_filepath_for_logs>", self.base_filepath_for_logs).replace("<hostname>", hostname)
                 )
+
+        # raise Exception("just stop here for now")
 
     def set_processors(self):
         """
