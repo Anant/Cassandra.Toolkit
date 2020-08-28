@@ -107,11 +107,15 @@ If you want to add more logs from the Cassandra node into the tarball for ingest
   - If these are log files that you are adding, Kibana won't see them unless you configure our ingestion tool to do so.
   - `ingest_tarball.py` actually looks at `helper_classes/filebeat_yml.py#log_type_definitions` for what will end up in your filebeat.yml, as well as for what to ingest into kibana. Add a new item in that list in order to ingest your new logs.
       * key (e.g., "spark.master") can be anything as long as it's unique, it is more of a label for us really.
-      * `path_to_logs_source` is where the log collection needs to put these logs (corresponds to what you set in `node.py#copy_files_to_final_destination`).
-      * `path_to_logs_dest` is where the log collection will end up after unarchiving and positioning the logs
-      * `tags` is for separating these logs from other logs, so they are searchable in Kibana
-      * `log_regex` is the regex that filebeat.yml will use to find htese logs after they are placed by the ingest_tarball.py script. Will include the `path_to_logs_dest` but the regex should include all files you are copying in and exclude files you don't want filebeat to ingest.
+      * `path_to_logs_source` is where the log collection needs to put these logs (corresponds to what you set in `node.py#copy_files_to_final_destination`). These do not need to be unique: e.g., `cassandra.dse-collectd` and `cassandra.garbage_collection` have the same `path_to_logs_source`, and it's no problem. It just means our script will try to copy all these logs twice, which doesn't hurt anything, but it will have two separate entries in our generated filebeat.yml with different paths and different tags, which is what we need.
+      * `path_to_logs_dest` is where the log collection will end up after unarchiving and positioning the logs. These do not need to be unique either.
+      * `tags` is for separating these logs from other logs, so they are searchable in Kibana. 
+      * `log_regex` is the regex that filebeat.yml will use to find htese logs after they are placed by the ingest_tarball.py script. Will include the `path_to_logs_dest` but the regex should include all files you are copying in and exclude files you don't want filebeat to ingest. Files that match will be assigned the `tags` in Kibana. Should be unique as well.
+      * if any of the defaults (see 'filebeat_input_template') need to be overwritten, add a key "custom_overwrites" (see `linux.system` logs for example, which uses this).
 
+4) If these are logs that have a pattern different from the other logs that we are ingesting into kibana, you will have to add the pattern into our `config-templates/filebeat.template.yml` file, under the field `processors`.
+  - This file contains all dissect patterns.
+  - You will probably want to add at least two patterns: 1. for the log pattern itself; 2. One for field: "log.file.path" so that these new logs' filepath gets into kibana correctly also
 
 ## Setup
 - Requires python3 and pip3

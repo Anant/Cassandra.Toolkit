@@ -311,7 +311,7 @@ class CollectLogs:
     def create_dirs_for_hosts(self):
         """
         iterate over all hostnames, and create one directory for each in the directory that we're going to archive
-        - Only doing cassandra for now; add spark logs later
+        - Only doing cassandra for now; add spark nodes later
         - NOTE might not be necessary, since we use shutil.copytree later, and that creates directories recursively for us
 
         TODO do for Spark also

@@ -38,16 +38,22 @@ output.elasticsearch:
 processors:
 # temporarily removing gc logs and system logs until we can consistently get them in our log tarballs
 #------------------------------------- system messages 
-#   - dissect:
-#       tokenizer: "%{timestamp} %{+timestamp->} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}"
-#       field: "message"
-#       target_prefix: "ingest"
-# 
-#   - dissect:
-#       # <path_for_client> will be replaced by the python script
-#       tokenizer: "<path_for_client>/incident-%{incident-id}/%{host-name}/system/"
-#       field: "log.file.path"
-#       target_prefix: "ingest"
+  - dissect:
+      tokenizer: "%{timestamp} %{+timestamp->} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}"
+      field: "message"
+      target_prefix: "ingest"
+
+  # auth.log
+  - dissect:
+      tokenizer: "%{timestamp} %{+timestamp} %{+timestamp} %{system-host-name} %{component}: %{message}"
+      field: "message"
+      target_prefix: "ingest"
+
+  - dissect:
+      # <path_for_client> will be replaced by the python script
+      tokenizer: "<path_for_client>/incident-%{incident-id}/%{host-name}/system/"
+      field: "log.file.path"
+      target_prefix: "ingest"
 
 #-#------------------------------------ cassandra   
   - dissect:

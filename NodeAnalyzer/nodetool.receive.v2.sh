@@ -51,6 +51,9 @@ receive_copy_config_log() {
 }
 
 # copy linux system logs
+# - note that some of these paths are for debian based systems, some for non-debian. 
+# - If it doesn't find the log though, will report it and move on so just add both to same list
+# - Used list from https://www.eurovps.com/blog/important-linux-log-files-you-must-be-monitoring
 system_logs_array=$(cat $parent_path/nodetool.linux-log-paths.txt | tr "," "\n")
 
 if [ "${debug}" -eq 1 ] ; then printf "\nNow copying linux system logs\n" ; fi

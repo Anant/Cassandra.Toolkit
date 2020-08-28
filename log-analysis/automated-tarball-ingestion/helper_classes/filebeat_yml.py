@@ -14,10 +14,13 @@ class FilebeatYML:
     filebeat_input_template = {
         "enabled": "true",
         "exclude_files": ["\.zip$"],
-        "multiline.match": "after",
+        # Since true, means if pattern is found, DON'T append as part of the same log entry
         "multiline.negate": "true",
+        # append matched line (don't prepend) to previous line
+        "multiline.match": "after",
         "multiline.pattern": "^TRACE|DEBUG|WARN|INFO|ERROR",
         "type": "log",
+        # will add these as the script runs
         "paths": [],
     }
 
@@ -92,17 +95,121 @@ class FilebeatYML:
             "log_regex": "<self.base_filepath_for_logs>/<hostname>/cassandra/dse-collectd.log*",
         },
 
+        #######################
         # linux system logs
-        "system": {
-            # NOTE: This is for a finding system logs, not cassandra logs
-            "path_to_logs_source": "<hostname>/logs/linux-system-logs", # TODO set this when we have a path
+        #######################
+        "linux.system.kern": {
+            # looks something like: Aug 24 10:42:56 bionic64 kernel: [  317.987923] [drm:drm_crtc_helper_set_config [drm_kms_helper]] *ERROR* failed to set mode on [CRTC:29:crtc-0]
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs",
             "path_to_logs_dest": "<hostname>/linux-system",
-            "tags": ["system", "messages"],
-            # just get everything
-            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/*",
+            "tags": ["linux-system", "kernel"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/kern.log",
+            # these are one log per line
+            "custom_overwrites": {
+                "multiline.type": "count",
+                "multiline.count_lines: 1
+            }
         },
 
+        "linux.system.boot": {
+            # looks like: [^[[0;32m  OK  ^[[0m] Listening on D-Bus System Message Bus Socket.
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs",
+            "path_to_logs_dest": "<hostname>/linux-system",
+            "tags": ["linux-system", "boot"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/boot.log",
+            "custom_overwrites": {
+                # each line begins with a bracket
+                "multiline.pattern": '^\[',
+            }
+        },
+
+        # auth.log
+        "linux.system.auth": {
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs",
+            "path_to_logs_dest": "<hostname>/linux-system",
+            "tags": ["linux-system", "authentication"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/auth.log",
+            # these are one log per line
+            "custom_overwrites": {
+                "multiline.type": "count",
+                "multiline.count_lines: 1
+            }
+        },
+
+        # TODO test
+        # /var/log/messages 
+        "linux.system.messages": {
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs",
+            "path_to_logs_dest": "<hostname>/linux-system",
+            "tags": ["linux-system", "system-messages"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/sys.log",
+            # these are one log per line
+            "custom_overwrites": {
+                "multiline.type": "count",
+                "multiline.count_lines: 1
+            }
+        },
+
+        # /var/log/sys.log (debian version of /var/log/messages)
+        "linux.system.sys": {
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs",
+            "path_to_logs_dest": "<hostname>/linux-system",
+            "tags": ["linux-system", "system-messages"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/messages",
+            # these are one log per line
+            "custom_overwrites": {
+                "multiline.type": "count",
+                "multiline.count_lines: 1
+            }
+        },
+
+        # /var/log/dmesg 
+        # TODO test
+        # based on example from: https://geek-university.com/linux/dmesg-command/
+        "linux.system.dmesg": {
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs",
+            "path_to_logs_dest": "<hostname>/linux-system",
+            "tags": ["linux-system", "dmesg"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/dmesg",
+            "custom_overwrites": {
+                # each line begins with a bracket
+                "multiline.pattern": '^\[',
+            }
+        },
+
+        # /var/log/cron
+        # TODO test
+        # based on example from: https://www.thegeekstuff.com/2012/07/crontab-log/
+        "linux.system.dmesg": {
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs",
+            "path_to_logs_dest": "<hostname>/linux-system",
+            "tags": ["linux-system", "cron"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/cron",
+            # these are one log per line
+            "custom_overwrites": {
+                "multiline.type": "count",
+                "multiline.count_lines: 1
+            }
+        },
+
+        # /var/log/secure (seems to be Redhat version of auth.log ?)
+        # TODO test
+        # based on example from: https://www.thegeekstuff.com/2012/07/crontab-log/
+        "linux.system.secure": {
+            "path_to_logs_source": "<hostname>/logs/linux-system-logs", 
+            "path_to_logs_dest": "<hostname>/linux-system",
+            "tags": ["linux-system", "secure"],
+            "log_regex": "<self.base_filepath_for_logs>/<hostname>/linux-system/secure",
+            # these are one log per line
+            "custom_overwrites": {
+                "multiline.type": "count",
+                "multiline.count_lines: 1
+            }
+        },
+
+        #######################
         # spark logs
+        #######################
         "spark.master": {
             "path_to_logs_source": "<hostname>/logs/spark/master",
             "path_to_logs_dest": "<hostname>/spark/master",
