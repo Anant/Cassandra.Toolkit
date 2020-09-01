@@ -10,7 +10,8 @@
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
   index.number_of_shards: 1
-  _source.enabled: false
+  # watch out for setting this to false, can make it so kibana only shows an empty _source field in the Discover pane.
+  #_source.enabled: true
 
 #============================== Dashboards =====================================
 setup.dashboards.enabled: false

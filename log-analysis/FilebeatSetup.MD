@@ -88,7 +88,8 @@ filebeat.inputs:
 setup.template.settings:
   index.number_of_shards: 1
   #index.codec: best_compression
-  _source.enabled: false
+  # watch out for setting this to false, can make it so kibana only shows an empty _source field in the Discover pane.
+  _source.enabled: true
 #================================ General =====================================
 #name:
 #tags: ["service-X", "web-tier"]

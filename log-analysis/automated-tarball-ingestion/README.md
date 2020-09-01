@@ -1,6 +1,7 @@
 # Instructions for collect_logs.py
 ## Setup
 - Requires python3 and pip3
+
 ### Configuration
 - create a config/environments.yaml
     Should be same format as TableAnalyzer takes
@@ -117,6 +118,8 @@ If you want to add more logs from the Cassandra node into the tarball for ingest
   - This file contains all dissect patterns.
   - You will probably want to add at least two patterns: 1. for the log pattern itself; 2. One for field: "log.file.path" so that these new logs' filepath gets into kibana correctly also
 
+
+# Ingest Tarball of logs into Kibana
 ## Setup
 - Requires python3 and pip3
 - `pip3 install -r requirements.txt`
@@ -197,7 +200,16 @@ sudo filebeat -e -d "*" --c cassandra.toolkit/log-analysis/automated-tarball-ing
 #### Try sudo filebeat setup
 Sometimes filebeat will process logs correctly (which you will be able to see in the filebeat log output, since it will show a log (level DEBUG) for event "Publish event"that shows all the fields. However, it won't get into kibana correctly. Sometimes all it takes is running `sudo filebeat setup` so that filebeat configures for the current elasticsearch setup
 
+Note that by default, `sudo filebeat setup` will use your default filebeat.yml file, which is found at `/etc/filebeat/filebeat.yml`. Make sure those settings are correct, since even running filebeat with a different filebeat.yml will not override some of these configs (especially configs under the `setup` property, e.g., `setup.template.settings`). Those settings only get set when running `filebeat setup`. 
+
+If you want to setup filebeat using a different filebeat.yml file, you can use the `--c` flag, e.g.,:
+
+```
+sudo filebeat setup --c cassandra.toolkit/log-analysis/automated-tarball-ingestion/logs-for-client/{client_name}/incident-{incident_id}/tmp/filebeat.yaml
+```
+
 ## Testing
+### OLD WAY: use the test class
 NOTE Currently out of date. 
 Eventually would do
 ```
@@ -205,4 +217,15 @@ Eventually would do
   pip3 install -r test/requirements.txt
   cd test
   python3 ingest_tarball_test.py
+```
+### NEW WAY: 
+Run collect_logs test first. Then run ingest_tarball.py on that test tarball:
+
+```
+  pip3 install -r requirements.txt
+  pip3 install -r test/requirements.txt
+  cd test
+  python3 collect_logs_test.py
+  cd ..
+  python3 ingest_tarball.py  test_client.tar.gz test_client --clean-out-filebeat-first
 ```
