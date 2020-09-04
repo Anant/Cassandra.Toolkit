@@ -1,9 +1,0 @@
-- hosts: elk
-  any_errors_fatal: true
-  tasks:
-    - name: getting hostname
-      command: hostname
-      register: hostname_output
-
-    - name: hello ansible
-      debug: msg="Hello from '{{ hostname_output.stdout }}', distribution='{{ ansible_distribution }}' version='{{ ansible_distribution_version }}' kernel='{{ ansible_kernel }}' os='{{ ansible_os_family }} }}'"
