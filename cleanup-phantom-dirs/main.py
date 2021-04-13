@@ -1,6 +1,7 @@
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 import getpass
+import subprocess
 import argparse
 import os
 import csv
@@ -10,8 +11,10 @@ exclude_ks = ["system", "cfs", "cfs_archive", "HiveMetaStore", "OpsCenter", "dse
 cassandra_data_dir = "/var/lib/cassandra/data/"
 results_dir_path = "./results/"
 
-def main():
-    session = setup_session()
+def main(args):
+    hostname = args.hostname if args.hostname != '' else get_hostname()
+
+    session = setup_session(hostname)
     # identify keepers
     ks_to_keep = find_keyspaces_to_keep(session)
     tables_to_keep = find_tables_to_keep(session)
@@ -22,7 +25,27 @@ def main():
 
     cleanup(session)
 
-def setup_session():
+def get_hostname():
+    """
+    returns hostname to use to connect to C* using python driver
+    @param passed_in_hostname if they passed something in besides empty string, use that. If not, use runs `hostname -i` to get local node's ip
+    @return string of node's ip (e.g,. "127.0.0.1")
+    """
+
+    command = str("hostname -i")
+
+    try:
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True).decode()
+
+        return output
+    except subprocess.CalledProcessError as e:
+        result = str(e.output)
+        if result.find("Connection refused") >= 0:
+            print("Cannot Connect To Cassandra, Terminating code")
+            sys.exit();
+
+
+def setup_session(hostname):
     username = input("username: (cassandra)")
     if username == "":
         username = "cassandra"
@@ -33,7 +56,7 @@ def setup_session():
 
     auth_provider = PlainTextAuthProvider(username=username, password=password)
 
-    cluster = Cluster(auth_provider=auth_provider)
+    cluster = Cluster([hostname], auth_provider=auth_provider)
     session = cluster.connect()
     session.set_keyspace('system')
 
@@ -244,9 +267,10 @@ def cleanup(session):
     session.shutdown()
 
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser(
-    #     description='identify directories from orphaned C* keyspaces and tables',
-    #     usage='{} {company_name}')
-    # parser.add_argument('tarball_filename', type=str, help='name of archive file (e.g., tarball-for-my-client.tar.gz). Can be .tar.gz or .zip')
-    # parser.add_argument('client_name', type=str, help='name of client')
-    main()
+    parser = argparse.ArgumentParser(
+        description='identify directories from orphaned C* keyspaces and tables',
+        usage='{} {node_hostname}')
+    # set default to empty string, which will later be switched out for output of hostname -i
+    parser.add_argument('--hostname', default='', type=str, help='node hostname to connect to using python driver. defaults to output of `hostname -i`')
+    args = parser.parse_args()
+    main(args)
