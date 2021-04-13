@@ -5,7 +5,7 @@ import argparse
 import os
 import csv
 
-exclude_ks = ["system", "cfs", "cfs_archive", "HiveMetaStore", "OpsCenter", "dse_perf", "dse_security","solr_admin","dse_insights_local","dse_system", "system_traces", "dsefs", "dse_leases", "dse_analytics","system_schema","dse_insights","system_distributed","dse_system_local","system_auth"]
+exclude_ks = ["system", "cfs", "cfs_archive", "HiveMetaStore", "OpsCenter", "dse_perf", "dse_security","solr_admin","dse_insights_local","dse_system", "system_traces", "dsefs", "dse_leases", "dse_analytics","system_schema","dse_insights","system_distributed","dse_system_local","system_auth", "system_backups"]
 
 cassandra_data_dir = "/var/lib/cassandra/data/"
 
@@ -69,8 +69,7 @@ def get_table_data_dir_subdirectories(keyspace):
 
     ks_data_dir = os.path.join(cassandra_data_dir, keyspace)
 
-    # only add subdirectories
-    ks_data_subdirs =  [ item for item in os.listdir(ks_data_dir) if os.path.isdir(item) ]
+    ks_data_subdirs =  [ item for item in os.listdir(ks_data_dir) ]
     print("got subdirs", ks_data_subdirs)
 
     return ks_data_subdirs
@@ -81,13 +80,16 @@ def get_keyspace_data_dir_subdirectories():
     - these are names of keyspaces
     """
 
-    # only add subdirectories
-    data_subdirs =  [ item for item in os.listdir(cassandra_data_dir) if os.path.isdir(item) ]
+    data_subdirs =  [ item for item in os.listdir(cassandra_data_dir) ]
     print("got subdirs", data_subdirs)
 
     return data_subdirs
 
+
 def find_system_keyspaces(session):
+    """
+    find keyspaces that are keepers, ie, are in the data dir and have a row in system_schema
+    """
 
     keyspace_rows = session.execute("select * from system_schema.keyspaces;")
 
@@ -96,12 +98,11 @@ def find_system_keyspaces(session):
 
     for ks in keyspace_rows:
         if ks.keyspace_name not in exclude_ks:
-            print(ks.keyspace_name)
-            # for now, only one column, the keyspace name
 
             if ks.keyspace_name in get_keyspace_data_dir_subdirectories():
                 print(ks.keyspace_name, "is in the keyspace data directory, adding to keyspaces to keep")
 
+                # for now, only one column, the keyspace name
                 ks_to_keep.append([ks.keyspace_name])
 
     print("~~~ writing non-system keyspaces to file ~~~\n")
