@@ -3,39 +3,48 @@
 A curated set of useful Cassandra compatible tools for building, managing, and monitoring Cassandra clusters.
 
 - [Overview](#overview)
+- [Getting Started](#getting-started)
 - [Compatibility](#compatibility)
-- [Resources](#resources)
-    - [Backup](#backup)
-    - [Cluster management](#cluster-management)
-    - [Snapshot strategy (future changes)](#snapshot-strategy-future-changes)
+- [Development and Testing](#development-and-testing)
+- [Resources / Further Reading](#resources--further-reading)
 - [Credits](#credits)
 
 # Overview
 
-Cassandra.toolkit makes it easy to setup all the tools you will need for building, managing, and monitoring your Cassandra cluster. All the tools provided by Cassandra.toolkit work together 
+Cassandra.toolkit makes it easy to setup all the tools you will need for building, managing, and monitoring your Cassandra cluster. 
 
-<img src="https://github.com/Anant/cassandra.toolkit/blob/master/docs/assets/deployment.png"
-     alt="deployment"
-     style="float: left; margin-right: 10px;" />
+![flow-chart](./docs/assets/deployment.png)
 
-For further information on how all of these tools work together and how to get started, see the description below.
+<br/>
+For further information on how all of these tools work together and how to get started, see below.
+<br/>
+<br/>
+
+# Getting Started
 
 ## Cluster Setup
-The first step is to get everything installed. [Click here](cluster-setup) to get started. These instructions will help you build your Cassandra cluster if you don't have one already, or to setup Cassandra.toolkit on your existing cluster. 
+The first step is to get everything installed. [Click here to get started](./setup/README.md). 
 
-To setup our Cassandra clusters with cassandra.toolkit, we use:
+These instructions will help you build your Cassandra cluster if you don't have one already, and then to setup Cassandra.toolkit on your cluster. 
 
-    - [Terraform](https://www.terraform.io/)
-    - [Ansible](https://github.com/ansible/ansible)
-    - [Docker](https://www.docker.com/)
-    - [Kubernetes](https://kubernetes.io/)
+To make the setup process easy, we use:
+
+- [Terraform](https://www.terraform.io/)
+- [Ansible](https://github.com/ansible/ansible)
+- [Docker](https://www.docker.com/)
+- [Kubernetes](https://kubernetes.io/)
+
+Cassandra.toolkit provides good defaults and instructions on how to leverage all of these technologies to set up your cluster with all the Cassandra tools you will need for your cluster. Besides running updates or setting up the toolkit on new Cassandra nodes, you should only have to setup cassandra.toolkit once on your cluster. After that, you can focus on cluster maintenance.
 
 ## Cluster Maintenance
-After setting up your cluster, you will need to maintain it. All the tools below should already be installed at this point if you followed the instructions for [Cluster Setup](#cluster-setup), but your Cassandra Cluster is not really a "set it and forget it" kind of database. We break down cluster maintenance into [backing up your data](cluster-maintenance/backup/), [monitoring](cluster-maintenance/monitoring/), and repairing your cluster.
+After setting up your cluster, you will need to maintain it. All the tools below should already be installed at this point if you followed the instructions for [Cluster Setup](#cluster-setup), but your Cassandra Cluster is not really a "set it and forget it" kind of database. The difference is that now you have the tools that you need to take care of your cluser. We break down cluster maintenance into the following categories: 
+- [Backups](./cluster-maintenance/backup/README.md)
+- [Monitoring](./cluster-maintenance/monitor/README.md)
+- [Repairs](./cluster-maintenance/repair/README.md) 
 
-[Click here](cluster-maintenance) to get started.
+[Click here](cluster-maintenance/README.md) to get started.
 
-As part of our toolkit, we provide instructions in how to use the tools below [here](cluster-maintenance), but feel free to follow the links below to poke around source code and learn more about the tools in our toolkit.
+See below for our list of Cassandra.toolkit tools. We provide [instructions](cluster-maintenance/README.md) for how to integrate these tools into your cluster, but it is helpful to become familiar with each tool on its own as well.
 
 ### Cluster Monitoring
 
@@ -58,21 +67,22 @@ Live Cluster Monitoring
 | [Grafana](https://grafana.com/) | Grafana is a multi-platform open source analytics and interactive visualization software. | 
 
 
-### Backing Up Your Data
+### Cluster Backups
 |  |   |
 | ------------- | ------------- | 
 | [cassandra-medusa](https://github.com/thelastpickle/cassandra-medusa) | Medusa is an Apache Cassandra backup system. |
-
+<br />
 
 ### Cluster Repair
 |  |   |
 | ------------- | ------------- | 
 | [table-reaper](http://cassandra-reaper.io/) | Cassandra Reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters. | 
+<br />
 
 # Compatibility
-Eventually we want compatability for the following platforms:
+Eventually we want compatibility for the following platforms:
 
-| Platform            | Receive            | Transform |
+| Platform            | TableAnalyzer Receive | TableAnalyzer Transform |
 | ------------------- | ------------------ | --------- |
 | DSE 4.8.x           | Diagnostic Tarball | Y         |
 | DSE 4.8.x/C\* 2.1.x | Nodetool           | Y         |
@@ -89,9 +99,14 @@ Eventually we want compatability for the following platforms:
 | CosmosDB?           | Tarball            | Y         |
 | AWS MCS?            | Tarball            | Y         |
 
-# Resources / Further Reading
+# Development and Testing
 
-## Backing Up Your Data
+To quickly get started developing on this project, we recommend using [CCM, the Cassandra Cluster Manager](https://github.com/riptano/ccm). We describe how to setup a test cluster using CCM [here](./setup/README.md#sandbox-clusters-for-testing-and-development).
+
+This project is maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra.
+
+# Resources / Further Reading
+Information on various tools in cassandra.toolkit:
 
 - https://thelastpickle.com/blog/2018/04/03/cassandra-backup-and-restore-aws-ebs.html
 - https://8kmiles.com/blog/cassandra-backup-and-restore-methods/
@@ -101,11 +116,10 @@ Eventually we want compatability for the following platforms:
 - https://www.linkedin.com/pulse/snap-cassandra-s3-tablesnap-vijaya-kumar-hosamani/
 - http://datos.io/2017/02/02/choose-right-backup-solution-cassandra/
 
-## Credits
+
+# Credits
 
 1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](src/TableAnalyzer)
 2. Sean Bogaard - Concept, Advisor, Curator
 3. John Doe (*) - Developing terraform & ansible automation, testing, documentation of 3rd party tools
 4. Obi Anomnachi - Testing
-
-Maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra.
