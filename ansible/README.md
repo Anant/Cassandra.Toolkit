@@ -112,7 +112,7 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.
 ```
 - Example C (using Datastax MCAC)
 ```
-ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e "install_tablesnap=True" -e "install_cassandra_exporter=True" -e "install_filebeat=True" -e "enable_jmx=True" -e 'create_reaper_db=True' -e 'install_medusa=True'
+ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e "install_tablesnap=True" -e "install_cassandra_exporter=True" -e "install_filebeat=True" -e "enable_jmx=True" -e 'create_reaper_db=True' -e 'install_medusa=True -e install_datastax_mcac=True'
 ```
 With the correct ansible varables set, the next tools will be installed on cassandra nodes:
 - tablesnap (when `install_tablesnap=True`)
