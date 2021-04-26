@@ -81,7 +81,8 @@ Live Cluster Monitoring
 
 # Compatibility
 ## Platform Compatibility
-Eventually we want compatibility for the following platforms:
+### Target Compatibility
+Eventually our goal is to have compatibility for the following platforms:
 
 | Platform            | TableAnalyzer Receive | TableAnalyzer Transform |
 | ------------------- | ------------------ | --------- |
@@ -100,8 +101,12 @@ Eventually we want compatibility for the following platforms:
 | CosmosDB?           | Tarball            | Y         |
 | AWS MCS?            | Tarball            | Y         |
 
-## Ansible Version Compatibility
-[Click here](./src/ansible/README.md#compatibility) for information on Ansible version compatibility.
+In the chart above, `TableAnalyzer Receive` refers to the method that we would use to receive TableAnalyzer information for the [TableAnalyzer](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/TableAnalyzer) tool. `TableAnalyzer Transform` refers to whether or not we are able to take the archive file that we received from `TableAnalyzer Receive` and tranform it into a csv file. 
+
+In summary, our goal is that eventually we will be able to install and run all the tools in cassandra.toolkit on the platforms listed above, including to run TableAnalyzer on them to generate a CSV file from the `TableAnalyzer Transform` command, regardless of the method ran in `TableAnalyzer Receive`. 
+
+### Current Compatibilty
+[Click here](./src/ansible/README.md#compatibility) for the latest information on platform and ansible version compatibility.
 
 # Development and Testing
 
