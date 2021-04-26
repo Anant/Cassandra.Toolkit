@@ -135,7 +135,7 @@ The above tools are available to access in the browser at following urls:
 - `http://localhost:5601/` - kibana
 - `http://localhost:8080/webui/` - cassandra reaper (admin:admin)
 
-NOTE some of these ports will be different depending on what monitoring tool you chose, cassandra_exporter or Datastax MCAC. [Click here for more information](./setup.metrics-monitoring.md).
+**NOTE** some of these ports will be different depending on what monitoring tool you chose, cassandra_exporter or Datastax MCAC. [Click here for more information](./setup.metrics-monitoring.md).
 
 # What's Next?
 Now that the tools in your toolkit are installed, you are ready to use them across your cluster. Head over to [Cluster Maintenance](../cluster-maintenance/README.md) to get started.

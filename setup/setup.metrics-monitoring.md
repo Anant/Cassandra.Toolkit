@@ -29,6 +29,10 @@ In case `node_exporter` is also needed, execute the next command to install it.
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-node_exporter-install.yml
 ```
 
+### Resources / Further Reading
+
+- https://github.com/criteo/cassandra_exporter
+- https://github.com/instaclustr/cassandra-exporter
 
 ## Monitoring Metrics with Datastax Metric Collector
 A better alternative to the above cassandra_exporter/Prometheus/Grafana installation is [Metrics Collector for Apache Cassandra (MCAC)](https://github.com/datastax/metric-collector-for-apache-cassandra).

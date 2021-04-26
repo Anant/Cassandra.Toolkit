@@ -4,6 +4,7 @@ A curated set of useful Cassandra compatible tools for building, managing, and m
 
 - [Overview](#overview)
 - [Getting Started](#getting-started)
+- [Tools in the Toolkit](#tools-in-the-toolkit)
 - [Compatibility](#compatibility)
 - [Development and Testing](#development-and-testing)
 - [Resources / Further Reading](#resources--further-reading)
@@ -44,7 +45,8 @@ After setting up your cluster, you will need to maintain it. All the tools below
 
 [Click here](cluster-maintenance/README.md) to get started.
 
-See below for our list of Cassandra.toolkit tools. We provide [instructions](cluster-maintenance/README.md) for how to integrate these tools into your cluster, but it is helpful to become familiar with each tool on its own as well.
+# Tools in the Toolkit
+See below for our list of tools that are included in Cassandra.toolkit. We provide instructions for how to [setup](setup/README.md) and [operate](cluster-maintenance/README.md) these tools into your cluster, but it is helpful to become familiar with each tool on its own as well.
 
 ### Cluster Monitoring
 
@@ -60,7 +62,7 @@ Offline Log Collection and Ingestion
 Live Cluster Monitoring
 |  |   |
 | ------------- | ------------- | 
-| [tablesnap](https://github.com/JeremyGrosser/tablesnap) | Tablesnap is a script that uses inotify to monitor a directory for IN_MOVED_TO events and reacts to them by spawning a new thread to upload that file to Amazon S3, along with a JSON-formatted list of what other files were in the directory at the time of the copy. |
+| [Metrics Collector for Apache Cassandra (MCAC)](https://github.com/datastax/metric-collector-for-apache-cassandra) | Metric collection and Dashboards for Apache Cassandra clusters | 
 | [node_exporter](https://github.com/prometheus/node_exporter) | Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written in Go with pluggable metric collectors. |
 | [cassandra_exporter](https://github.com/criteo/cassandra_exporter) | Cassandra exporter is a standalone application which exports Apache Cassandra® metrics throught a Prometheus friendly endpoint. |
 | [Prometheus](https://prometheus.io/) | Prometheus is an open-source systems monitoring and alerting toolkit |
@@ -71,6 +73,7 @@ Live Cluster Monitoring
 |  |   |
 | ------------- | ------------- | 
 | [cassandra-medusa](https://github.com/thelastpickle/cassandra-medusa) | Medusa is an Apache Cassandra backup system. |
+| [tablesnap](https://github.com/JeremyGrosser/tablesnap) | Tablesnap is a script that uses inotify to monitor a directory for IN_MOVED_TO events and reacts to them by spawning a new thread to upload that file to Amazon S3, along with a JSON-formatted list of what other files were in the directory at the time of the copy. |
 <br />
 
 ### Cluster Repair
