@@ -1,22 +1,25 @@
-# Cassandra docker-tools
-**Note:** All the tools described here are installed and configured with ansible from [ansible](../ansible) folder. 
-It's better to use that approach to run them all because ansible will generate all needed artifacts depending on what cassandra hosts are mentioned in the context.
+# Docker Tools for Testing and Experimentation
+**Note:** All the tools described here can be installed and configured with ansible from [ansible](../ansible), following the [instructions provided here](../../setup/README.md). 
 
-In case you need to experiment more, you can run the cotainers using the set of shell scripts provided here.
+It's better to use that approach to run them all because ansible will generate all needed artifacts depending on what cassandra hosts are mentioned in the context. However, in case you want to experiment more, you can run the containers using the set of shell scripts provided here.
+
+## Elasticsearch
 - `./start-elasticsearch.sh`
-- `./start-grafana.sh`
-- `./start-kibana.sh`
-- `./start-prometheus.sh`
-- `./start-reaper.sh`
    
-## start-elasticsearch
-## start-grafana
-## start-kibana
-## start-prometheus
-## start-reaper
+## Kibana
+- `./start-kibana.sh`
+
+## Grafana
+- `./start-grafana.sh`
+
+## Prometheus
+- `./start-prometheus.sh`
+
+## Cassandra Reaper
+- `./start-reaper.sh`
 
 Run `start-reaper.sh` to launch cassandra-reaper in a docker container.
-The script has a few variable which can be modified if a different version is needed, or to match the jmx cassandra cluster jmx authentication credentials.
+The script has a few variables which can be modified if a different version is needed, or to match the jmx cassandra cluster jmx authentication credentials.
 ```
 ./start-reaper.sh
 ```
@@ -33,7 +36,7 @@ cassandra-reaper can use cassandra itself as backend to store clusters meta-info
 
 Open `http://127.0.0.1:8080/webui` and login with `admin:admin`.
 
-## 
-More details on how to use cassandra-reaper docker image here:
+# Further Reading
+## More details on how to use cassandra-reaper docker image here:
 
 https://hub.docker.com/r/thelastpickle/cassandra-reaper

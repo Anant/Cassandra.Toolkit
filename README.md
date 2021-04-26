@@ -80,6 +80,7 @@ Live Cluster Monitoring
 <br />
 
 # Compatibility
+## Platform Compatibility
 Eventually we want compatibility for the following platforms:
 
 | Platform            | TableAnalyzer Receive | TableAnalyzer Transform |
@@ -99,9 +100,14 @@ Eventually we want compatibility for the following platforms:
 | CosmosDB?           | Tarball            | Y         |
 | AWS MCS?            | Tarball            | Y         |
 
+## Ansible Version Compatibility
+[Click here](./src/ansible/README.md#compatibility) for information on Ansible version compatibility.
+
 # Development and Testing
 
 To quickly get started developing on this project, we recommend using [CCM, the Cassandra Cluster Manager](https://github.com/riptano/ccm). We describe how to setup a test cluster using CCM [here](./setup/README.md#sandbox-clusters-for-testing-and-development).
+
+You can also test out individual tools quickly using docker, without having to setup everything in Ansible. We provide some sample scripts to make it easy. [Click here for instructions](./src/docker/README.md).
 
 This project is maintained by Rahul Singh of [Anant](http://anant.us). Feel free contact me if you'd like to collaborate on this and other tools. I also work on [Cassandra.Link](http://cassandra.link), a curated set of knowledge on all things related to Cassandra.
 

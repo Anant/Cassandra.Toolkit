@@ -1,6 +1,8 @@
 # Quickstart Tutorials
 ## Purpose
-These 
+These directories contain sample docker containers, docker-compose files, instructions and configs to quickly get setup with toy projects for development or testing. 
+
+These projects are not directly related to cassandra.toolkit and are not required, although some can be used alongside the clusters that you create using cassandra.toolkit.
 
 # Table of Contents
 - [dse-on-docker](./dse-on-docker)

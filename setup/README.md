@@ -1,8 +1,6 @@
 # Cluster Setup - Overview
 - [Building a New Cassandra cluster](#building-a-new-cassandra-cluster)
 - [Install cassandra.toolkit on existing cluster](#installing-cassandra.toolkit-on-your-cluster)
-- [Compatibility](#compatibility)
-- [Resources / Further Reading](#resources--further-reading)
 
 Cassandra.toolkit makes it easy to setup all the tools you will need for building, managing, and monitoring your Cassandra cluster. Whether you already have a Cassandra cluster or need to create your cluster, we have you covered. Just follow instructions below to get started.
 
@@ -10,40 +8,37 @@ Cassandra.toolkit makes it easy to setup all the tools you will need for buildin
 # Building a New Cassandra Cluster
 We have put together a separate project, [DSE.Auto](https://github.com/Anant/DSE.Auto), to guide you through this process. This will guide you through the process of using infrastructure and configuration tools such as [Terraform](https://www.terraform.io/), [Ansible](https://github.com/ansible/ansible), [Docker](https://www.docker.com/), and [Kubernetes](https://kubernetes.io/).
 
-To initialize a new cassandra cluster use one of the next links:
+To create a new Cassandra cluster use one of the next links:
 
-- https://github.com/Anant/DSE.Auto/tree/master/ansible/cassandra - for apache-cassandra
-- https://github.com/Anant/DSE.Auto/tree/master/ansible/datastax_yum - for DSE 5.x, 6.x
+| Distribution | Compatibility |
+| ------------ | ------------- | 
+| [Apache Cassandra](https://github.com/Anant/DSE.Auto/tree/master/ansible/cassandra) | Tested on CentOS-7, Ubuntu 18.04 |
+| [DSE](https://github.com/Anant/DSE.Auto/tree/master/ansible/datastax) | Tested with dse-5.1.20 and dse-6.8.9 on CentOS-7 and Ubuntu-18 |
 
-The `hosts.ini` file used the in scenarios above can be reused as we continue, so you can skip to [Step 2](#step-2-Install-cassandra-toolkit).
-
+<br/>
+The `hosts.ini` file used the in DSE.Auto can be reused as we continue.
+<br/>
+<br/>
 
 ### Sandbox Clusters For Testing and Development
 If you want to practice setting up and experimenting with Cassandra.toolkit in a sandbox environment, or if you want to develop Cassandra.toolkit on your local machine, we recommend using [CCM, the Cassandra Cluster Manager](https://github.com/riptano/ccm). 
 
 Follow instructions on their site to get a cluster started on your local machine. Their documentation also shows how to get the ip addresses that you will use for the hosts.ini file that Ansible requires. 
 
-Then continue on by following the instructions for [installing cassandra.toolkit on existing cluster](#installing-cassandra.toolkit-on-your-cluster).
+Then continue on by following the instructions for [installing cassandra.toolkit on existing cluster](#installing-cassandra.toolkit-on-your-cluster). Alternatively, if you want to test out individual tools on your ccm cluster, see below under [Testing Tools Outside of Cassandra.Toolkit](#testing-tools-without-ansible)
 
 # Installing Cassandra.toolkit on your cluster
 
 Now that your Cassandra cluster is up and running, you are ready to install the toolkit onto your cluster.
 
-- [Step 1 - Create and Populate Ansible Config Files](#step-1-create-and-populate-ansible-config-files)
-- [Step 2 - Verify Access To Your Nodes](#step-2-verify-access-to-your-nodes)
-- [Step 3 - Install the Toolkit onto Your Nodes](#step-3-install-the-toolkit-onto-your-nodes)
-- [Step 3 - note](#step-3---note)
-- [Step 4 - docker compose](#step-4---start-containers-using-docker-compose)
-- [AWS S3 backups](#aws-s3-backups)
-- [Install tablesnap for AWS S3 backups](#install-tablesnap-for-aws-s3-backups)
-- [Install cassandra-medusa for AWS S3 backups](#install-cassandra-medusa-for-aws-s3-backups)
-- [Metrics to prometheus server](#metrics-to-prometheus-server)
-- [Datastax Metrics Collector](#datastax-metrics-collector)
-    - [Metrics using Datastax Metrics Collector for Apache Cassandra (MCAC)](#metrics-using-datastax-metrics-collector-for-apache-cassandra-mcac)
-    - [DSE Metrics Collector Dashboards](#dse-metrics-collector-dashboards)
+- [Step 1: Create and Populate Ansible Config Files](#step-1-create-and-populate-ansible-config-files)
+- [Step 2: Verify Access To Your Nodes](#step-2-verify-access-to-your-nodes)
+- [Step 3: Install the Toolkit onto Your Nodes](#step-3-install-the-toolkit-onto-your-nodes)
+- [Step 4: Restart Cluster to Enable JMX](#step-4-restart-cluster-to-enable-jmx-if-needed)
+- [Step 5: Start Containers Using Docker Compose](#step-5-start-containers-using-docker-compose)
 
 ## Step 1: Create and Populate Ansible Config Files
-Unless you created your brand new cluster using our ansible setup as described in the instructions above, you will need to create a `hosts.ini` with all the needed cassandra hosts for Ansible to use. [See instructions here](./setup.ansible-config-files.md).
+Unless you created your brand new cluster using our ansible setup as described in the instructions above, you will need to create a `hosts.ini` with all the needed cassandra hosts for Ansible to use. You will also need to set your `group_vars/all.yml` file for your ansible environment. [See instructions here](./setup.ansible-config-files.md).
 
 ## Step 2: Verify Access To Your Nodes
 Make sure you can access all apache-cassandra or dse cluster nodes you want the tools for. For example, if you are using the `_local` environment:
@@ -52,51 +47,38 @@ Make sure you can access all apache-cassandra or dse cluster nodes you want the 
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-hello.yml
 ```
 
+If it worked, then now you are ready to run the ansible playbook and install cassandra.toolkit to your Cassandra cluster! If not, you might want to [go back to the instructions for setting your hosts.ini file](./setup.ansible-config-files.md#Step-1.1-list-all-hosts-in-hosts.ini) before trying again. 
+
 ## Step 3: Install the Toolkit onto Your Nodes
 
-### Step 3.1 - Choose what Tools to Install
-There are different options and configurations possible, depending on the tools you prefer to use. 
+### Run the Ansible Playbook
+Finally you are ready to install the toolkit onto your nodes using Ansible Playbook. Be sure to pass in the arguments corresponding to the tools you chose from [Step 1.2](./setup.ansible-config-files.md#step-1.2-choose-what-tools-to-install). 
 
-#### Selecting Your Tools in Ansible
-You can choose which tools to install by setting the following variables in Ansible:
-
-|  |   |
-| ------------- | ------------- | 
-| filebeat | `install_filebeat=True` |
-| cassandra_exporter, prometheus, grafana* | `install_cassandra_exporter=True` |
-| datastax-mcac | `install_datastax_mcac=True` |
-| tablesnap | `install_tablesnap=True` |
-| cassandra-medusa | `install_medusa=True` |
-
-*Note that cassandra_exporter, prometheus, and grafana are assumed to be used together, so all of them can be installed by setting a single variable, `install_cassandra_exporter`.
+Below are some examples to get you started, using the `_local` env. Most of the args passed in using `-e` can also be passed in using `envs/<your-env>/group_vars/all.yml`, besides AWS credentials.
 
 <br/>
 
-These will be passed into the commandline using the `-e` flag, for example `-e install_datastax_mcac=True`. Examples are given below.
-
-<br/>
-
-### Step 3.2 - Run the Ansible Playbook
-Finally we are ready to install the toolkit onto your nodes using Ansible Playbook. Be sure to pass in the arguments corresponding to the tools you chose from [Step 3.1](#step-3.1---choose-what-tools-to-install). 
-
-Below are some examples to get you started, using the `_local` env. The args passed in using `-e` can also be passed in using `envs/<your-env>/group_vars/all.yml`.
-
-<br/>
-
+### Examples
 #### Example A: With Defaults Only
-A basic, barebones installation. This will only install tools based on variables set in `envs/_local/group_vars/all.yml`.
+This is the basic ansible-playbook command. This will only install tools based on variables set in `envs/_local/group_vars/all.yml`.
 
 ```
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml
 ```
+
 #### Example B: Enable CLI Features
 This installs all the medusa for backups, filebeat for monitoring, and reaper for repairs. This provides a strong stack across the board, but does not have any live metric monitoring dashboard like Datastax MCAC.
+
+Again, note that args passed in using `-e` can also be set in your `group_vars/all.yml` file, though we recommend not setting AWS credentials in that file, but passing them in here instead.
+
 ```
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml \
 -e "install_filebeat=True" \
 -e "enable_jmx=True" \
 -e 'create_reaper_db=True' \
--e 'install_medusa=True'
+-e 'install_medusa=True' \
+-e 'aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY' \
+-e 'aws_access_key_id=AKIAIOSFODNN7EXAMPLE 
 ```
 
 #### Example C: Enable Metric Visualization using Datastax MCAC
@@ -107,29 +89,34 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.
 -e "enable_jmx=True" \
 -e 'create_reaper_db=True' \
 -e 'install_medusa=True' \
--e 'install_datastax_mcac=True'
+-e 'aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY' \
+-e 'aws_access_key_id=AKIAIOSFODNN7EXAMPLE \
+-e 'install_datastax_mcac=True' 
 ```
- 
-##### Step 3 - Restart Cluster to Enable JMX?
-If installation has run with `enable_jmx=True` then cassandra cluster has to be restarted to allow new jmx configs to be enabled.
+
+If `enable_jmx=True` (whether by passing in as an arg with `-e` or by setting in `group_vars/all.yml`), continue on to Step 4. If not, you can skip to [Step 5](#). 
+
+## Step 4: Restart Cluster to Enable JMX (If Needed)
+If installation was run with `enable_jmx=True` then your cluster has to be restarted to allow new jmx configs to be enabled. However, if `enable_jmx=False` then you can skip this step.
+
 ```
 ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-restart-service.yml
 ```
  
-##### Step 4 - Start Containers Using Docker Compose
-Docker Compose makes it easy to start everything at once. Simply run the following command:
+## Step 5: Start Containers Using Docker Compose
+Now that the tools are installed on our cluster, we're finally ready to start up our toolkit. Docker Compose makes it easy to start everything at once. Simply run the following command:
 ```
-docker-compose -f ./artifacts/docker/docker-compose.yml up
+docker-compose -f ../src/ansible/artifacts/docker/docker-compose.yml up
 ```
 
-This will start the following containers:
-- `elasticsearch` - ingests logs from cassandra hosts
+This will start the following containers, depending on what tools you decided to install earlier:
+- `elasticsearch` - ingests logs from cassandra hosts received from filebeat
 - `kibana` - visualize elasticsearch data
 - `prometheus` - ingests metrics from cassandra hosts
 - `grafana` - visualize cassandra metrics received from prometheus server
 - `cassandra-reaper` - performs repairs on cassandra cluster
 
-In a separate shell you can check that all containers are running and healthy by running `docker ps`. Output should look something like this:
+In a separate shell you can check that all containers are running and healthy by running `docker ps`. Output should look something like this (again, depending on what tools you decided to install earlier):
 
 ```
 # docker ps 
@@ -148,9 +135,7 @@ The above tools are available to access in the browser at following urls:
 - `http://localhost:5601/` - kibana
 - `http://localhost:8080/webui/` - cassandra reaper (admin:admin)
 
+NOTE some of these ports will be different depending on what monitoring tool you chose, cassandra_exporter or Datastax MCAC. [Click here for more information](./setup.metrics-monitoring.md).
 
-# Next Steps
+# What's Next?
 Now that the tools in your toolkit are installed, you are ready to use them across your cluster. Head over to [Cluster Maintenance](../cluster-maintenance/README.md) to get started.
-
-# Compatibility
-[Ansible compatibility](../src/ansible/README.md#compatibility)
