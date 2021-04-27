@@ -7,9 +7,9 @@ This project is maintained by Rahul Singh of [Anant](http://anant.us). Feel free
 - [Contribution Guidelines](#contribution-guidelines)
 
 ## Setting up a Development Environment
-To quickly get started developing on this project, we recommend using [CCM, the Cassandra Cluster Manager](https://github.com/riptano/ccm). We describe how to setup a test cluster using CCM [here](./setup/README.md#sandbox-clusters-for-testing-and-development).
+We are still working on a process to make it easy to test and develop cassandra.toolkit.
 
-You can also test out individual tools quickly using docker, without having to setup everything in Ansible. We provide some sample scripts to make it easy. [Click here for instructions](../src/docker/README.md).
+In the meantime, you can also test out individual tools quickly using docker, without having to setup everything in Ansible. We provide some sample scripts to make it easy. [Click here for instructions](../src/docker/README.md).
 
 ## Project Directory Structure
 
