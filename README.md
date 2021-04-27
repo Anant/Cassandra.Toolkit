@@ -46,7 +46,7 @@ We break down cluster maintenance into the following categories:
 # Tools in the Toolkit
 Curious about what tools we will be installing on your cluster? See below for our list of tools that are included in Cassandra.toolkit. 
 
-We provide instructions for how to [setup](./setup/README.md) and [operate](./docs/cluster-maintenance/README.md) these tools into your cluster, but it is helpful to become familiar with each tool on its own as well. Accordingly we provide links to the official project websites for each tool for you to browse.
+We provide instructions for how to [setup](./docs/setup/README.md) and [operate](./docs/cluster-maintenance/README.md) these tools into your cluster, but it is helpful to become familiar with each tool on its own as well. Accordingly we provide links to the official project websites for each tool for you to browse.
 
 ### Cluster Monitoring
 
