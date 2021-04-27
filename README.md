@@ -114,6 +114,8 @@ In summary, our goal is that eventually we will be able to install and run all t
 # Development and Testing
 See instructions in our [CONTRIBUTING](./docs/CONTRIBUTING.md) file for instructions on getting a development environment set up, as well as contribution guidelines and notes on how this project is organized.
 
+Testing is still a work in progress.
+
 # Credits
 
 1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](src/TableAnalyzer)
