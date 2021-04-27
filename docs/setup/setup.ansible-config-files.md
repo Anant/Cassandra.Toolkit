@@ -10,11 +10,21 @@ These instructions will help you setup your hosts.ini file as well as you group_
 Ansible requires a hosts.ini file that lists out all of the hosts that it will run against. In our case, this will be all the hosts in your Cassandra Cluster.
 
 ### First, create your environment directory inside `./envs/<YOUR_ENV>`. 
-- You can name it anything you like to, perhaps something like `production` or `staging`. See [Ansible documentation](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout) for best practices.
-- We have two examples of environment folders provided, `_local` and `_local_dse`. 
+We have two examples of environment folders provided, [`_example`](../../config/ansible/envs/_example) and [`_example_dse`](../../config/ansible/envs/_example_dse). You acn use those as a starter template. We will use Apache Cassandra for our examples below.
 
-### Then, add all cassandra hosts in your `./envs/<YOUR_ENV>/hosts.ini` file.
-As a reference, see [`../src/ansible/envs/_local/hosts.ini`](../src/ansible/envs/_local/hosts.ini). 
+```
+# assuming bash's current dir is this folder, and you want your env to be named "testing":
+cp -r ../../config/ansible/envs/_example ../../config/ansible/envs/testing
+mv ../../config/ansible/envs/testing/hosts.ini.example ../../config/ansible/envs/testing/hosts.ini
+mv ../../config/ansible/envs/testing/group_vars/all.yml.example ../../config/ansible/envs/testing/group_vars/all.yml
+cp ../../config/ansible/ansible.cfg.example ../../config/ansible/ansible.cfg
+```
+Now you are ready to fill out the config files!
+
+Note that you can name your environment anything you like to, perhaps something like `production` or `staging`. See [Ansible documentation](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout) for best practices.
+
+### Add all cassandra hosts in your `./envs/<YOUR_ENV>/hosts.ini` file.
+The first file you will fill out is the hosts.ini file. The example you copied above should get you started. 
 
 ## Step 1.2: Choose what Tools to Install
 There are different options and configurations possible, depending on the tools you prefer to use. All the tools in Cassandra.toolkit work well, but we have found some to work better than others. [Click here](./setup.recommendations.md) for our recommendations.
@@ -22,9 +32,7 @@ There are different options and configurations possible, depending on the tools 
 After selecting which tools to use, you are ready to configure the `group_vars/all.yml` file for your ansible environment.
 
 ## Step 1.3: Set Config Variables for Your Deployment
-Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file can be found at `../src/ansible/envs/<YOUR_ENV>/group_vars/all.yml`.
-
-As a reference, see [`../src/ansible/envs/_local/group_vars/all.yml`](../src/ansible/envs/_local/group_vars/all.yml).
+Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file should be located at `../../config/ansible/envs/<YOUR_ENV>/group_vars/all.yml`. Continuing the example from before, it would be [`../../config/ansible/envs/testing/group_vars/all.yml`](../../config/ansible/envs/testing/group_vars/all.yml)
 
 |               |               |
 | ------------- | ------------- | 

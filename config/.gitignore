@@ -2,3 +2,6 @@
 **/hosts.ini
 **/all.yml
 **/ansible.cfg
+**/envs
+!**/envs/_example
+!**/envs/_example_dse

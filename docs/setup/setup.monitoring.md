@@ -28,7 +28,7 @@ $ sudo systemctl status cassandra_exporter
 In case `node_exporter` is also needed, execute the next command to install it.
 
 ```
-ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-node_exporter-install.yml
+ansible-playbook -i ../../config/ansible/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-node_exporter-install.yml
 ```
 
 ### Resources / Further Reading
@@ -45,12 +45,12 @@ Metric Collector for Apache Cassandra (MCAC) aggregates OS and C* metrics along 
 - https://github.com/datastax/metric-collector-for-apache-cassandra/releases/download/v0.1.10/datastax-mcac-agent-0.1.10.zip
 
 ```
-ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.yml -e install_datastax_mcac=True
+ansible-playbook -i ../../config/ansible/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-tools-install.yml -e install_datastax_mcac=True
 ```
 
 Restart cassandra service on all nodes:
 ```
-ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-restart-service.yml
+ansible-playbook -i ../../config/ansible/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-restart-service.yml
 ```
 
 Launch prometheus and grafana docker containers:
