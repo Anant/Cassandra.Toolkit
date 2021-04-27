@@ -16,19 +16,13 @@ To make the setup process easy, we will use the following configuration and plat
 Continue on below to get started using these technologies to get everything setup.
 
 # Building a New Cassandra Cluster
-We have put together a separate project, [DSE.Auto](https://github.com/Anant/DSE.Auto), to guide you through this process. This will guide you through the process of using infrastructure and configuration tools such as [Terraform](https://www.terraform.io/), [Ansible](https://github.com/ansible/ansible), [Docker](https://www.docker.com/), and [Kubernetes](https://kubernetes.io/).
+To start you will need a Cassandra Cluster. Other tutorials walk you through this process, so we will defer to them. Some ways to do this include:
 
-To create a new Cassandra cluster use one of the next links:
 
-| Distribution | Compatibility |
-| ------------ | ------------- | 
-| [Apache Cassandra](https://github.com/Anant/DSE.Auto/tree/master/ansible/cassandra) | Tested on CentOS-7, Ubuntu 18.04 |
-| [DSE](https://github.com/Anant/DSE.Auto/tree/master/ansible/datastax) | Tested with dse-5.1.20 and dse-6.8.9 on CentOS-7 and Ubuntu-18 |
-
-<br/>
-The `hosts.ini` file used the in DSE.Auto can be reused as we continue.
-<br/>
-<br/>
+- [Apache Cassandra - Getting Started Guide](https://cassandra.apache.org/doc/latest/getting_started/)
+- [Datastax Enterprise Documentation](https://docs.datastax.com/)
+    - [Datastax Enterprise Installation Guide](https://docs.datastax.com/en/landing_page/doc/landing_page/installProducts.html)
+- [Ansible Installation](https://github.com/locp/ansible-role-cassandra)
 
 ### Sandbox Clusters For Testing and Development
 If you want to practice setting up and experimenting with Cassandra.toolkit in a sandbox environment, or if you want to develop Cassandra.toolkit on your local machine, we recommend using [CCM, the Cassandra Cluster Manager](https://github.com/riptano/ccm). 
@@ -48,7 +42,7 @@ Now that your Cassandra cluster is up and running, you are ready to install the 
 - [Step 5: Start Containers Using Docker Compose](#step-5-start-containers-using-docker-compose)
 
 ## Step 1: Create and Populate Ansible Config Files
-Unless you created your brand new cluster using our ansible setup as described in the instructions above, you will need to create a `hosts.ini` with all the needed cassandra hosts for Ansible to use. You will also need to set your `group_vars/all.yml` file for your ansible environment. [See instructions here](./setup.ansible-config-files.md).
+You will need to create a `hosts.ini` with all the needed Cassandra hosts for Ansible to use. You will also need to set your `group_vars/all.yml` file for your ansible environment. [See instructions here](./setup.ansible-config-files.md).
 
 ## Step 2: Verify Access To Your Nodes
 Make sure you can access all apache-cassandra or dse cluster nodes you want the tools for. For example, if you are using the `_local` environment:
