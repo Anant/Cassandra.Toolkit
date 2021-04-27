@@ -53,9 +53,6 @@ Offline Log Collection and Ingestion
 | ------------- | ------------- | 
 | [TableAnalyzer](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/TableAnalyzer) | A python based cfstat data anlyzer with a future in being able to visualize other Cassandra / Distributed platform stats. |
 | [NodeAnalyzer](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/NodeAnalyzer) | Shell based tool to collect conf, logs, nodetool output as a tar.gz file |
-| [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html) | Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events, and forwards them either to Elasticsearch or Logstash for indexing. |
-| [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html) | Elasticsearch is the distributed search and analytics engine at the heart of the Elastic Stack. We use Elasticsearch for monitoring and visualizing Cassandra log files in conjunction with Filebeat and Kibana |
-| [Kibana](https://www.elastic.co/guide/en/kibana/7.6/introduction.html) | Kibana provides a GUI for interacting with the Elastic Stack. We use Kibana in particular for visualizing Cassandra log files across the cluster. | 
 
 Live (Online) Cluster Monitoring
 |  |   |
@@ -65,6 +62,9 @@ Live (Online) Cluster Monitoring
 | [cassandra_exporter](https://github.com/criteo/cassandra_exporter) | Cassandra exporter is a standalone application which exports Apache Cassandra® metrics throught a Prometheus friendly endpoint. |
 | [Prometheus](https://prometheus.io/) | Prometheus is an open-source systems monitoring and alerting toolkit |
 | [Grafana](https://grafana.com/) | Grafana is a multi-platform open source analytics and interactive visualization software. | 
+| [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html) | Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events, and forwards them either to Elasticsearch or Logstash for indexing. Filebeat can also be used for offline log ingestion if you have a log tarball, which is what we do in [cassandra.vision](./docs/cluster-maintenance/monitor/README.md#Cassandra.Vision-Offline-Monitoring) |
+| [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html) | Elasticsearch is the distributed search and analytics engine at the heart of the Elastic Stack. We use Elasticsearch for monitoring and visualizing Cassandra log files in conjunction with Filebeat and Kibana |
+| [Kibana](https://www.elastic.co/guide/en/kibana/7.6/introduction.html) | Kibana provides a GUI for interacting with the Elastic Stack. We use Kibana in particular for visualizing Cassandra log files across the cluster. | 
 
 
 ### Cluster Backups
