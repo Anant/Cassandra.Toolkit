@@ -6,17 +6,18 @@ All the tools in cassandra.toolkit should already be installed onto your cluster
 We break down cluster maintenance into backups, monitoring, and repairs. Click links below to either learn about how to use Cassandra.toolkit for these three different categories, or for using the individual tools. 
 
 ### [Backups](./backup/README.md)
-- [cassandra-medusa](./backup)
-- [tablesnap](./backup)
+- [cassandra-medusa](./backup/maintenance.medusa.md)
+- [tablesnap](./backup/maintenance.tablesnap.md)
 
 ### [Monitoring](./monitor/README.md)
-- [node_exporter](./monitor)
-- [cassandra_exporter](./monitor)
-- [Prometheus](./monitor)
-- [Grafana](./monitor)
-- [Datastax MCAC](./monitor)
+- [Live Metrics Monitoring](./monitor/README.md#live-metrics-monitoring)
+    - [node_exporter](./monitor/maintenance.node_exporter.md)
+    - [cassandra_exporter (with Prometheus and Grafana)](./monitor/maintenance.cassandra_exporter.md)
+    - [Datastax MCAC](./monitor/maintenance.datastax-mcac.md)
+- [Offline Monitoring](./monitor/README.md#offline-monitoring)
+    - [TableAnalyzer](./monitor/maintenance.tableanalyzer.md)
+    - [NodeAnalyzer](./monitor/maintenance.nodeanalyzer.md)
+    - [Cassandra.Vision](./monitor/maintenance.cassandra.vision.md)
 
 ### [Repairs](./repair/README.md) 
-- [table-reaper](./repair)
-
-TODO set specific links for the tools listed above
+- [Cassandra Reaper](./repair/maintenance.reaper.md)

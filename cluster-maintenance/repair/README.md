@@ -1,7 +1,10 @@
 # Cluster Repairs
+According to the CAP theorem, [Cassandra trades consistency for availability and performance](https://www.datastax.com/blog/how-apache-cassandratm-balances-consistency-availability-and-performance). Instead, Cassandra can be described as "eventually consistent". Accordingly, from time to time your cluster will need to run repairs in order to bring all nodes back into a consistent state.
 
-## Cassandra Reaper
+The nodetool repair process was built for this purpose, but Cassandra Reaper improves on nodetool repair in several ways. 
 
-TODO
+Assuming that Cassandra Reaper is already installed by following the instructions if you followed the [instructions for setting up Cassandra Reaper](../../setup/setup.repairs).
 
-Ansible as configured will at most just setup a keyspace for reaper. Cassandra Reaper is then started in docker using docker-compose. (TODO double check this)
+
+- [Cassandra Reaper](./repair/maintenance.reaper.md)
+

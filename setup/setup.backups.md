@@ -1,5 +1,5 @@
-# Cassandra Backups - Overview
-This document is to provide further instructions for installation of backup tools for your Cassandra cluster. [Click here]() to go back to instructions for filling out your `group_vars/all.yml` file.
+# Setting Up Cassandra Backups - Overview
+This document is to provide further instructions for installation of backup tools for your Cassandra cluster. [Click here](./setup.ansible-config-files.md#Step-1.3-set-config-variables-for-your-deployment) to go back to instructions for filling out your `group_vars/all.yml` file.
 
 ## Install Tablesnap for AWS S3 backups
 Tablesnap is one of the backup tools that Cassandra.toolkit supports. Tablesnap will be installed on your cluster if you set `install_tablesnap=True`, either in your `group_vars/all.yml` file or using `-e` when executing ansible playbook.
@@ -12,7 +12,7 @@ If using Tablesnap, make sure you pass the following three variables related to 
 
  `tablesnap_aws_backup_bucket_name` can be set in your `envs/<your-env>/group_vars/all.yml` file. However, credentials should be sent in using the commandline so that they aren't stored in plaintext in the all.yml file, so make sure to send in `aws_access_key_id` and `aws_secret_access_key` using the `-e` arg instead. For instructions on how to do that, and for more information on what each of these variables does, see further [documentation here](./setup/setup.ansible-config-files.md). 
 
-## Install cassandra-medusa for AWS S3 backups
+## Install Cassandra Medusa for AWS S3 backups
 Cassandra Medusa is the other backup tool that Cassandra.toolkit supports. Cassandra Medusa will be installed on your cluster if you set `install_medusa=True`, either in your `group_vars/all.yml` file or using `-e` when executing ansible playbook.
 
 Make sure to set the following variables as well:

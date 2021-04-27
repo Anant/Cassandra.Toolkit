@@ -1,9 +1,19 @@
 # Cluster Setup - Overview
+### Table of Contents:
 - [Building a New Cassandra cluster](#building-a-new-cassandra-cluster)
 - [Install cassandra.toolkit on existing cluster](#installing-cassandra.toolkit-on-your-cluster)
 
 Cassandra.toolkit makes it easy to setup all the tools you will need for building, managing, and monitoring your Cassandra cluster. Whether you already have a Cassandra cluster or need to create your cluster, we have you covered. Just follow instructions below to get started.
 
+### What Configuration Technologies Used
+To make the setup process easy, we will use the following configuration and platform technologies to setup Cassandra.toolkit on your cluster:
+
+- [Terraform](https://www.terraform.io/)
+- [Ansible](https://github.com/ansible/ansible)
+- [Docker](https://www.docker.com/)
+- [Kubernetes](https://kubernetes.io/)
+
+Continue on below to get started using these technologies to get everything setup.
 
 # Building a New Cassandra Cluster
 We have put together a separate project, [DSE.Auto](https://github.com/Anant/DSE.Auto), to guide you through this process. This will guide you through the process of using infrastructure and configuration tools such as [Terraform](https://www.terraform.io/), [Ansible](https://github.com/ansible/ansible), [Docker](https://www.docker.com/), and [Kubernetes](https://kubernetes.io/).
@@ -94,7 +104,7 @@ ansible-playbook -i ./envs/_local/hosts.ini ./playbooks/cassandra-tools-install.
 -e 'install_datastax_mcac=True' 
 ```
 
-If `enable_jmx=True` (whether by passing in as an arg with `-e` or by setting in `group_vars/all.yml`), continue on to Step 4. If not, you can skip to [Step 5](#). 
+If `enable_jmx=True` (whether by passing in as an arg with `-e` or by setting in `group_vars/all.yml`), continue on to Step 4. If not, you can skip to [Step 5](#step-5-start-containers-using-docker-compose). 
 
 ## Step 4: Restart Cluster to Enable JMX (If Needed)
 If installation was run with `enable_jmx=True` then your cluster has to be restarted to allow new jmx configs to be enabled. However, if `enable_jmx=False` then you can skip this step.
@@ -135,7 +145,7 @@ The above tools are available to access in the browser at following urls:
 - `http://localhost:5601/` - kibana
 - `http://localhost:8080/webui/` - cassandra reaper (admin:admin)
 
-**NOTE** some of these ports will be different depending on what monitoring tool you chose, cassandra_exporter or Datastax MCAC. [Click here for more information](./setup.metrics-monitoring.md).
+**NOTE** some of these ports will be different depending on what monitoring tool you chose, cassandra_exporter or Datastax MCAC. [Click here for more information](./setup.monitoring.md).
 
 # What's Next?
 Now that the tools in your toolkit are installed, you are ready to use them across your cluster. Head over to [Cluster Maintenance](../cluster-maintenance/README.md) to get started.

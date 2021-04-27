@@ -1,6 +1,8 @@
 # Backups
-- AWS setup
-https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.md
+
+## Instructions for Specific Backup Tools
+- [cassandra-medusa](./maintenance.medusa.md)
+- [tablesnap](./maintenance.tablesnap.md)
 
 ## Snapshot strategy (future changes)
 

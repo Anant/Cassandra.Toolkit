@@ -1,7 +1,9 @@
-# Live Metrics Monitoring - Overview
+# Setting Up Monitoring - Overview
+This document is to provide further instructions for installation of monitoring tools for your Cassandra cluster. [Click here](./setup.ansible-config-files.md#Step-1.3-set-config-variables-for-your-deployment) to go back to instructions for filling out your `group_vars/all.yml` file.
+
 This document explains the two ways to do live metrics monitoring in Cassandra.toolkit: 1) with [Prometheus and cassandra_exporter](#monitoring-metrics-with-prometheus-and-cassandra-exporter) and 2) with [Datastax MCAC](#monitoring-metrics-with-datastax-metric-collector).
 
-For offline monitoring, no setup is required. Instead see documentation under [Cluster Maintenance](../cluster-maintenance/monitor/README.md#offline-monitoring)
+For offline monitoring, no setup is required. Instead see documentation under [Cluster Maintenance](../cluster-maintenance/monitor/README.md#offline-monitoring). 
 
 ## Monitoring Metrics with Prometheus and Cassandra Exporter
 One way to do live monitoring with a dashboard is to use cassandra_exporter with Prometheus and Grafana.
