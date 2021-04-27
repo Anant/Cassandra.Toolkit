@@ -11,8 +11,8 @@ Is integrated within Cassandra.Vision, but also can be used on its own.
 TODO
 ### Cassandra.Vision Offline Monitoring
 
-The main documentation for off-line Cassandra monitoring is found in a separate repo, Cassandra.vision.
+The main documentation for offline Cassandra monitoring is found in a separate repo, [Cassandra.vision](https://github.com/Anant/cassandra.vision).
 
-But here, we will discuss how off-line monitoring fits within the overall scope of Cassandra cluster maintenance.
+But here, we will discuss how offline monitoring fits within the overall scope of Cassandra cluster maintenance.
 
-https://github.com/Anant/cassandra.vision
+Note that Filebeat, Elasticsearch, and Kibana can also be used for online (live) monitoring. [Click here](./maintenance.live-monitoring.md#live-monitoring-with-filebeat-elasticsearch-and-kibana) for documentation on online monitoring with Filebeat, Elasticsearch, and Kibana.
