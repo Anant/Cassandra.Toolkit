@@ -1,0 +1,4 @@
+# don't let developers/users accidentally commit their personal configs
+**/hosts.ini
+**/all.yml
+**/ansible.cfg

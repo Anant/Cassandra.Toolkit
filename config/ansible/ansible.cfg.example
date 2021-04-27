@@ -1,0 +1,7 @@
+[defaults]
+host_key_checking = False
+roles_path = ./roles
+### REPLACE OR REMOVE AND USE "--user USER --private-key PRIVATE_KEY_PATH" WHEN EXECUTING THE PLAYBOOK
+remote_user = user
+library = ./library
+log_path=./ansible.log

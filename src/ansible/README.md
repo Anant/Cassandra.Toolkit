@@ -4,7 +4,7 @@
 See [the main README.md](../../README.md) for more information.
 
 ## Installation
-See [the setup instructions](../../setup/README.md#installing-cassandra.toolkit-on-your-cluster) for more information.
+See [the setup instructions](../../docs/setup/README.md#installing-cassandra.toolkit-on-your-cluster) for more information.
 
 # Compatibility
 Below is compatibility information for our current implementation of the ansible playbooks as provided in cassandra.toolkit.

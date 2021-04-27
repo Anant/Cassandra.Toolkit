@@ -1,5 +1,5 @@
 # Docker Tools for Testing and Experimentation
-**Note:** All the tools described here can be installed and configured with ansible from [ansible](../ansible), following the [instructions provided here](../../setup/README.md). 
+**Note:** All the tools described here can be installed and configured with ansible from [ansible](../ansible), following the [instructions provided here](../../docs/setup/README.md). 
 
 It's better to use that approach to run them all because ansible will generate all needed artifacts depending on what cassandra hosts are mentioned in the context. However, in case you want to experiment more, you can run the containers using the set of shell scripts provided here.
 
