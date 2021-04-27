@@ -7,6 +7,6 @@ We break down cluster maintenance into backups, monitoring, and repairs. Click l
 
 - [Backups](./backup/README.md)
 - [Monitoring](./monitor/README.md)
-    - [Live Metrics Monitoring](./monitor/README.md#live-online-monitoring)
-    - [Offline Monitoring](./monitor/README.md#offline-monitoring)
+    - [Live Metrics Monitoring](./monitor/maintenance.live-monitoring.md)
+    - [Offline Monitoring](./monitor/maintenance.offline-monitoring.md)
 - [Repairs](./repair/README.md) 

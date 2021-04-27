@@ -3,7 +3,7 @@ This document is to provide further instructions for installation of monitoring 
 
 This document explains the two ways to do live metrics monitoring in Cassandra.toolkit: 1) with [Prometheus and cassandra_exporter](#monitoring-metrics-with-prometheus-and-cassandra-exporter) and 2) with [Datastax MCAC](#monitoring-metrics-with-datastax-metric-collector).
 
-For offline monitoring, no setup is required. Instead see documentation under [Cluster Maintenance](../cluster-maintenance/monitor/README.md#offline-monitoring). 
+For offline monitoring, no setup is required. Instead see documentation under [Cluster Maintenance](../cluster-maintenance/monitor/maintenance.offline-monitoring.md). 
 
 ## Monitoring Metrics with Prometheus and Cassandra Exporter
 One way to do live monitoring with a dashboard is to use cassandra_exporter with Prometheus and Grafana.
