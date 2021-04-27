@@ -24,13 +24,6 @@ To start you will need a Cassandra Cluster. Other tutorials walk you through thi
     - [Datastax Enterprise Installation Guide](https://docs.datastax.com/en/landing_page/doc/landing_page/installProducts.html)
 - [Ansible Installation](https://github.com/locp/ansible-role-cassandra)
 
-### Sandbox Clusters For Testing and Development
-If you want to practice setting up and experimenting with Cassandra.toolkit in a sandbox environment, or if you want to develop Cassandra.toolkit on your local machine, we recommend using [CCM, the Cassandra Cluster Manager](https://github.com/riptano/ccm). 
-
-Follow instructions on their site to get a cluster started on your local machine. Their documentation also shows how to get the ip addresses that you will use for the hosts.ini file that Ansible requires. 
-
-Then continue on by following the instructions for [installing cassandra.toolkit on existing cluster](#installing-cassandra.toolkit-on-your-cluster). Alternatively, if you want to test out individual tools on your ccm cluster, see below under [Testing Tools Outside of Cassandra.Toolkit](#testing-tools-without-ansible)
-
 # Installing Cassandra.toolkit on your cluster
 
 Now that your Cassandra cluster is up and running, you are ready to install the toolkit onto your cluster.
