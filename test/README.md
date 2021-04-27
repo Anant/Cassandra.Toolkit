@@ -23,8 +23,14 @@ pip3 install -r ../scripts/requirements.txt
 
 ## Generate config files
 ```
+# TODO this script isn't ready yet
 # assuming you're in the test dir still
-python3 ./generate-test-configuration.py
+# python3 ./generate-test-configuration.py
+
+# get output of ccm liveset OR ccm node1 nodetool status (more human readable) to get host ids
+ccm liveset
+# sample output:
+# 127.0.0.1,127.0.0.2,127.0.0.3
 ```
 
 # Cleaning up
