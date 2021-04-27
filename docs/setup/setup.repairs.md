@@ -12,3 +12,6 @@ TODO add more details here
 ## Further Reading
 - http://cassandra-reaper.io/
 - https://github.com/thelastpickle/cassandra-reaper
+- https://cassandra.tools/cassandra-reaper
+- https://cassandra.link/post/experiences-with-tombstones-in-apache-cassandra
+- https://blog.anant.us/cassandra-lunch-16-anti-entropy-repair-synchronization/

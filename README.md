@@ -8,7 +8,6 @@ A curated set of useful Cassandra compatible tools for building, managing, and m
 - [Tools in the Toolkit](#tools-in-the-toolkit)
 - [Compatibility](#compatibility)
 - [Development and Testing](#development-and-testing)
-- [Resources / Further Reading](#resources--further-reading)
 - [Credits](#credits)
 
 # Overview
@@ -58,7 +57,7 @@ Offline Log Collection and Ingestion
 | [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html) | Elasticsearch is the distributed search and analytics engine at the heart of the Elastic Stack. We use Elasticsearch for monitoring and visualizing Cassandra log files in conjunction with Filebeat and Kibana |
 | [Kibana](https://www.elastic.co/guide/en/kibana/7.6/introduction.html) | Kibana provides a GUI for interacting with the Elastic Stack. We use Kibana in particular for visualizing Cassandra log files across the cluster. | 
 
-Live Cluster Monitoring
+Live (Online) Cluster Monitoring
 |  |   |
 | ------------- | ------------- | 
 | [Metrics Collector for Apache Cassandra (MCAC)](https://github.com/datastax/metric-collector-for-apache-cassandra) | Metric collection and Dashboards for Apache Cassandra clusters | 
@@ -112,18 +111,6 @@ In summary, our goal is that eventually we will be able to install and run all t
 
 # Development and Testing
 See instructions in our [CONTRIBUTING](./docs/CONTRIBUTING.md) file for instructions on getting a development environment set up, as well as contribution guidelines and notes on how this project is organized.
-
-# Resources / Further Reading
-Information on various tools in cassandra.toolkit:
-
-- https://thelastpickle.com/blog/2018/04/03/cassandra-backup-and-restore-aws-ebs.html
-- https://8kmiles.com/blog/cassandra-backup-and-restore-methods/
-- https://github.com/JeremyGrosser/tablesnap
-- https://devops.com/things-know-planning-cassandra-backup
-- http://techblog.constantcontact.com/devops/cassandra-and-backups/
-- https://www.linkedin.com/pulse/snap-cassandra-s3-tablesnap-vijaya-kumar-hosamani/
-- http://datos.io/2017/02/02/choose-right-backup-solution-cassandra/
-
 
 # Credits
 
