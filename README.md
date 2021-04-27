@@ -25,7 +25,7 @@ For further information on how all of these tools work together and how to get s
 # Getting Started
 
 ## Cluster Setup
-The first step is to get everything installed. [Click here to get started](./setup/README.md). 
+The first step is to get everything installed. [Click here to get started](./docs/setup/README.md). 
 
 These instructions will help you build your Cassandra cluster if you don't have one already, and then to setup Cassandra.toolkit on your cluster. 
 
@@ -35,17 +35,17 @@ Cassandra.toolkit provides good defaults and instructions on how to leverage all
 After setting up your cluster, you will need to maintain it. All the tools below should already be installed at this point if you followed the instructions for [Cluster Setup](#cluster-setup). However, your Cassandra Cluster is not really a "set it and forget it" kind of database - setting up is just the beginning! The difference is that now that you have cassandra.toolkit setup on your cluster, you have all the tools that you will need already installed and configured. Moreover, this guide will walk you through the process of maintaining your cluster using these battle tested tools.
 
 We break down cluster maintenance into the following categories: 
-- [Backups](./cluster-maintenance/backup/README.md)
-- [Monitoring](./cluster-maintenance/monitor/README.md)
-- [Repairs](./cluster-maintenance/repair/README.md) 
+- [Backups](./docs/cluster-maintenance/backup/README.md)
+- [Monitoring](./docs/cluster-maintenance/monitor/README.md)
+- [Repairs](./docs/cluster-maintenance/repair/README.md) 
 
-[Click here](cluster-maintenance/README.md) to learn how to use cassandra.toolkit tools to maintain your cluster.
+[Click here](docs/cluster-maintenance/README.md) to learn how to use cassandra.toolkit tools to maintain your cluster.
 
 
 # Tools in the Toolkit
 Curious about what tools we will be installing on your cluster? See below for our list of tools that are included in Cassandra.toolkit. 
 
-We provide instructions for how to [setup](./setup/README.md) and [operate](./cluster-maintenance/README.md) these tools into your cluster, but it is helpful to become familiar with each tool on its own as well. Accordingly we provide links to the official project websites for each tool for you to browse.
+We provide instructions for how to [setup](./setup/README.md) and [operate](./docs/cluster-maintenance/README.md) these tools into your cluster, but it is helpful to become familiar with each tool on its own as well. Accordingly we provide links to the official project websites for each tool for you to browse.
 
 ### Cluster Monitoring
 
@@ -111,7 +111,7 @@ In summary, our goal is that eventually we will be able to install and run all t
 [Click here](./src/ansible/README.md#compatibility) for the latest information on platform and ansible version compatibility.
 
 # Development and Testing
-See instructions in our [CONTRIBUTING](./docs/CONTRIBUTING.md) file for instructions on getting a development environment set up, as well as guidelines for how this project is organized.
+See instructions in our [CONTRIBUTING](./docs/CONTRIBUTING.md) file for instructions on getting a development environment set up, as well as contribution guidelines and notes on how this project is organized.
 
 # Resources / Further Reading
 Information on various tools in cassandra.toolkit:

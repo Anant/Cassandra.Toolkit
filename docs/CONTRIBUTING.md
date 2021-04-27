@@ -3,18 +3,15 @@ This project is maintained by Rahul Singh of [Anant](http://anant.us). Feel free
 
 ### Table of Contents
 - [Setting up a Development Environment](#setting-up-a-development-environment)
+- [Project Directory Structure](#project-directory-structure)
 - [Contribution Guidelines](#contribution-guidelines)
-
 
 ## Setting up a Development Environment
 To quickly get started developing on this project, we recommend using [CCM, the Cassandra Cluster Manager](https://github.com/riptano/ccm). We describe how to setup a test cluster using CCM [here](./setup/README.md#sandbox-clusters-for-testing-and-development).
 
 You can also test out individual tools quickly using docker, without having to setup everything in Ansible. We provide some sample scripts to make it easy. [Click here for instructions](../src/docker/README.md).
 
-## Contribution Guidelines
-In order to keep this project organized, please keep in mind the following principles when adding or modifying tools and documentation to cassandra.toolkit. 
-
-#### Directory Structure
+## Project Directory Structure
 
 | Directory | Purpose | 
 | ------------------- | ------------------ |
@@ -26,15 +23,28 @@ In order to keep this project organized, please keep in mind the following princ
 | [`quickstart-tutorials/`](../quickstart-tutorials) | These are kind of unrelated to cassandra.toolkit, but provide easy to use starter files to setup Cassandra related tooling on localhost. Nothing should go in here that is actually required for cassandra.toolkit to work. |
 | [`src/`](../src/) | This is the low-level source code for the project, including ansible files and docker related files that are used in cassandra.toolkit. Documentation in this directory and all subdirectories should be mostly for developers, not for end-users, though of course some end-users will want to look in here to see what is going on under the hood. |
 
-#### How to: Add Documentation
+## Contribution Guidelines
+In order to keep this project organized, please keep in mind the following principles when adding or modifying tools and documentation to cassandra.toolkit. 
+
+### How to: Add or Modify Documentation
 
 Our goal is to make it easy for new users should be able to open cassandra.toolkit in Github or in their IDE and easily know exactly how to navigate through the project from start to finish. 
 
-Accordingly, the project root README.md should be simple and easy to navigate. Don't add to much here, just enough so that users can find what they need here and then be redirected to the documentation that they are looking for. 
+Accordingly, [the project root README.md](../README.md) should be simple and easy to navigate. Don't add to much here, just enough so that users can find what they need here and then be redirected to the documentation that they are looking for. 
 
+- Documentation for end users should all go in the main project `docs` dir, not in any other directory.
+- Documentation for installing/setting up/configuring cassandra.toolkit all goes in `docs/setup`
+- Documentation for using the tools all goes in `docs/cluster-maintenance`
 - **Links** should be relative paths when internal to the project (as modelled within this file). This makes it so users in IDEs or Github can click on them and follow them easily. Add links liberally so that it is easy to navigate through the documentation, though not too many in order to avoid making the documentation too cluttered.
+- Note that since links in documentation are relative links, if you move or rename a documentation file make sure to do a search for that filename and change all relative links throughout the documentation.
 - Larger documentation files should have a **Table of Contents** at the top, that is labelled as such.
+- Please do your best to follow file namespacing convention that is used throughout the documentation. One file per directory is named `README.md` (for the sake of Github if nothing else) and then everything else should be appropriately namespaced so that someone looking at the file name (without even knowing the dir) can guess the basic purpose of the file (e.g., `setup.monitoring.md` is easily distinguishable from `maintenance.monitoring.md`). 
 
-#### How to: Add Tools
+### How to: Add Tools
 
 - All directories and subdirectories should have their own `README.md` file describing the purpose of the directory, so as to keep the project organized. Before adding files to cassandra.toolkit, check the directory you are about to add it to and make sure this is where it belongs.
+- source code all goes in `src` directory
+- Make sure to add the new tool's name and description to the following places in the documentation:
+    - [Main project README.md](../README.md#tools-in-the-toolkit) under the appropriate category (backup, monitoring, repairs)
+    - docs/setup/ instructions (TODO write out specific places here, there's multiple)
+    - docs/cluster-maintenance/ instructions (TODO write out specific places here, there's multiple)
