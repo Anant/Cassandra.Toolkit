@@ -12,16 +12,17 @@
 
 
 - name: download and install public signing repo key (apt)
-  command: "wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+  ansible.builtin.apt_key: 
+    keyserver: https://artifacts.elastic.co/GPG-KEY-elasticsearch
 "
   tags: ["filebeat"]
   when: ansible_os_family == "Debian"
 
-- name: save elastic repo definition key (apt)
-  command: "wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-"
-  tags: ["filebeat"]
-  when: ansible_os_family == "Debian"
+# - name: save elastic repo definition key (apt)
+#   command: "echo \"deb https://artifacts.elastic.co/packages/7.x/apt stable main\" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+# "
+#   tags: ["filebeat"]
+#   when: ansible_os_family == "Debian"
 
 - name: install apt-transport-https (apt)
   yum:
