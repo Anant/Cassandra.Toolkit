@@ -24,6 +24,10 @@ To start you will need a Cassandra Cluster. Other tutorials walk you through thi
     - [Datastax Enterprise Installation Guide](https://docs.datastax.com/en/landing_page/doc/landing_page/installProducts.html)
 - [Ansible Installation](https://github.com/locp/ansible-role-cassandra)
 
+Note that you will need to know the ips of the nodes in your cluster for the next step.
+
+Once your cluster is up and running, continue to the next step to install Cassandra.toolkit on your cluster.
+
 # Installing Cassandra.toolkit on your cluster
 
 Now that your Cassandra cluster is up and running, you are ready to install the toolkit onto your cluster.
@@ -38,19 +42,23 @@ Now that your Cassandra cluster is up and running, you are ready to install the 
 You will need to create a `hosts.ini` with all the needed Cassandra hosts for Ansible to use. You will also need to set your `group_vars/all.yml` file for your ansible environment. [See instructions here](./setup.ansible-config-files.md).
 
 ## Step 2: Verify Access To Your Nodes
-Make sure you can access all apache-cassandra or dse cluster nodes you want the tools for. For example, if you are using the `testing` environment:
+Next we will make sure you can access all apache-cassandra or dse cluster nodes you want the tools for. If you haven't installed ansible already, you can refer to the [official instructions here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).
+
+Refer to the `hosts.ini` file in your env using `-i`, and use the `cassandra-hello.yml` playbook.
+
+For example, if you are using the `testing` environment:
 
 ```
-# assuming current dir is this dir, docs/setup:
-ansible-playbook -i ../../config/ansible/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-hello.yml
+# assuming current dir is this project root, docs/setup:
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-hello.yml
 ```
 
-If it worked, then now you are ready to run the ansible playbook and install cassandra.toolkit to your Cassandra cluster! If not, you might want to [go back to the instructions for setting your hosts.ini file](./setup.ansible-config-files.md#Step-1.1-list-all-hosts-in-hosts.ini) before trying again. 
+If it worked, then now you are ready to run the ansible playbook and install cassandra.toolkit to your Cassandra cluster! If not, you might want to [go back to the instructions for setting your hosts.ini file](./setup.ansible-config-files.md#Step-1.2-list-all-hosts-in-hosts.ini) before trying again. 
 
 ## Step 3: Install the Toolkit onto Your Nodes
 
 ### Run the Ansible Playbook
-Finally you are ready to install the toolkit onto your nodes using Ansible Playbook. Be sure to pass in the arguments corresponding to the tools you chose from [Step 1.2](./setup.ansible-config-files.md#step-1.2-choose-what-tools-to-install). 
+Finally you are ready to install the toolkit onto your nodes using Ansible Playbook. Be sure to pass in the arguments corresponding to the tools you chose from [Step 1.3](./setup.ansible-config-files.md#step-1.3-choose-what-tools-to-install). 
 
 Below are some examples to get you started, assuming and env called `testing`. Most of the args passed in using `-e` can also be passed in using `envs/<your-env>/group_vars/all.yml`, besides AWS credentials.
 
@@ -62,7 +70,7 @@ This is the basic ansible-playbook command. This will only install tools based o
 
 ```
 # assuming this docs/setup dir is the current dir, and <YOUR ENV> is "testing":
-ansible-playbook -i ../../config/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-tools-install.yml
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-tools-install.yml
 ```
 
 #### Example B: Enable CLI Features
@@ -72,7 +80,7 @@ Again, note that args passed in using `-e` can also be set in your `group_vars/a
 
 ```
 # assuming this docs/setup dir is the current dir, and <YOUR ENV> is "testing":
-ansible-playbook -i ../../config/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-tools-install.yml \
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-tools-install.yml \
 -e "install_filebeat=True" \
 -e "enable_jmx=True" \
 -e 'create_reaper_db=True' \
@@ -85,7 +93,7 @@ ansible-playbook -i ../../config/envs/testing/hosts.ini ../../src/ansible/playbo
 This includes CLI tools from Example B, as well as Datastax MCAC for monitoring using a dashboard.
 ```
 # assuming this docs/setup dir is the current dir, and <YOUR ENV> is "testing":
-ansible-playbook -i ../../config/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-tools-install.yml \
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-tools-install.yml \
 -e "install_filebeat=True" \
 -e "enable_jmx=True" \
 -e 'create_reaper_db=True' \
@@ -101,7 +109,7 @@ If `enable_jmx=True` (whether by passing in as an arg with `-e` or by setting in
 If installation was run with `enable_jmx=True` then your cluster has to be restarted to allow new jmx configs to be enabled. However, if `enable_jmx=False` then you can skip this step.
 
 ```
-ansible-playbook -i ../../config/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-restart-service.yml
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-restart-service.yml
 ```
  
 ## Step 5: Start Containers Using Docker Compose

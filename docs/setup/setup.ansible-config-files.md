@@ -2,37 +2,62 @@
 These instructions will help you setup your hosts.ini file as well as you group_vars.all.yml file, the two config files you'll need to run ansible. If you are here, it is assumed that you have already built your Cassandra cluster. If you haven't, see [our instructions for doing so](./README.md#building-a-new-cassandra-cluster) before continuing.
 
 ### Table of Contents:
-- [Step 1.1: List All Hosts in hosts.ini](#Step-1.1-list-all-hosts-in-hosts.ini)
-- [Step 1.2: Choose what Tools to Install](#Step-1.2-choose-what-tools-to-install)
-- [Step 1.3: Set Config Variables for Your Deployment](#Step-1.3-set-config-variables-for-your-deployment)
+- [Step 1.1: Copy the Example Files](#Step-1.1-copy-the-example-files)
+- [Step 1.2: List All Hosts in hosts.ini](#Step-1.2-list-all-hosts-in-hosts.ini)
+- [Step 1.3: Choose what Tools to Install](#Step-1.3-choose-what-tools-to-install)
+- [Step 1.4: Set Config Variables for Your Deployment](#Step-1.4-set-config-variables-for-your-deployment)
+- [Step 1.5: Set Credentials in ansible.cfg](#step-1.5-set-credentials-in-ansible.cfg)
 
-## Step 1.1: List All Hosts in hosts.ini
-Ansible requires a hosts.ini file that lists out all of the hosts that it will run against. In our case, this will be all the hosts in your Cassandra Cluster.
-
-### First, create your environment directory inside `./envs/<YOUR_ENV>`. 
-We have two examples of environment folders provided, [`_example`](../../config/ansible/envs/_example) and [`_example_dse`](../../config/ansible/envs/_example_dse). You acn use those as a starter template. We will use Apache Cassandra for our examples below.
+## Step 1.1: Copy the Example Files
+First, you will need to create your environment directory inside `./envs/<YOUR_ENV>`. 
+We have two examples of environment folders provided, [`_example`](./config/ansible/envs/_example) and [`_example_dse`](./config/ansible/envs/_example_dse). You can use those as a starter template. We will use Apache Cassandra for our examples below.
 
 ```
-# assuming bash's current dir is this folder, and you want your env to be named "testing":
-cp -r ../../config/ansible/envs/_example ../../config/ansible/envs/testing
-mv ../../config/ansible/envs/testing/hosts.ini.example ../../config/ansible/envs/testing/hosts.ini
-mv ../../config/ansible/envs/testing/group_vars/all.yml.example ../../config/ansible/envs/testing/group_vars/all.yml
-cp ../../config/ansible/ansible.cfg.example ../../config/ansible/ansible.cfg
+# assuming bash's current dir is project root, and you want your env to be named "testing":
+cp -r ./config/ansible/envs/_example ./config/ansible/envs/testing
+mv ./config/ansible/envs/testing/hosts.ini.example ./config/ansible/envs/testing/hosts.ini
+mv ./config/ansible/envs/testing/group_vars/all.yml.example ./config/ansible/envs/testing/group_vars/all.yml
+
+# put the ansible config in a place where ansible knows to look. For now we'll put it where the doc examples have users calling ansible-playbook from, the project root
+cp ./src/ansible/ansible.cfg.example ./ansible.cfg
 ```
+Some Notes: 
+- You can name your environment anything you like to, perhaps something like `production` or `staging`. See [Ansible documentation](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout) for best practices.
+- If you want to put your ansible.cfg file somewhere else, [see instructions here](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file) for what your options are. You will also need to change where the `roles` dir is set to be in the ansible.cfg to still find cassandra.toolkit ansible roles at `src/ansible/roles`.
+
 Now you are ready to fill out the config files!
 
-Note that you can name your environment anything you like to, perhaps something like `production` or `staging`. See [Ansible documentation](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout) for best practices.
+
+## Step 1.2: List All Hosts in hosts.ini
+Ansible requires a hosts.ini file that lists out all of the hosts that it will run against. In our case, this will be all the hosts in your Cassandra Cluster.
 
 ### Add all cassandra hosts in your `./envs/<YOUR_ENV>/hosts.ini` file.
 The first file you will fill out is the hosts.ini file. The example you copied above should get you started. 
 
-## Step 1.2: Choose what Tools to Install
+1) Give a name for each node in your cluster `[cassandra:children]`. You will refer to these nodes using these names throughout the hosts.ini file. In the example files, there are three nodes, named "node1", "node2", and "node3":
+
+```
+[cassandra:children]
+node1
+node2
+node3
+```
+
+2) For each node, put a variable in the hosts.ini file using that name
+Here's an explanation of the variables you need to set:
+|   hosts.ini variable  |  Description   |
+| ------------- | ------------- | 
+| `[cassandra:children]` | List of all the nodes.   |
+|  | |
+
+## Step 1.3: Choose what Tools to Install
 There are different options and configurations possible, depending on the tools you prefer to use. All the tools in Cassandra.toolkit work well, but we have found some to work better than others. [Click here](./setup.recommendations.md) for our recommendations.
 
 After selecting which tools to use, you are ready to configure the `group_vars/all.yml` file for your ansible environment.
 
-## Step 1.3: Set Config Variables for Your Deployment
-Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file should be located at `../../config/ansible/envs/<YOUR_ENV>/group_vars/all.yml`. Continuing the example from before, it would be [`../../config/ansible/envs/testing/group_vars/all.yml`](../../config/ansible/envs/testing/group_vars/all.yml)
+
+## Step 1.4: Set Config Variables for Your Deployment
+Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file should be located at `./config/ansible/envs/<YOUR_ENV>/group_vars/all.yml`. Continuing the example from before, it would be [`./config/ansible/envs/testing/group_vars/all.yml`](./config/ansible/envs/testing/group_vars/all.yml)
 
 |               |               |
 | ------------- | ------------- | 
@@ -77,5 +102,14 @@ These variables should be passed in using the `-e ` arg as well, as shown [**her
 
 [Click here](./setup.backups.md) for more information on which variables to use for setting up backups for your data.
 
+## Step 1.5: Set Credentials in ansible.cfg
+
+Assuming you already copied the example file using [our instructions given above](#Step-1.1-copy-the-example-files) you can find the file in `~/.ansible.cfg`. Use your favorite text editor and set the credentials.
+```
+### REPLACE OR REMOVE AND USE "--user USER --private-key PRIVATE_KEY_PATH" WHEN EXECUTING THE PLAYBOOK
+```
+
+
 # What's Next
 Now that your config files are ready and you know what tools you want to install, you are ready to verify that Ansible is speaking to your nodes correctly. [Click here to get started](./README.md#step-2-verify-access-to-your-nodes).
+
