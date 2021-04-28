@@ -13,8 +13,9 @@
 
 - name: download and install public signing repo key (apt)
   ansible.builtin.apt_key: 
-    keyserver: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-"
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+    
   tags: ["filebeat"]
   when: ansible_os_family == "Debian"
 
