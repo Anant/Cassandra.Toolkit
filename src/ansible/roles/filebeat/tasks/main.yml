@@ -15,7 +15,7 @@
   ansible.builtin.apt_key: 
     url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
     state: present
-    
+
   tags: ["filebeat"]
   when: ansible_os_family == "Debian"
 
@@ -30,6 +30,12 @@
     name: "apt-transport-https"
     state: present
   tags: ["filebeat"]
+  when: ansible_os_family == "Debian"
+
+- name: Update apt packages (apt)
+  become: true
+  apt:
+    update_cache: yes
   when: ansible_os_family == "Debian"
 
 - name: install filebeat
