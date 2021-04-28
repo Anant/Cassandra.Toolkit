@@ -15,6 +15,14 @@
     group: "{{ cassandra_ops_os_user }}"
     owner: "{{ cassandra_ops_os_user }}"
 
+- name: install unzip (if mcac is a .zip file)
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "unzip"
+  when: datastax_mcac_file_ext == ".zip" or datastax_mcac_grafana_dashboards_file_ext == ".zip" 
+
 - name: un-archiving datastax mcac into {{ tools_install_folder }}
   unarchive:
     remote_src: yes
