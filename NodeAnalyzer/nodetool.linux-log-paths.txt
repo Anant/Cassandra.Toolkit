@@ -1,8 +1,0 @@
-/var/log/messages
-/var/log/syslog
-/var/log/boot.log
-/var/log/dmesg
-/var/log/kern.log
-/var/log/cron
-/var/log/auth.log
-/var/log/secure
