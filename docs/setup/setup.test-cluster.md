@@ -57,8 +57,10 @@ create_reaper_db: True
 ### 6) Run the commands
 Since running on localhost, using basic auth, not keys. So use `--ask-become-pass` arg when using all ansible-playbook commands. 
 
-E.g., 
+E.g.
 
 ```
-ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-tools-install.yml --ask-pass
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-tools-install.yml --ask-become-pass
 ```
+
+Then put in your password for your current user so ansible can use sudo commands.

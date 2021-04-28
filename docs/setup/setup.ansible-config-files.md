@@ -29,7 +29,9 @@ Now you are ready to fill out the config files!
 
 
 ## Step 1.2: List All Hosts in hosts.ini
-Ansible requires a hosts.ini file that lists out all of the hosts that it will run against. In our case, this will be all the hosts in your Cassandra Cluster.
+Ansible requires a hosts.ini file that lists out all of the hosts that it will run against. In our case, this will be all the hosts in your Cassandra Cluster. 
+
+The `hosts.ini` file that you need for cassandra.toolkit follows the basic instructions that you can find in the [official ansible documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#how-to-build-your-inventory). Using the terminology from the ansible docs, the main thing to keep in mind is that you will need a "host group" in your `hosts.ini` called `cassandra` and each host needs a var named `private_ip`. We will walk you through this process in the instructions below.
 
 ### Add all cassandra hosts in your `./envs/<YOUR_ENV>/hosts.ini` file.
 The first file you will fill out is the hosts.ini file. The example you copied above should get you started. 
@@ -45,10 +47,13 @@ node3
 
 2) For each node, put a variable in the hosts.ini file using that name
 Here's an explanation of the variables you need to set:
-|   hosts.ini variable  |  Description   |
+|  Ansible terminology  | Key(s) | Value(s) | Notes   |
 | ------------- | ------------- | 
-| `[cassandra:children]` | List of all the nodes.   |
-|  | |
+| "group of groups" | `[cassandra:children]` | a list of all the nodes. | You only need one group of groups, which is called `cassandra`. For values, un our example, we use names like `node1`, `node2` etc, each of which is a "group" but you can use whatever name you want to. [See here for more information](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#inheriting-variable-values-group-variables-for-groups-of-groups). | 
+| "groups" | one for each node | public ip of the node | We are using an "ansible group" to represent a node. The only value that you need to set is the public_ip. For more details on "ansible groups", see [documentation here](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#inventory-basics-formats-hosts-and-groups) |
+| "Group Variables" | One for each host  | `private_ip=<host private ip>` | In our example file, this is `[node1:vars]`, `node2:vars` etc. For more info see official docs on ["group variables"](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#assigning-a-variable-to-many-machines-group-variables). | 
+
+
 
 ## Step 1.3: Choose what Tools to Install
 There are different options and configurations possible, depending on the tools you prefer to use. All the tools in Cassandra.toolkit work well, but we have found some to work better than others. [Click here](./setup.recommendations.md) for our recommendations.
@@ -62,7 +67,7 @@ Having chosen what tools you want to use, you will now need to provide a few var
 |               |               |
 | ------------- | ------------- | 
 | `cassandra_data_file_directories` | Used by tablesnap to monitor and back up files to AWS-S3 |
-| `cassandra_ops_os_user` | Used by `ansible` to ssh into a cassandra host and run `nodetool`|
+| `cassandra_ops_os_user` | Used by `ansible` to ssh into a cassandra host and run `nodetool`. This will likely be the same value as  the `remote_user` var in your `ansible.cfg` file. |
 | `cassandra_shell_user` | Used by `cassandra-medusa`, by `ansible` to authenticate with `nodetool`, and to create a new keyspace named `reaper_db` for cassandra-reaper meta-data if `create_reaper_db=True`  |
 | `cassandra_shell_password` | Password for the user set by `cassandra_shell_user` |
 | `nodetool_exec`: | Absolute path to `nodetool` |
@@ -105,8 +110,43 @@ These variables should be passed in using the `-e ` arg as well, as shown [**her
 ## Step 1.5: Set Credentials in ansible.cfg
 
 Assuming you already copied the example file using [our instructions given above](#Step-1.1-copy-the-example-files) you can find the file in `~/.ansible.cfg`. Use your favorite text editor and set the credentials.
+
+First, set the value for the remote user. In your `ansible.cfg` file, set the `remote_user` var to the username. This will likely be the same value as `cassandra_ops_os_user` in your `group_vars/all.yml` file.
+
+E.g., if your user is named `my_user_name`
+
 ```
-### REPLACE OR REMOVE AND USE "--user USER --private-key PRIVATE_KEY_PATH" WHEN EXECUTING THE PLAYBOOK
+[defaults]
+host_key_checking = False
+roles_path = ./src/ansible/roles
+remote_user = my_user_name
+library = ./src/ansible/library
+log_path=./src/ansible/ansible.log
+```
+
+Then, setup authentication using one of the two following methods:
+1) Using ssh private key
+2) Using Username and Password (NOT RECOMMENDED)
+
+### Using SSH Private Key
+This is the recommended way to authenticate into your remote hosts. There are different ways you can setup your ssh keys so that ansible can use them as described in [their official documentation](https://docs.ansible.com/ansible/latest/user_guide/connection_details.html#setting-up-ssh-keys). We will describe only one such way here, namely, using `--private-key` when calling `ansible-playbook`. 
+
+When calling ansible-playbook, send in the private-key using `--private-key` arg. Your command would look something like this:
+
+```
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-hello.yml --private-key ~/.ssh/keypair.pem
+```
+
+### Using username and password (NOT RECOMMENDED)
+The [official Ansible documentation](https://docs.ansible.com/ansible/latest/user_guide/connection_details.html#setting-up-ssh-keys) does not recommend using username and password, and neither do we. However, if testing on your local machine or if your setup requires it, using username and password is a possibility as well. 
+
+**Set Password:** 
+Insert password using the  `--ask-become-pass` flag. ([See official documentation for more info](https://docs.ansible.com/ansible/latest/user_guide/become.html#become-command-line-options)).
+
+E.g., 
+
+```
+ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-hello.yml --ask-become-pass
 ```
 
 
