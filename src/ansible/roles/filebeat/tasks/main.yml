@@ -19,14 +19,17 @@
   tags: ["filebeat"]
   when: ansible_os_family == "Debian"
 
-# - name: save elastic repo definition key (apt)
-#   command: "echo \"deb https://artifacts.elastic.co/packages/7.x/apt stable main\" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
-# "
-#   tags: ["filebeat"]
-#   when: ansible_os_family == "Debian"
+# https://github.com/elastic/ansible-elasticsearch/blob/master/tasks/elasticsearch-Debian.yml#L56-L64
+# we're not worrying about removing the old repo though, which they do in the code given above
+- name: add elasticsearch repository (apt)
+  ansible.builtin.apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+    state: present
+  tags: ["filebeat"]
+  when: ansible_os_family == "Debian"
 
 - name: install apt-transport-https (apt)
-  yum:
+  apt:
     name: "apt-transport-https"
     state: present
   tags: ["filebeat"]
