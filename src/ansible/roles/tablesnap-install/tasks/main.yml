@@ -5,12 +5,12 @@
     state: stopped
   ignore_errors: true
 
-- name: install python2-pip
+- name: install python-pip
   yum:
     name: "{{ item }}"
     state: present
   with_items:
-    - "python2-pip"
+    - "python-pip"
 
 - name: install virtualenv and packages
   command: "{{ item }}"
