@@ -10,10 +10,13 @@ These instructions will help you setup your hosts.ini file as well as you group_
 
 ## Step 1.1: Copy the Example Files
 First, you will need to create your environment directory inside `./envs/<YOUR_ENV>`. 
-We have two examples of environment folders provided, [`_example`](./config/ansible/envs/_example) and [`_example_dse`](./config/ansible/envs/_example_dse). You can use those as a starter template. We will use Apache Cassandra for our examples below.
+
+We have two examples of environment folders provided, [`_example`](./config/ansible/envs/_example) for open source Apache Cassandra and [`_example_dse`](./config/ansible/envs/_example_dse) for DSE. You can use those as a starter template. 
+
+We will copy the Apache Cassandra example config for our example below.
 
 ```
-# assuming bash's current dir is project root, and you want your env to be named "testing":
+# assuming bash's current dir is project root, and you want your env to be named "testing", and using Apache Cassandra (not DSE):
 cp -r ./config/ansible/envs/_example ./config/ansible/envs/testing
 mv ./config/ansible/envs/testing/hosts.ini.example ./config/ansible/envs/testing/hosts.ini
 mv ./config/ansible/envs/testing/group_vars/all.yml.example ./config/ansible/envs/testing/group_vars/all.yml
