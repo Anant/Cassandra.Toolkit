@@ -1,11 +1,11 @@
 # Setup test cluster
+## On Localhost
+NOTE: WIP!! More needs to be done on this
+
+
 ### 1) Install and start dse via package installation 
 Find instructions here: https://docs.datastax.com/en/landing_page/doc/landing_page/installProducts.html
 - Note that if you do the tarball installation, you will have to change other variables in the `group_vars/all.yml` file below based on where your tarball is. So just use the package installation (e.g., for DSE 6.8 debian package installation, [these docs here](https://docs.datastax.com/en/install/6.8/install/installDEBdse.html)).
-
-```
-docker-compose -f ./quickstart-tutorials/dse-on-docker/docker-compose.yml up -d
-```
 
 ### 2) Use the _example_dse as your base, copy it over to new env
 
@@ -25,7 +25,9 @@ private_ip=127.0.0.1
 ```
 
 ### 4) Set the `group_vars/all.yml file` to use docker commands
-We want to test everything, so set all `install_*` to true, as well as `create_reaper_db` as well
+We want to test everything, so set all `install_*` to true, as well as `create_reaper_db` as well.
+
+Also make sure to set the `aws_*` vars, ideally through command line
 
 ```
 ### used by table snap to monitor and back up files to AWS-S3
@@ -48,6 +50,8 @@ install_cassandra_exporter: True
 install_filebeat: True
 enable_jmx: True
 create_reaper_db: True
+install_datastax_mcac: True
+install_medusa: True
 ```
 ### 5) Set username to localhost username in ansible.cfg
 
@@ -64,3 +68,8 @@ ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbo
 ```
 
 Then put in your password for your current user so ansible can use sudo commands.
+
+## On Digital Ocean
+### Notes on droplet size
+Basic, 4 GB Memory, 2vCPUs is sufficient for testing. (At time of writing, $20/mo)
+

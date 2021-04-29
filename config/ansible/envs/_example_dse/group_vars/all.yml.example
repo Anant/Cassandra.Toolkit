@@ -12,8 +12,21 @@ cassandra_install_lib_folder: /usr/share/dse/cassandra/lib
 
 cassandra_restart_command: systemctl restart dse
 
+medusa_aws_credentials_file: /opt/cassandra/.aws/credentials
+medusa_aws_backup_cluster_prefix: cluster-a
+medusa_aws_backup_bucket_name: <your-medusa-bucket>
+tablesnap_aws_backup_bucket_name: <your-tablesnap-bucket>
+
+### PLACEHOLDERS - pass these 2 variable from command line with "-e" when ansible-playbook is invoked
+### used by cassandra-medusa and tablesnap
+# aws_access_key_id: SOME_AWS_ACCESS_KEY
+# aws_secret_access_key: SOME_AWS_SECRET_ACCESS_KEY
+###
+
 install_tablesnap: False
 install_cassandra_exporter: False
 install_filebeat: False
 enable_jmx: False
 create_reaper_db: False
+install_datastax_mcac: False
+install_medusa: True

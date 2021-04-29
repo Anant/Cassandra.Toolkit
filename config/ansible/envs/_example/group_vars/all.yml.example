@@ -17,13 +17,13 @@ cassandra_start_command: systemctl start cassandra
 
 medusa_aws_credentials_file: /opt/cassandra/.aws/credentials
 medusa_aws_backup_cluster_prefix: cluster-a
-medusa_aws_backup_bucket_name: ion-cassandra-medusa-test
-tablesnap_aws_backup_bucket_name: ion-cassandra-tablesnap-test
+medusa_aws_backup_bucket_name: <your-medusa-bucket>
+tablesnap_aws_backup_bucket_name: <your-tablesnap-bucket>
 
 ### PLACEHOLDERS - pass these 2 variable from command line with "-e" when ansible-playbook is invoked
 ### used by cassandra-medusa and tablesnap
-aws_access_key_id: SOME_AWS_ACCESS_KEY
-aws_secret_access_key: SOME_AWS_SECRET_ACCESS_KEY
+# aws_access_key_id: SOME_AWS_ACCESS_KEY
+# aws_secret_access_key: SOME_AWS_SECRET_ACCESS_KEY
 ###
 
 install_tablesnap: False
