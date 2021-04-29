@@ -4,6 +4,7 @@ cassandra_data_file_directories: ["/var/lib/cassandra/data"]
 cassandra_ops_os_user: cassandra
 cassandra_shell_user: cassandra
 cassandra_shell_password: cassandra
+cassandra_yml_file: /etc/dse/cassandra/cassandra.yaml
 nodetool_exec: /bin/nodetool
 cqlsh_exec: /bin/cqlsh
 cassandra_env_exec: /etc/dse/cassandra/cassandra-env.sh
@@ -11,6 +12,8 @@ tools_install_folder: /usr/share/dse
 cassandra_install_lib_folder: /usr/share/dse/cassandra/lib
 
 cassandra_restart_command: systemctl restart dse
+cassandra_stop_command: systemctl stop dse
+cassandra_start_command: systemctl start dse
 
 medusa_aws_credentials_file: /opt/cassandra/.aws/credentials
 medusa_aws_backup_cluster_prefix: cluster-a
