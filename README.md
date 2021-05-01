@@ -114,7 +114,6 @@ In summary, our goal is that eventually we will be able to install and run all t
 # Development and Testing
 See instructions in our [CONTRIBUTING](./docs/CONTRIBUTING.md) file for instructions on getting a development environment set up, as well as contribution guidelines and notes on how this project is organized.
 
-# Testing
 Testing is still a work in progress, but you can find instructions for how to setup a test env in the [documentation for testing](./setup/setup.test-cluster.md).
 
 # Credits
