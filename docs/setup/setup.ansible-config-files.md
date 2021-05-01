@@ -5,7 +5,7 @@ These instructions will help you setup your hosts.ini file as well as you group_
 - [Step 1.1: Copy the Example Files](#Step-1.1-copy-the-example-files)
 - [Step 1.2: List All Hosts in hosts.ini](#Step-1.2-list-all-hosts-in-hosts.ini)
 - [Step 1.3: Choose what Tools to Install](#Step-1.3-choose-what-tools-to-install)
-- [Step 1.4: Set Config Variables for Your Deployment](#Step-1.4-set-config-variables-for-your-deployment)
+- [Step 1.4: Set Config Variables for Your Deployment in group_vars/all.yml](#Step-1.4-set-config-variables-for-your-deployment-in-group_varsall.yml)
 - [Step 1.5: Set Credentials in ansible.cfg](#step-1.5-set-credentials-in-ansible.cfg)
 
 ## Step 1.1: Copy the Example Files
@@ -13,7 +13,7 @@ First, you will need to create your environment directory inside `./envs/<YOUR_E
 
 We have two examples of environment folders provided, [`_example`](./config/ansible/envs/_example) for open source Apache Cassandra and [`_example_dse`](./config/ansible/envs/_example_dse) for DSE. You can use those as a starter template. 
 
-We will copy the Apache Cassandra example config for our example below.
+We will copy the Apache Cassandra example config for our example below. Example paths assume that Cassandra/DSE was installed using package installation, but if you used a binary tarball instead you just have to change some of the variables in the group_vars/all.yml file.
 
 ```
 # assuming bash's current dir is project root, and you want your env to be named "testing", and using Apache Cassandra (not DSE):
@@ -36,7 +36,7 @@ Ansible requires a hosts.ini file that lists out all of the hosts that it will r
 
 The `hosts.ini` file that you need for cassandra.toolkit follows the basic instructions that you can find in the [official ansible documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#how-to-build-your-inventory). Using the terminology from the ansible docs, the main thing to keep in mind is that you will need a "host group" in your `hosts.ini` called `cassandra` and each host needs a var named `private_ip`. We will walk you through this process in the instructions below.
 
-### Add all cassandra hosts in your `./envs/<YOUR_ENV>/hosts.ini` file.
+### Add all Cassandra hosts in your `./envs/<YOUR_ENV>/hosts.ini` file.
 The first file you will fill out is the hosts.ini file. The example you copied above should get you started. 
 
 1) Give a name for each node in your cluster `[cassandra:children]`. You will refer to these nodes using these names throughout the hosts.ini file. In the example files, there are three nodes, named "node1", "node2", and "node3":
@@ -66,7 +66,7 @@ There are different options and configurations possible, depending on the tools 
 After selecting which tools to use, you are ready to configure the `group_vars/all.yml` file for your ansible environment.
 
 
-## Step 1.4: Set Config Variables for Your Deployment
+## Step 1.4: Set Config Variables for Your Deployment in group_vars/all.yml
 Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file should be located at `./config/ansible/envs/<YOUR_ENV>/group_vars/all.yml`. Continuing the example from before, it would be [`./config/ansible/envs/testing/group_vars/all.yml`](./config/ansible/envs/testing/group_vars/all.yml)
 
 |               |               |
