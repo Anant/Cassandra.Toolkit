@@ -7,6 +7,13 @@ The nodetool repair process was built for repairing nodes as well, but Cassandra
 Assuming that Cassandra Reaper is already installed by following the instructions if you followed the [instructions for setting up Cassandra Reaper](../../setup/setup.repairs), you are ready to start running repairs.
 
 ## Operation
+Now that you setup cassandra.toolkit on your cluster is that we have generated a `docker-compose.yml` file for you to use, assuming of course that you configured cassandra.toolkit to install Reaper when setting ansible variables. This docker-compose file makes it easy to start running Reaper on your ansible control node.
+
+```
+# assuming calling from project root
+docker-compose -f ./src/ansible/artifacts/docker/docker-compose.yml up -d 
+```
+
 If set up correctly, Cassandra reaper should be able to be viewable at `http://localhost:8080/webui/`, using the following credentials: 
 
 |               |               |

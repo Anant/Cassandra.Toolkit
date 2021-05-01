@@ -3,7 +3,7 @@ This document is to provide further instructions for installation of backup tool
 
 We use Cassandra Reaper to automate cluster repairs. The main configuration that is required for using Cassandra Reaper is to determine whether or not you need a new `reaper_db` keyspace in your schema. Unless you have this keyspace already, you will need to set `create_reaper_db=True`. Apart from that, all you will need to do is run the `docker-compose up` command as discussed [in the main project setup instructions](./README.md#step-5-start-containers-using-docker-compose) and reaper is ready to use.
 
-Once Cassandra.toolkit is setup and running, you can find instructions on how to use Reaper in our [documentation on cluster maintenance](../cluster-maintenance/repair/README.md#Running-Cluster-Repairs-with-Cassandra-Reaper).
+Once Cassandra.toolkit is setup and running, you can find instructions on how to use Reaper in our [documentation on cassandra.toolkit operation](../operation/repair/README.md#Running-Cluster-Repairs-with-Cassandra-Reaper).
 
 
 TODO add more details here

@@ -1,7 +1,7 @@
 # Setting Up Cassandra Backups - Overview
 This document is to provide further instructions for installation of backup tools for your Cassandra cluster. [Click here](./setup.ansible-config-files.md#Step-1.4-set-config-variables-for-your-deployment-in-group_varsall.yml) to go back to instructions for filling out your `group_vars/all.yml` file.
 
-[Click here](../cluster-maintenance/backup/README.md) for instructions on running your backups.
+[Click here](../operation/backup/README.md) for instructions on running your backups.
 
 ## Install Cassandra Medusa for AWS S3 backups
 Cassandra Medusa is the backup tool that we most often recommend. Cassandra Medusa will be installed on your cluster if you set `install_medusa=True`, either in your `group_vars/all.yml` file or using `-e` when executing ansible playbook.

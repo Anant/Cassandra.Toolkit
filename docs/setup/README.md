@@ -152,4 +152,4 @@ The above tools are available to access in the browser at following urls:
 Having trouble getting things setup? Find help for common errors [here](./setup.debugging.md).
 
 # What's Next?
-Now that the tools in your toolkit are installed, you are ready to use them across your cluster. Head over to [Cluster Maintenance](../cluster-maintenance/README.md) to get started.
+Now that the tools in your toolkit are installed, you are ready to use them across your cluster. Head over to [Operation documentation](../operation/README.md) to get started.
