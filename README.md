@@ -118,7 +118,7 @@ Testing is still a work in progress, but you can find instructions for how to se
 
 # Credits
 
-1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](src/TableAnalyzer)
+1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/TableAnalyzer)
 2. Sean Bogaard - Concept, Advisor, Curator
 3. John Doe (*) - Developing terraform & ansible automation, testing, documentation of 3rd party tools
 4. Obi Anomnachi - Testing
