@@ -1,7 +1,7 @@
 # Cluster Setup - Overview
 ### Table of Contents:
 - [Building a New Cassandra cluster](#building-a-new-cassandra-cluster)
-- [Install cassandra.toolkit on existing cluster](#installing-cassandra.toolkit-on-your-cluster)
+- [Install cassandra.toolkit on existing cluster](#installing-cassandratoolkit-on-your-cluster)
 - [Debugging](#Debugging)
 - [What's Next](#whats-next)
 
