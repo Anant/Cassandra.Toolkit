@@ -2,6 +2,11 @@
 ### Table of Contents:
 - [Building a New Cassandra cluster](#building-a-new-cassandra-cluster)
 - [Install cassandra.toolkit on existing cluster](#installing-cassandratoolkit-on-your-cluster)
+    - [Step 1: Create and Populate Ansible Config Files](#step-1-create-and-populate-ansible-config-files)
+    - [Step 2: Verify Access To Your Nodes](#step-2-verify-access-to-your-nodes)
+    - [Step 3: Install the Toolkit onto Your Nodes](#step-3-install-the-toolkit-onto-your-nodes)
+    - [Step 4: Restart Cluster to Enable JMX](#step-4-restart-cluster-to-enable-jmx-if-needed)
+    - [Step 5: Start Containers Using Docker Compose](#step-5-start-containers-using-docker-compose)
 - [Debugging](#Debugging)
 - [What's Next](#whats-next)
 
@@ -31,12 +36,6 @@ Once your cluster is up and running, continue to the next step to install Cassan
 # Installing Cassandra.toolkit on your cluster
 
 Now that your Cassandra cluster is up and running, you are ready to install the toolkit onto your cluster.
-
-- [Step 1: Create and Populate Ansible Config Files](#step-1-create-and-populate-ansible-config-files)
-- [Step 2: Verify Access To Your Nodes](#step-2-verify-access-to-your-nodes)
-- [Step 3: Install the Toolkit onto Your Nodes](#step-3-install-the-toolkit-onto-your-nodes)
-- [Step 4: Restart Cluster to Enable JMX](#step-4-restart-cluster-to-enable-jmx-if-needed)
-- [Step 5: Start Containers Using Docker Compose](#step-5-start-containers-using-docker-compose)
 
 ## Step 1: Create and Populate Ansible Config Files
 You will need to create a `hosts.ini` with all the needed Cassandra hosts for Ansible to use. You will also need to set your `group_vars/all.yml` file for your ansible environment. [See instructions here](./setup.ansible-config-files.md).
