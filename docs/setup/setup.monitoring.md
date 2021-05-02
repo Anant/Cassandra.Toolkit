@@ -59,11 +59,11 @@ You should now be able to view the metrics you are collecting in Grafana and Pro
 - `http://localhost:3000/` - grafana (admin:admin)
 - `http://localhost:9090/` - prometheus 
 
-![mcac dashboard](../docs/assets/mcac-01.png)
+![mcac dashboard](../assets/mcac-01.png)
 
 You are now ready to monitor your cluster. [Click here to learn more](../operation/monitor/README.md).
 
 
 #### DSE Metrics Collector Dashboards
 
-ToDo 
+TODO
