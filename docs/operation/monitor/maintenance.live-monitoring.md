@@ -43,7 +43,6 @@ Grafana should now be viewable at `http://localhost:3000`.
 For more on this process, checkout the following resources:
 - https://blog.pythian.com/cassandra-open-source-log-analysis-kibana-using-filebeat-modeled-docker/
 - https://blog.anant.us/cassandra-lunch-14-basic-log-diagnostics-with-elk-fek-bek/
-- https://github.com/Anant/cassandra.vision
 
 One difference between that documentation and what you can do now that you setup cassandra.toolkit on your cluster is that we have generated a `docker-compose.yml` file for you to use, assuming you set `install_cassandra_exporter=True` when setting ansible variables. This docker-compose file makes it easy to start running Elasticsearch and Kibana on your ansible control node.
 
