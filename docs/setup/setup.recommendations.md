@@ -16,6 +16,6 @@ See [our blog post](https://blog.anant.us/cassandra-lunch-15-cassandra-backup-re
 Cassandra.toolkit is setup to store backups in AWS S3. S3 credentials get passed into Ansible using the variables `aws_access_key_id` and `aws_secret_access_key`, as described in the [instructions for our backup tools](./setup.backups.md).
 
 ## Our Recommendation: Repair
-Cassandra.toolkit recommends [Cassandra Reaper](https://github.com/thelastpickle/cassandra-reaper) and uses it by default. 
+Cassandra.toolkit recommends [Cassandra Reaper](./setup.repairs.md) and uses it by default. 
 
 Currently there is no way to disable this other than manually removing it from the docker-compose.yml file before running it. 
