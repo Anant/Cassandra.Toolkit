@@ -2,7 +2,7 @@
 Table of Contents:
 - [Datastax MCAC](#monitoring-your-cluster-with-datastax-mcac)
 - [cassandra_exporter (with Prometheus and Grafana)](#monitoring-your-cluster-with-cassandra-exporter)
-- [Filebeat, Elasticsearch, and Kibana](#monitoring-your-cluster-with-cassandra-exporter)
+- [Filebeat, Elasticsearch, and Kibana](#live-monitoring-with-filebeat-elasticsearch-and-kibana)
 
 ### Monitoring Your Cluster with Datastax MCAC
 If Datastax MCAC is configured to be installed by our toolkit, Cassandra.toolkit's ansible playbook will generate some artifacts for Datastax MCAC for you, including: 
