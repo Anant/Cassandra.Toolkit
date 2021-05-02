@@ -10,7 +10,7 @@ TASK [cassandra-exporter-install : create cassandra_exporter folder] ***********
 
 In your `group_vars/all.yml` file the `cassandra_ops_os_user` var is set to `cassandra`. Make sure this value corresponds to the linux username for the node.
 
-# AnsibleUndefinedVariable: 'aws_access_key_id' is undefined
+## ERROR: AnsibleUndefinedVariable: 'aws_access_key_id' is undefined
 E.g., 
 
 ```
@@ -35,14 +35,15 @@ You need to install a python lib on your ansible controller, as mentioned [in th
 apt install --no-install-recommends python-netaddr
 ```
 
-## ERROR Destination directory /root/.aws does not exist
-This is if /root/.aws is the target dir for aws creds. 
+## ERROR: Destination directory <some dir here> does not exist
+
+You will get this if you didn't create the directory that you specified for your aws cred file using `medusa_aws_credentials_file`. 
 
 ### Solution 
 
 Just create the dir and try again, e.g.,
 
 ```
-mkdir -p /root/.aws
+mkdir -p <aws-creds-dir>
 ```
 
