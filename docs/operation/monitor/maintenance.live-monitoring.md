@@ -1,4 +1,5 @@
 ## Live (Online) Monitoring
+Table of Contents:
 - [Datastax MCAC](#monitoring-your-cluster-with-datastax-mcac)
 - [cassandra_exporter (with Prometheus and Grafana)](#monitoring-your-cluster-with-cassandra-exporter)
 
