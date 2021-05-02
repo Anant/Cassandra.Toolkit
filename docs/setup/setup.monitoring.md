@@ -63,7 +63,7 @@ You should now be able to view the metrics you are collecting in Grafana and Pro
 
 ![mcac dashboard](../assets/mcac-01.png)
 
-You are now ready to monitor your cluster. [Click here to learn more](../operation/monitor/README.md).
+You are now ready to monitor your cluster. [Click here to learn more](../operation/monitor/maintenance.live-monitoring.md).
 
 
 #### DSE Metrics Collector Dashboards
