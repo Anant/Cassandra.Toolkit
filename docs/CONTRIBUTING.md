@@ -7,7 +7,7 @@ This project is maintained by Rahul Singh of [Anant](http://anant.us). Feel free
 - [Contribution Guidelines](#contribution-guidelines)
 
 ## Setting up a Development Environment
-We are still working on a process to make it easy to test and develop cassandra.toolkit.
+Follow instructions in the [documentation for testing](./setup/setup.test-cluster.md) for setting up a development environment 
 
 In the meantime, you can also test out individual tools quickly using docker, without having to setup everything in Ansible. We provide some sample scripts to make it easy. [Click here for instructions](../src/docker/README.md).
 
