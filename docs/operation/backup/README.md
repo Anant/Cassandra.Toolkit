@@ -23,7 +23,6 @@ For more resources on backing up Cassandra in general:
 - https://devops.com/things-know-planning-cassandra-backup
 - http://techblog.constantcontact.com/devops/cassandra-and-backups/
 - https://www.linkedin.com/pulse/snap-cassandra-s3-tablesnap-vijaya-kumar-hosamani/
-- http://datos.io/2017/02/02/choose-right-backup-solution-cassandra/
 
 # README todos:
 - TODO add more instructions for running backups with Medusa
