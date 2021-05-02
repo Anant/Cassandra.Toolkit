@@ -1,7 +1,7 @@
-# Setup test cluster
+# Setup Test Cluster
 Table of Contents
 - [Testing on Localhost](#testing-on-localhost)
-- [Testing on DigitalOcean, DSE 6.8, Centos](#testing-on-digitalocean-dse-6.8-centos)
+- [Testing on DigitalOcean, Centos, DSE 6.8](#testing-on-digitalocean-centos-dse-68)
 - [Debugging](#debugging)
 # Testing on Localhost
 NOTE: WIP!! More needs to be done on this
@@ -74,7 +74,7 @@ Then put in your password for your current user so ansible can use sudo commands
 
 
 
-## Testing on Digital Ocean, CentOS, DSE 6.8
+## Testing on DigitalOcean, CentOS, DSE 6.8
 These instructions are for specifically CentOS 6.7, DSE 6.8, and setting up on Digital Ocean. The steps will be pretty close to what you would also do for Apache Cassandra rather than DSE, or Ubuntu rather than CentOS as well however.
 
 ### Create the cluster
