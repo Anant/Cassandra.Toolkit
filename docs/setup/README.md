@@ -10,10 +10,8 @@ Cassandra.toolkit makes it easy to setup all the tools you will need for buildin
 ### What Configuration Technologies Used
 To make the setup process easy, we will use the following configuration and platform technologies to setup Cassandra.toolkit on your cluster:
 
-- [Terraform](https://www.terraform.io/)
 - [Ansible](https://github.com/ansible/ansible)
 - [Docker](https://www.docker.com/)
-- [Kubernetes](https://kubernetes.io/)
 
 Continue on below to get started using these technologies to get everything setup.
 
