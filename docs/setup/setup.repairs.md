@@ -5,10 +5,6 @@ We use Cassandra Reaper to automate cluster repairs. The main configuration that
 
 Once Cassandra.toolkit is setup and running, you can find instructions on how to use Reaper in our [documentation on cassandra.toolkit operation](../operation/repair/README.md#Running-Cluster-Repairs-with-Cassandra-Reaper).
 
-
-TODO add more details here
-
-
 ## Further Reading
 - http://cassandra-reaper.io/
 - https://github.com/thelastpickle/cassandra-reaper
