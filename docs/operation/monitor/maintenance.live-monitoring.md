@@ -1,8 +1,8 @@
 ## Live (Online) Monitoring
 Table of Contents:
-- [Datastax MCAC](#monitoring-your-cluster-with-datastax-mcac)
-- [cassandra_exporter (with Prometheus and Grafana)](#monitoring-your-cluster-with-cassandra-exporter)
-- [Filebeat, Elasticsearch, and Kibana](#live-monitoring-with-filebeat-elasticsearch-and-kibana)
+- [Monitoring Your Cluster with Datastax MCAC](#monitoring-your-cluster-with-datastax-mcac)
+- [Monitoring Your Cluster with Cassandra Exporter](#monitoring-your-cluster-with-cassandra-exporter)
+- [Live Monitoring with Filebeat, Elasticsearch, and Kibana](#live-monitoring-with-filebeat-elasticsearch-and-kibana)
 
 ### Monitoring Your Cluster with Datastax MCAC
 If Datastax MCAC is configured to be installed by our toolkit, Cassandra.toolkit's ansible playbook will generate some artifacts for Datastax MCAC for you, including: 
@@ -10,10 +10,9 @@ If Datastax MCAC is configured to be installed by our toolkit, Cassandra.toolkit
 - Adding a new Cassandra javaagent
 - Generating a docker compose file 
 
-You can find these in the artifacts dir ([src/ansible/artifacts/datastax-mcac](../../src/ansible/artifacts/datastax-mcac)). 
+You can find these in the artifacts dir ([src/ansible/artifacts/datastax-mcac](../../../src/ansible/artifacts/)). If the `datastax-mcac/` dir is not there, it means that it was not configured correctly, and you'll want to double check your configuration and try running the ansible playbook again.
 
 The docker compose file can be ran using:
-
 ```
 # assuming: 
 #   - calling from project root
@@ -21,7 +20,7 @@ The docker compose file can be ran using:
 docker-compose -f ./src/ansible/artifacts/datastax-mcac/datastax-mcac-dashboards-0.1.10/docker-compose.yaml up -d
 ```
 
-Grafana should now be viewable at `http://localhost:3000`.
+Grafana should now be viewable at `http://localhost:3000`, and you can use `admin` as username and `admin` as password for credentials. The Prometheus GUI should be available at `http://localhost:9090` as well.
 
 ### Monitoring Your Cluster with Cassandra Exporter
 Cassandra Exporter (With Prometheus and Grafana)
