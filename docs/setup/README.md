@@ -114,7 +114,7 @@ ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbo
 ## Step 5: Start Containers Using Docker Compose
 Now that the tools are installed on our cluster, we're finally ready to start up our toolkit. Docker Compose makes it easy to start everything at once. Simply run the following command:
 ```
-docker-compose -f ../src/ansible/artifacts/docker/docker-compose.yml up
+docker-compose -f ./src/ansible/artifacts/docker/docker-compose.yml up -d
 ```
 
 This will start the following containers, depending on what tools you decided to install earlier:
