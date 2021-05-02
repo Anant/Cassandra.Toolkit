@@ -17,10 +17,10 @@ Note that though Filebeat, Elasticsearch, and Kibana can be used for offline mon
 ### TableAnalyzer Offline Monitoring
 TableAnalyzer is integrated within Cassandra.Vision, but also can be used on its own.
 
-The main documentation using NodeAnalyzer can be found [here](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/TableAnalyzer)
+The main documentation using NodeAnalyzer can be found [here](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/TableAnalyzer).
 
 ### NodeAnalyzer Offline Monitoring
 NodeAnalyzer is integrated within Cassandra.Vision, but also can be used on its own.
 
-The main documentation using NodeAnalyzer can be found [here](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/NodeAnalyzer)
+The main documentation using NodeAnalyzer can be found [here](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/NodeAnalyzer).
 
