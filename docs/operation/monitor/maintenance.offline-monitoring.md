@@ -1,8 +1,8 @@
 ## Offline Monitoring
 Table of Contents:
+- [Cassandra.Vision](#Cassandra.Vision-Offline-Monitoring)
 - [TableAnalyzer](#TableAnalyzer-Offline-Monitoring)
 - [NodeAnalyzer](#NodeAnalyzer-Offline-Monitoring)
-- [Cassandra.Vision](#Cassandra.Vision-Offline-Monitoring)
 
 Offline monitoring is sometimes necessary when you need to analyze or diagnose problems on a Cassandra cluster but do not have the ability (either due to security protocol, time constraints, etc) to setup live monitoring, but you do have access to a diagnostic tarball. A diagnostic tarball includes files such as Cassandra and system logs for each node, nodetool outputs and so on. 
 
