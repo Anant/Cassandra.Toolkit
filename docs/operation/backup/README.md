@@ -20,7 +20,6 @@ For information on how to use Tablesnap, see the [official documentation](https:
 
 # Further Reading
 For more resources on backing up Cassandra in general: 
-- https://8kmiles.com/blog/cassandra-backup-and-restore-methods/
 - https://devops.com/things-know-planning-cassandra-backup
 - http://techblog.constantcontact.com/devops/cassandra-and-backups/
 - https://www.linkedin.com/pulse/snap-cassandra-s3-tablesnap-vijaya-kumar-hosamani/
