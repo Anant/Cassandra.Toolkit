@@ -57,7 +57,7 @@ If it worked, then now you are ready to run the ansible playbook and install cas
 ## Step 3: Install the Toolkit onto Your Nodes
 
 ### Run the Ansible Playbook
-Finally you are ready to install the toolkit onto your nodes using Ansible Playbook. Be sure to pass in the arguments corresponding to the tools you chose from [Step 1.3](./setup.ansible-config-files.md#step-1.3-choose-what-tools-to-install). 
+Finally you are ready to install the toolkit onto your nodes using Ansible Playbook. Be sure to pass in the arguments corresponding to the tools you chose from [Step 1.3](./setup.ansible-config-files.md#step-13-choose-what-tools-to-install). 
 
 Below are some examples to get you started, assuming and env called `testing`. Most of the args passed in using `-e` can also be passed in using `envs/<your-env>/group_vars/all.yml`, besides AWS credentials.
 
