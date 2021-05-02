@@ -69,6 +69,7 @@ After selecting which tools to use, you are ready to configure the `group_vars/a
 ## Step 1.4: Set Config Variables for Your Deployment in group_vars/all.yml
 Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file should be located at `./config/ansible/envs/<YOUR_ENV>/group_vars/all.yml`. Continuing the example from before, it would be `./config/ansible/envs/testing/group_vars/all.yml`.
 
+### General Configuration Variables
 |               |               |
 | ------------- | ------------- | 
 | `cassandra_data_file_directories` | Used by tablesnap to monitor and back up files to AWS-S3 |
@@ -87,8 +88,9 @@ Having chosen what tools you want to use, you will now need to provide a few var
 | `cassandra_stop_command` | Used by `cassandra-medusa` to operate cluster nodes backups and restores. This variable is only required when `install_medusa` is set to `True`. |
 | `cassandra_start_command` | Used by `cassandra-medusa` to operate cluster nodes backups and restores. This variable is only required when `install_medusa` is set to `True`. |
 
-Also, provide the next variables to select which steps are needed for your environment:
-By default they are `False`. These can also be set when calling the ansible playbook using the `-e` flag.
+### Variables to Select Steps to Run
+Provide the next variables to select which steps are needed for your environment. By default they are `False`. These can also be set when calling the ansible playbook using the `-e` flag.
+
 |               |               |
 | ------------- | ------------- | 
 | `install_tablesnap`  | Set to `True` to install tablesnap to your cluster. |
@@ -99,8 +101,7 @@ By default they are `False`. These can also be set when calling the ansible play
 | `install_medusa` | Set to `True` to install Cassandra Medusa to your cluster. |
 | `install_datastax_mcac` | Set to `True` to install Datastax MCAC to your cluster. If set to `True`, make sure `install_cassandra_exporter=False`  |
 
-You can also enable the above variables in the cli when the playbook is executed as shown [**here**](./README.md#Example-B-Enable-CLI-Features). 
-
+### Credential Variables
 Some variables are sensitive, and so perhaps should not be stored in this config file for security reasons. These variables include: 
 
 |               |               |
