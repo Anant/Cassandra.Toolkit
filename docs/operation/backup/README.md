@@ -11,7 +11,6 @@
 For information on how to use Cassandra Medusa, see the [official documentation](https://github.com/thelastpickle/cassandra-medusa).
  
 ### Using with AWS 
-https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.md
 
 For further information on how to setup AWS S3 backups with Cassandra Medusa, checkout the  [official documentation here](https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.md). See also the related blog post: https://thelastpickle.com/blog/2018/04/03/cassandra-backup-and-restore-aws-ebs.html
 
