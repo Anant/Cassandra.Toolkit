@@ -8,7 +8,7 @@
 
 ## Running Backups with Cassandra Medusa
 
-TODO add more instructions for running backups with Medusa
+For information on how to use Cassandra Medusa, see the [official documentation](https://github.com/thelastpickle/cassandra-medusa).
  
 ### Using with AWS 
 https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.md
@@ -16,7 +16,8 @@ https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.
 For further information on how to setup AWS S3 backups with Cassandra Medusa, checkout the  [official documentation here](https://github.com/thelastpickle/cassandra-medusa/blob/master/docs/aws_s3_setup.md). See also the related blog post: https://thelastpickle.com/blog/2018/04/03/cassandra-backup-and-restore-aws-ebs.html
 
 ## Running Backups with Tablesnap
-TODO add more instructions for running backups with Tablesnap
+
+For information on how to use Tablesnap, see the [official documentation](https://github.com/JeremyGrosser/tablesnap)
 
 # Further Reading
 For more resources on backing up Cassandra in general: 
@@ -25,3 +26,7 @@ For more resources on backing up Cassandra in general:
 - http://techblog.constantcontact.com/devops/cassandra-and-backups/
 - https://www.linkedin.com/pulse/snap-cassandra-s3-tablesnap-vijaya-kumar-hosamani/
 - http://datos.io/2017/02/02/choose-right-backup-solution-cassandra/
+
+# README todos:
+- TODO add more instructions for running backups with Medusa
+- TODO add more instructions for running backups with Tablesnap
