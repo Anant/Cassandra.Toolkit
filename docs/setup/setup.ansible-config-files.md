@@ -61,7 +61,7 @@ Here's an explanation of the variables you need to set:
 | "Group Variables" | One for each node  | `private_ip=<node private ip>` | Since we created a group for each node, we now tell ansible what the private ip for each node is by assigning group variables for each node. In our example file, this is `[node1:vars]`, `node2:vars` etc. For more info see official docs on ["group variables"](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#assigning-a-variable-to-many-machines-group-variables). | 
 
 ## Step 1.3: Choose what Tools to Install
-There are different options and configurations possible, depending on the tools you prefer to use. All the tools in Cassandra.toolkit work well, but we have found some to work better than others. [Click here](./setup.recommendations.md) for our recommendations.
+There are different options and configurations possible, depending on the tools you prefer to use. All the tools in Cassandra.toolkit work well, but we have found some to work better than others. [Click here for our recommendations](./setup.recommendations.md) .
 
 After selecting which tools to use, you are ready to configure the `group_vars/all.yml` file for your ansible environment.
 

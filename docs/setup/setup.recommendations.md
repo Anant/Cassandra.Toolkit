@@ -9,6 +9,8 @@ We support both options since both tools work well. However, we have found that 
 ## Our Recommendation: Backups
 Cassandra.toolkit is built to run backups using either [cassandra-medusa](https://github.com/thelastpickle/cassandra-medusa) or [tablesnap](https://github.com/JeremyGrosser/tablesnap). Although technically you can install both, you should only install one. Of course, you can also choose to install neither, if you have a separate backup strategy. 
 
+Cassandra Medusa is the backup tool that we most often recommend. Tablesnap is not being actively maintained currently, and is supported in cassandra.toolkit only for legacy reasons. 
+
 See [our blog post](https://blog.anant.us/cassandra-lunch-15-cassandra-backup-restoration/) for more information on backup strategies.
 
 Cassandra.toolkit is setup to store backups in AWS S3. S3 credentials get passed into Ansible using the variables `aws_access_key_id` and `aws_secret_access_key`, as described in the [instructions for our backup tools](./setup.backups.md).
