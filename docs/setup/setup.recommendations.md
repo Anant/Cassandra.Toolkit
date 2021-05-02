@@ -2,7 +2,7 @@
 All the tools in Cassandra.toolkit work well, but we have found some to work better than others. Below are our recommendations for monitoring, backup, and repair tools. 
 
 ## Our Recommendation: Monitoring
-Cassandra.Toolkit provides instructions and configuration for two ways to do live monitoring. The first option is to use [cassandra_exporter](https://github.com/criteo/cassandra_exporter) along with Prometheus and Grafana. [Click here to read more about this option](./setup.monitoring.md#monitoring-metrics-with-prometheus). The second option is to use [Datastax MCAC](https://github.com/datastax/metric-collector-for-apache-cassandra). For further information on how to use Datastax MCAC with Cassandra.toolkit can be [found here](./setup.monitoring.md#monitoring-metrics-with-datastax-metric-collector).
+Cassandra.Toolkit provides instructions and configuration for two ways to do live monitoring. The first option is to use [cassandra_exporter](./setup.monitoring.md#monitoring-metrics-with-prometheus-and-cassandra-exporter). The second option is to use [Datastax MCAC](./setup.monitoring.md#monitoring-metrics-with-datastax-metric-collector).
 
 We support both options since both tools work well. However, we have found that Datastax MCAC is the better alternative.
 
