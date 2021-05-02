@@ -16,7 +16,7 @@ For further information on how to setup AWS S3 backups with Cassandra Medusa, ch
 
 ## Running Backups with Tablesnap
 
-For information on how to use Tablesnap, see the [official documentation](https://github.com/JeremyGrosser/tablesnap)
+For information on how to use Tablesnap, see the [official documentation](https://github.com/JeremyGrosser/tablesnap).
 
 # Further Reading
 For more resources on backing up Cassandra in general: 
