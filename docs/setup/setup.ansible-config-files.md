@@ -1,5 +1,5 @@
 # Step 1: Setup Ansible Config Files
-These instructions will help you setup your hosts.ini file as well as you group_vars.all.yml file, the two config files you'll need to run ansible. If you are here, it is assumed that you have already built your Cassandra cluster. If you haven't, see [our instructions for doing so](./README.md#building-a-new-cassandra-cluster) before continuing.
+These instructions will help you setup your hosts.ini file as well as your `group_vars/all.yml` file, the two config files you'll need to run ansible. If you are here, it is assumed that you have already built your Cassandra cluster. If you haven't, we give [some tips on building a cluster here](./README.md#building-a-new-cassandra-cluster).
 
 ### Table of Contents:
 - [Step 1.1: Copy the Example Files](#Step-11-copy-the-example-files)
