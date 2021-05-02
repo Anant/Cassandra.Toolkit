@@ -11,7 +11,7 @@ These instructions will help you setup your hosts.ini file as well as your `grou
 ## Step 1.1: Copy the Example Files
 First, you will need to create your environment directory inside `./envs/<YOUR_ENV>`. 
 
-We have two examples of environment folders provided, [`_example`](./config/ansible/envs/_example) for open source Apache Cassandra and [`_example_dse`](./config/ansible/envs/_example_dse) for DSE. You can use those as a starter template. 
+We have two examples of environment folders provided, [`_example`](../../config/ansible/envs/_example) for open source Apache Cassandra and [`_example_dse`](../../config/ansible/envs/_example_dse) for DSE. You can use those as a starter template. 
 
 We will copy the Apache Cassandra example config for our example below. Example paths assume that Cassandra/DSE was installed using package installation, but if you used a binary tarball instead you just have to change some of the variables in the group_vars/all.yml file.
 
