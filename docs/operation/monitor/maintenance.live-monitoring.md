@@ -10,7 +10,7 @@ If Datastax MCAC is configured to be installed by our toolkit, Cassandra.toolkit
 - Adding a new Cassandra javaagent
 - Generating a docker compose file 
 
-You can find these in the artifacts dir ([src/ansible/artifacts/datastax-mcac](../../../src/ansible/artifacts/)). If the `datastax-mcac/` dir is not there, it means that it was not configured correctly, and you'll want to double check your configuration and try running the ansible playbook again.
+You can find these in the artifacts dir ([src/ansible/artifacts/datastax-mcac](../../../src/ansible/artifacts/)) of your ansible controller node. If the `datastax-mcac/` dir is not there, it means that it was not configured correctly, and you'll want to double check your configuration and try running the ansible playbook again.
 
 The docker compose file can be ran using:
 ```
