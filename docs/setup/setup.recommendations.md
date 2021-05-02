@@ -7,7 +7,7 @@ Cassandra.Toolkit provides instructions and configuration for two ways to do liv
 We support both options since both tools work well. However, we have found that Datastax MCAC is the better alternative.
 
 ## Our Recommendation: Backups
-Cassandra.toolkit is built to run backups using either [cassandra-medusa](https://github.com/thelastpickle/cassandra-medusa) or [tablesnap](https://github.com/JeremyGrosser/tablesnap). Although technically you can install both, you should only install one. Of course, you can also choose to install neither, if you have a separate backup strategy. 
+Cassandra.toolkit is built to run backups using either [cassandra-medusa](./setup.backups.md#Install-Cassandra-Medusa-for-AWS-S3-backups) or [tablesnap](./setup.backups.md#Install-tablesnap-for-AWS-S3-backups). Although technically you can install both, you should only install one. Of course, you can also choose to install neither, if you have a separate backup strategy. 
 
 Cassandra Medusa is the backup tool that we most often recommend. Tablesnap is not being actively maintained currently, and is supported in cassandra.toolkit only for legacy reasons. 
 
