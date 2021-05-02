@@ -10,6 +10,15 @@
   when: ansible_os_family == "RedHat"
   tags: ["medusa"]
 
+- name: install python3-pip and packages (apt)
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "python3-pip"
+  when: ansible_os_family == "Debian"
+  tags: ["medusa"]
+
 - name: install virtualenv and packages
   command: "{{ item }}"
   with_items:

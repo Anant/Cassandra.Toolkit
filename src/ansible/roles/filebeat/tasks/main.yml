@@ -9,6 +9,7 @@
     src: "elastic.repo"
     dest: "/etc/yum.repos.d"
   tags: ["filebeat"]
+  when: ansible_os_family == "RedHat"
 
 
 - name: download and install public signing repo key (apt)
