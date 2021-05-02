@@ -60,7 +60,6 @@ Live (Online) Cluster Monitoring
 |  |   |
 | ------------- | ------------- | 
 | [Metrics Collector for Apache Cassandra (MCAC)](https://github.com/datastax/metric-collector-for-apache-cassandra) | Metric collection and Dashboards for Apache Cassandra clusters | 
-| [node_exporter](https://github.com/prometheus/node_exporter) | Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written in Go with pluggable metric collectors. |
 | [cassandra_exporter](https://github.com/criteo/cassandra_exporter) | Cassandra exporter is a standalone application which exports Apache Cassandra® metrics throught a Prometheus friendly endpoint. |
 | [Prometheus](https://prometheus.io/) | Prometheus is an open-source systems monitoring and alerting toolkit |
 | [Grafana](https://grafana.com/) | Grafana is a multi-platform open source analytics and interactive visualization software. | 

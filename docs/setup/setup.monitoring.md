@@ -27,11 +27,6 @@ $ sudo systemctl status cassandra_exporter
    CGroup: /system.slice/cassandra_exporter.service
            └─1184 /bin/java -jar /opt/cassandra/ddac/lib/cassandra_exporter-2.3.2-all.jar /opt/cassandra/ddac/conf/config.yml
 ```
-In case `node_exporter` is also needed, execute the next command to install it.
-
-```
-ansible-playbook -i ../../config/ansible/envs/testing/hosts.ini ../../src/ansible/playbooks/cassandra-node_exporter-install.yml
-```
 
 ### Resources / Further Reading
 

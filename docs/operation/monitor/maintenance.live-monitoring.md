@@ -1,7 +1,6 @@
 ## Live (Online) Monitoring
 - [Datastax MCAC](#monitoring-your-cluster-with-datastax-mcac)
 - [cassandra_exporter (with Prometheus and Grafana)](#monitoring-your-cluster-with-cassandra-exporter)
-- [node_exporter](#metric-ingestion-into-prometheus-with-node-exporter)
 
 ### Monitoring Your Cluster with Datastax MCAC
 If Datastax MCAC is configured to be installed by our toolkit, Cassandra.toolkit's ansible playbook will generate some artifacts for Datastax MCAC for you, including: 
@@ -36,11 +35,6 @@ docker-compose -f ./src/ansible/artifacts/docker/docker-compose.yml up -d
 ```
 
 Grafana should now be viewable at `http://localhost:3000`.
-
-### Metric ingestion into Prometheus with Node Exporter
-Node Exporter is self described as a "Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written in Go with pluggable metric collectors." 
-
-TODO add more instructions for using node exporter
 
 ### Live Monitoring with Filebeat, Elasticsearch, and Kibana
 
