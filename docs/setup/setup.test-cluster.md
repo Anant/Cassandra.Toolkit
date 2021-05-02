@@ -195,7 +195,7 @@ As long as there's no failed or unreachable then it passes.
 
 
 # Debugging 
-For most issues, see [the main document](./setup.debugging.md) that discusses some sample errors you might run into while setting up cassandra.toolkit. However, put notes here for debugging issues that aren't really related to cassandra.toolkit but you might run into when following these instructions for testing.
+For most issues, see [the main debugging document](./setup.debugging.md) that discusses some sample errors you might run into while setting up cassandra.toolkit. However, put notes here for debugging issues that aren't really related to cassandra.toolkit but you might run into when following these instructions for testing.
 
 
 ### pip2 issue (unrelated to cassandra.toolkit)
