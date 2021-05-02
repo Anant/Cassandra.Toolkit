@@ -2,11 +2,11 @@
 These instructions will help you setup your hosts.ini file as well as you group_vars.all.yml file, the two config files you'll need to run ansible. If you are here, it is assumed that you have already built your Cassandra cluster. If you haven't, see [our instructions for doing so](./README.md#building-a-new-cassandra-cluster) before continuing.
 
 ### Table of Contents:
-- [Step 1.1: Copy the Example Files](#Step-1.1-copy-the-example-files)
-- [Step 1.2: List All Hosts in hosts.ini](#Step-1.2-list-all-hosts-in-hosts.ini)
-- [Step 1.3: Choose what Tools to Install](#Step-1.3-choose-what-tools-to-install)
-- [Step 1.4: Set Config Variables for Your Deployment in group_vars/all.yml](#Step-1.4-set-config-variables-for-your-deployment-in-group_varsall.yml)
-- [Step 1.5: Set Credentials in ansible.cfg](#step-1.5-set-credentials-in-ansible.cfg)
+- [Step 1.1: Copy the Example Files](#Step-11-copy-the-example-files)
+- [Step 1.2: List All Hosts in hosts.ini](#Step-12-list-all-hosts-in-hostsini)
+- [Step 1.3: Choose what Tools to Install](#Step-13-choose-what-tools-to-install)
+- [Step 1.4: Set Config Variables for Your Deployment in group_vars/all.yml](#Step-14-set-config-variables-for-your-deployment-in-group_varsallyml)
+- [Step 1.5: Set Credentials in ansible.cfg](#step-15-set-credentials-in-ansiblecfg)
 
 ## Step 1.1: Copy the Example Files
 First, you will need to create your environment directory inside `./envs/<YOUR_ENV>`. 
@@ -67,7 +67,7 @@ After selecting which tools to use, you are ready to configure the `group_vars/a
 
 
 ## Step 1.4: Set Config Variables for Your Deployment in group_vars/all.yml
-Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file should be located at `./config/ansible/envs/<YOUR_ENV>/group_vars/all.yml`. Continuing the example from before, it would be [`./config/ansible/envs/testing/group_vars/all.yml`](./config/ansible/envs/testing/group_vars/all.yml)
+Having chosen what tools you want to use, you will now need to provide a few variables specific to your Cassandra deployment. This is done by filling out the `group_vars/all.yml` file for your ansible environment. This file should be located at `./config/ansible/envs/<YOUR_ENV>/group_vars/all.yml`. Continuing the example from before, it would be `./config/ansible/envs/testing/group_vars/all.yml`.
 
 |               |               |
 | ------------- | ------------- | 
@@ -114,7 +114,7 @@ These variables should be passed in using the `-e ` arg as well, as shown [**her
 
 ## Step 1.5: Set Credentials in ansible.cfg
 
-Assuming you already copied the example file using [our instructions given above](#Step-1.1-copy-the-example-files) you can find the file in `~/.ansible.cfg`. Use your favorite text editor and set the credentials.
+Assuming you already copied the example file using [our instructions given above](#Step-11-copy-the-example-files) you can find the file in `~/.ansible.cfg`. Use your favorite text editor and set the credentials.
 
 First, set the value for the remote user. In your `ansible.cfg` file, set the `remote_user` var to the username. This will likely be the same value as `cassandra_ops_os_user` in your `group_vars/all.yml` file.
 

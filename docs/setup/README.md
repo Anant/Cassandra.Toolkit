@@ -52,7 +52,7 @@ For example, if you are using the `testing` environment:
 ansible-playbook -i ./config/ansible/envs/testing/hosts.ini ./src/ansible/playbooks/cassandra-hello.yml
 ```
 
-If it worked, then now you are ready to run the ansible playbook and install cassandra.toolkit to your Cassandra cluster! If not, you might want to [go back to the instructions for setting your hosts.ini file](./setup.ansible-config-files.md#Step-1.2-list-all-hosts-in-hosts.ini) before trying again. 
+If it worked, then now you are ready to run the ansible playbook and install cassandra.toolkit to your Cassandra cluster! If not, you might want to [go back to the instructions for setting your hosts.ini file](./setup.ansible-config-files.md#Step-12-list-all-hosts-in-hostsini) before trying again. 
 
 ## Step 3: Install the Toolkit onto Your Nodes
 
