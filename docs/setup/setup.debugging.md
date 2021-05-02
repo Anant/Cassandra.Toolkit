@@ -19,7 +19,7 @@ TASK [tablesnap-install : install systemd tablesnap.service unit] **************
 
 Make sure to send in `aws_access_key_id` using the `-e` flag when calling `ansible-playbook`, or specifying in the `group_vars/all.yml` file for your ansible env.
 
-## ERROR The next_nth_usable filter requires python's netaddr be installed on the ansible controller
+## ERROR: The next_nth_usable filter requires python's netaddr be installed on the ansible controller
 
 E.g., 
 ```
