@@ -2,7 +2,6 @@
 ## On Localhost
 NOTE: WIP!! More needs to be done on this
 
-
 ### 1) Install and start dse via package installation 
 Find instructions here: https://docs.datastax.com/en/landing_page/doc/landing_page/installProducts.html
 - Note that if you do the tarball installation, you will have to change other variables in the `group_vars/all.yml` file below based on where your tarball is. So just use the package installation (e.g., for DSE 6.8 debian package installation, [these docs here](https://docs.datastax.com/en/install/6.8/install/installDEBdse.html)).
@@ -181,3 +180,25 @@ localhost                  : ok=24   changed=10   unreachable=0    failed=0    s
 ```
 
 As long as there's no failed or unreachable then it passes. 
+
+
+# DEBUGGING
+For most issues, see [the main document](./setup.debugging.md) that discusses some sample errors you might run into while setting up cassandra.toolkit. However, put notes here for debugging issues that aren't really related to cassandra.toolkit but you might run into when following these instructions for testing.
+
+
+### pip2 issue (unrelated to cassandra.toolkit)
+For whatever reason, when testing on CentOS on Digital Ocean, I needed to manually install pip2 not using yum package manager by using the following command:
+
+```
+curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" -o "get-pip.py"
+python get-pip.py
+```
+
+If not I would get the following command, I would get the the following error anytime I did anything with `pip`:
+
+```
+ImportError: No module named typing
+```
+I could not even do `pip -V` or `pip install typing`, or it would return that error, even after reinstalling pip2. Installing using the get-pip.py file worked though.
+
+

@@ -2,6 +2,8 @@
 ### Table of Contents:
 - [Building a New Cassandra cluster](#building-a-new-cassandra-cluster)
 - [Install cassandra.toolkit on existing cluster](#installing-cassandra.toolkit-on-your-cluster)
+- [Debugging](#Debugging)
+- [What's Next](#whats-next)
 
 Cassandra.toolkit makes it easy to setup all the tools you will need for building, managing, and monitoring your Cassandra cluster. Whether you already have a Cassandra cluster or need to create your cluster, we have you covered. Just follow instructions below to get started.
 
@@ -145,6 +147,9 @@ The above tools are available to access in the browser at following urls:
 - `http://localhost:8080/webui/` - cassandra reaper (admin:admin)
 
 **NOTE** some of these ports will be different depending on what monitoring tool you chose, cassandra_exporter or Datastax MCAC. [Click here for more information](./setup.monitoring.md).
+
+# Debugging
+Having trouble getting things setup? Find help for common errors [here](./setup.debugging.md).
 
 # What's Next?
 Now that the tools in your toolkit are installed, you are ready to use them across your cluster. Head over to [Cluster Maintenance](../cluster-maintenance/README.md) to get started.

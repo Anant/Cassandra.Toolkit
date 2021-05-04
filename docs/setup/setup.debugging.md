@@ -34,3 +34,15 @@ You need to install a python lib on your ansible controller, as mentioned [in th
 ```
 apt install --no-install-recommends python-netaddr
 ```
+
+## ERROR Destination directory /root/.aws does not exist
+This is if /root/.aws is the target dir for aws creds. 
+
+### Solution 
+
+Just create the dir and try again, e.g.,
+
+```
+mkdir -p /root/.aws
+```
+
