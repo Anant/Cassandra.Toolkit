@@ -10,10 +10,13 @@ These instructions will help you setup your hosts.ini file as well as you group_
 
 ## Step 1.1: Copy the Example Files
 First, you will need to create your environment directory inside `./envs/<YOUR_ENV>`. 
-We have two examples of environment folders provided, [`_example`](./config/ansible/envs/_example) and [`_example_dse`](./config/ansible/envs/_example_dse). You can use those as a starter template. We will use Apache Cassandra for our examples below.
+
+We have two examples of environment folders provided, [`_example`](./config/ansible/envs/_example) for open source Apache Cassandra and [`_example_dse`](./config/ansible/envs/_example_dse) for DSE. You can use those as a starter template. 
+
+We will copy the Apache Cassandra example config for our example below.
 
 ```
-# assuming bash's current dir is project root, and you want your env to be named "testing":
+# assuming bash's current dir is project root, and you want your env to be named "testing", and using Apache Cassandra (not DSE):
 cp -r ./config/ansible/envs/_example ./config/ansible/envs/testing
 mv ./config/ansible/envs/testing/hosts.ini.example ./config/ansible/envs/testing/hosts.ini
 mv ./config/ansible/envs/testing/group_vars/all.yml.example ./config/ansible/envs/testing/group_vars/all.yml
@@ -45,15 +48,17 @@ node2
 node3
 ```
 
-2) For each node, put a variable in the hosts.ini file using that name
+2) For each node, put a variable in the hosts.ini file using that name.
+
+There are other ways to assign variables within ansible to your nodes as [described in their official docs](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html). However, we found the following way to be easiest, and is what we use in our example files. 
+
 Here's an explanation of the variables you need to set:
+
 |  Ansible terminology  | Key(s) | Value(s) | Notes   |
 | ------------- | ------------- | 
 | "group of groups" | `[cassandra:children]` | a list of all the nodes. | You only need one group of groups, which is called `cassandra`. For values, un our example, we use names like `node1`, `node2` etc, each of which is a "group" but you can use whatever name you want to. [See here for more information](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#inheriting-variable-values-group-variables-for-groups-of-groups). | 
-| "groups" | one for each node | public ip of the node | We are using an "ansible group" to represent a node. The only value that you need to set is the public_ip. For more details on "ansible groups", see [documentation here](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#inventory-basics-formats-hosts-and-groups) |
-| "Group Variables" | One for each host  | `private_ip=<host private ip>` | In our example file, this is `[node1:vars]`, `node2:vars` etc. For more info see official docs on ["group variables"](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#assigning-a-variable-to-many-machines-group-variables). | 
-
-
+| "groups" | one for each node | public ip of the node | We are creating an "ansible group" for a node. The only value that you need to set is the public ip for the node. For more details on "ansible groups", see [documentation here](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#inventory-basics-formats-hosts-and-groups) |
+| "Group Variables" | One for each host  | `private_ip=<host private ip>` | Since we created a group for each node, we now tell ansible what the private ip for each node is by assigning group variables for each node. In our example file, this is `[node1:vars]`, `node2:vars` etc. For more info see official docs on ["group variables"](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#assigning-a-variable-to-many-machines-group-variables). | 
 
 ## Step 1.3: Choose what Tools to Install
 There are different options and configurations possible, depending on the tools you prefer to use. All the tools in Cassandra.toolkit work well, but we have found some to work better than others. [Click here](./setup.recommendations.md) for our recommendations.
@@ -76,7 +81,7 @@ Having chosen what tools you want to use, you will now need to provide a few var
 | `tools_install_folder` | An absolute path where to install all cassandra tools |
 | `cassandra_install_lib_folder` | Absolute path to cassandra `lib` folder to install cassandra_exporter as java agent. *This path is not used when cassandra_exporter is installed as a standalone service.* |
 | `tablesnap_aws_backup_bucket_name` | Tablesnap aws-s3 backup bucket name. This variable is only required when `install_tablesnap` is set to `True`. |
-| `medusa_aws_credentials_file` | Location of aws credentials file which will be used to talk to aws-s3. This file will get written to the location provided by this variable using values provided by `aws_access_key_id` and `aws_secret_access_key`, which are provided when the playbook is ran. This variable is only required when `install_medusa` is set to `True`. |
+| `medusa_aws_credentials_file` | Path to the aws credentials file on target nodes. This will be used to talk to aws-s3. This file will get written to the location provided by this variable using values provided by `aws_access_key_id` and `aws_secret_access_key`, which are provided when the playbook is ran. This variable is only required when `install_medusa` is set to `True`. |
 | `medusa_aws_backup_cluster_prefix` | Multitenancy support in the same aws-s3 bucket. This variable is only required when `install_medusa` is set to `True`.   |
 | `medusa_aws_backup_bucket_name` | Medusa aws-s3 backup bucket name. This variable is only required when `install_medusa` is set to `True`. |
 | `cassandra_stop_command` | Used by `cassandra-medusa` to operate cluster nodes backups and restores. This variable is only required when `install_medusa` is set to `True`. |
@@ -96,7 +101,7 @@ By default they are `False`. These can also be set when calling the ansible play
 
 You can also enable the above variables in the cli when the playbook is executed as shown [**here**](./README.md#Example-B-Enable-CLI-Features). 
 
-Some variables should not be stored in this config file for security reasons as well, such as credential variables. These variables include: 
+Some variables are sensitive, and so perhaps should not be stored in this config file for security reasons. These variables include: 
 
 |               |               |
 | ------------- | ------------- | 

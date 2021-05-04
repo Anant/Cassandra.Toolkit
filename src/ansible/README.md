@@ -16,7 +16,7 @@ Tested on:
 
 - CentOS Linux release 7.7.1908 (Core) *(with apache-cassandra-3.11.x, dse-5.1.x, dse-6.8.x)* 
 - CentOS Linux release 7.8.2003 (Core) *(with apache-cassandra-3.11.x, dse-5.1.x, dse-6.8.x)*
-- Ubuntu 18.04 *(with apache-cassandra-3.11.x)*
+- Ubuntu 18.04 *(with apache-cassandra-3.11.x, dse.6.8.x)*
 
 ## Ansible Version Compatibility
 Installation tested with `ansible-2.9.6`
