@@ -5,12 +5,21 @@
     state: stopped
   ignore_errors: true
 
-- name: install python-pip
+- name: install python-pip (yum)
+  yum:
+    name: "{{ item }}"
+    state: installed 
+  with_items:
+    - "python2-pip"
+  when: ansible_os_family == "RedHat"
+
+- name: install python-pip (apt)
   yum:
     name: "{{ item }}"
     state: present
   with_items:
     - "python-pip"
+  when: ansible_os_family == "Debian"
 
 - name: install virtualenv and packages
   command: "{{ item }}"
