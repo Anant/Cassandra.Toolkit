@@ -1,12 +1,14 @@
 # Setting Up Monitoring - Overview
-This document is to provide further instructions for installation of monitoring tools for your Cassandra cluster. [Click here](./setup.ansible-config-files.md#Step-1.4-set-config-variables-for-your-deployment) to go back to instructions for filling out your `group_vars/all.yml` file.
+This document is to provide further instructions for installation of monitoring tools for your Cassandra cluster. [Click here](./setup.ansible-config-files.md#Step-1.4-set-config-variables-for-your-deployment-in-group_varsall.yml) to go back to instructions for filling out your `group_vars/all.yml` file.
 
 This document explains the two ways to do live metrics monitoring in Cassandra.toolkit: 1) with [Prometheus and cassandra_exporter](#monitoring-metrics-with-prometheus-and-cassandra-exporter) and 2) with [Datastax MCAC](#monitoring-metrics-with-datastax-metric-collector).
 
-For offline monitoring, no setup is required. Instead see documentation under [Cluster Maintenance](../cluster-maintenance/monitor/maintenance.offline-monitoring.md). 
+For offline monitoring, no setup is required. Instead see documentation regarding [Cassandra.toolkit operation](../operation/monitor/maintenance.offline-monitoring.md). 
 
 ## Monitoring Metrics with Prometheus and Cassandra Exporter
 One way to do live monitoring with a dashboard is to use cassandra_exporter with Prometheus and Grafana.
+
+Note that as of May 2021, Cassandra Exporter is still in Beta.
 
 The `cassandra_exporter.service` exposes metrics that are compatible with Prometheus server.
 Metrics are available on port `8080` when it runs as a `systemd` service in standalone mode, or on port `9500` when it's configured as a JVM agent in `cassandra-env.sh` file. 
@@ -64,7 +66,7 @@ You should now be able to view the metrics you are collecting in Grafana and Pro
 
 ![mcac dashboard](../docs/assets/mcac-01.png)
 
-You are now ready to monitor your cluster. [Click here to learn more](../cluster-maintenance/monitor/README.md).
+You are now ready to monitor your cluster. [Click here to learn more](../operation/monitor/README.md).
 
 
 #### DSE Metrics Collector Dashboards

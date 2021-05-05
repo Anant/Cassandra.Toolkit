@@ -28,25 +28,25 @@ The first step is to get everything installed. [Click here to get started](./doc
 
 These instructions will help you build your Cassandra cluster if you don't have one already, and then to setup Cassandra.toolkit on your cluster. 
 
-Cassandra.toolkit provides good defaults and instructions on how to leverage all of these technologies to set up your cluster with all the Cassandra tools you will need for your cluster. Besides running updates or setting up the toolkit on new Cassandra nodes, you should only have to setup cassandra.toolkit once on your cluster. After that, you can focus on cluster maintenance.
+Cassandra.toolkit provides good defaults and instructions on how to leverage all of these technologies to set up your cluster with all the Cassandra tools you will need for your cluster. Besides running updates or setting up the toolkit on new Cassandra nodes, you should only have to setup cassandra.toolkit once on your cluster. After that, you can focus on operating the Cassandra.toolkit, which we also provide instructions for.
 
 [Click here to setup Cassandra.toolkit on your cluster](./docs/setup/README.md). 
 
-## Cluster Maintenance
+## Operation
 After setting up your cluster, you will need to maintain it. All the tools below should already be installed at this point if you followed the instructions for [Cluster Setup](#cluster-setup). However, your Cassandra Cluster is not really a "set it and forget it" kind of database - setting up is just the beginning! The difference is that now that you have cassandra.toolkit setup on your cluster, you have all the tools that you will need already installed and configured. Moreover, this guide will walk you through the process of maintaining your cluster using these battle tested tools.
 
 We break down cluster maintenance into the following categories: 
-- [Backups](./docs/cluster-maintenance/backup/README.md)
-- [Monitoring](./docs/cluster-maintenance/monitor/README.md)
-- [Repairs](./docs/cluster-maintenance/repair/README.md) 
+- [Backups](./docs/operation/backup/README.md)
+- [Monitoring](./docs/operation/monitor/README.md)
+- [Repairs](./docs/operation/repair/README.md) 
 
-[Click here](docs/cluster-maintenance/README.md) to learn how to use cassandra.toolkit tools to maintain your cluster.
+[Click here](docs/operation/README.md) to learn how to operate cassandra.toolkit tools to maintain your cluster.
 
 
 # Tools in the Toolkit
 Curious about what tools we will be installing on your cluster? See below for our list of tools that are included in Cassandra.toolkit. 
 
-We provide instructions for how to [setup](./docs/setup/README.md) and [operate](./docs/cluster-maintenance/README.md) these tools into your cluster, but it is helpful to become familiar with each tool on its own as well. Accordingly we provide links to the official project websites for each tool for you to browse.
+We provide instructions for how to [setup](./docs/setup/README.md) and [operate](./docs/operation/README.md) these tools into your cluster, but it is helpful to become familiar with each tool on its own as well. Accordingly we provide links to the official project websites for each tool for you to browse.
 
 ### Cluster Monitoring
 
@@ -64,7 +64,7 @@ Live (Online) Cluster Monitoring
 | [cassandra_exporter](https://github.com/criteo/cassandra_exporter) | Cassandra exporter is a standalone application which exports Apache Cassandra® metrics throught a Prometheus friendly endpoint. |
 | [Prometheus](https://prometheus.io/) | Prometheus is an open-source systems monitoring and alerting toolkit |
 | [Grafana](https://grafana.com/) | Grafana is a multi-platform open source analytics and interactive visualization software. | 
-| [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html) | Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events, and forwards them either to Elasticsearch or Logstash for indexing. Filebeat can also be used for offline log ingestion if you have a log tarball, which is what we do in [cassandra.vision](./docs/cluster-maintenance/monitor/README.md#Cassandra.Vision-Offline-Monitoring) |
+| [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html) | Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events, and forwards them either to Elasticsearch or Logstash for indexing. Filebeat can also be used for offline log ingestion if you have a log tarball, which is what we do in [cassandra.vision](./docs/operation/monitor/README.md#Cassandra.Vision-Offline-Monitoring) |
 | [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html) | Elasticsearch is the distributed search and analytics engine at the heart of the Elastic Stack. We use Elasticsearch for monitoring and visualizing Cassandra log files in conjunction with Filebeat and Kibana |
 | [Kibana](https://www.elastic.co/guide/en/kibana/7.6/introduction.html) | Kibana provides a GUI for interacting with the Elastic Stack. We use Kibana in particular for visualizing Cassandra log files across the cluster. | 
 
@@ -114,12 +114,11 @@ In summary, our goal is that eventually we will be able to install and run all t
 # Development and Testing
 See instructions in our [CONTRIBUTING](./docs/CONTRIBUTING.md) file for instructions on getting a development environment set up, as well as contribution guidelines and notes on how this project is organized.
 
-# Testing
 Testing is still a work in progress, but you can find instructions for how to setup a test env in the [documentation for testing](./setup/setup.test-cluster.md).
 
 # Credits
 
-1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](src/TableAnalyzer)
+1. Rahul Singh - Concept, Curator, Creator of [tableanalyzer](https://github.com/Anant/cassandra.vision/tree/master/cassandra-analyzer/offline-log-collector/TableAnalyzer)
 2. Sean Bogaard - Concept, Advisor, Curator
 3. John Doe (*) - Developing terraform & ansible automation, testing, documentation of 3rd party tools
 4. Obi Anomnachi - Testing

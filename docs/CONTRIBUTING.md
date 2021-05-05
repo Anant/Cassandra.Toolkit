@@ -17,8 +17,8 @@ In the meantime, you can also test out individual tools quickly using docker, wi
 | ------------------- | ------------------ |
 | [`config/`](../config) | All configs (e.g., yamls, .ini files, etc) that users interact with should go here. They might choose to look at other config files in for example the `src/` dir, but they should not have to if they follow the instructions. Consider every other dir except for this one READ-ONLY for the end-user. |
 | [`docs/`](../docs) | All documentation files should go here, including  |
-| [`docs/cluster-maintenance/`](../docs/cluster-maintenance) | All documentation required to use the tools in cassandra.toolkit tools goes here. Documentation related to setting up the tools should not go here; it should go in `docs/setup/`. The main README.md in this dir functions as an index for all the other documentation files in this dir. |
-| [`docs/setup/`](../docs/setup) | All documentation required to setup a new Cassandra cluster and to install and start cassandra.toolkit tools goes here. Documentation related to actually using the tools should not go here; it should go in `docs/cluster-maintenance/`. The main README.md in this dir functions as an index for all the other documentation files in this dir. |
+| [`docs/operation/`](../docs/operation) | All documentation required to use the tools in cassandra.toolkit tools goes here. Documentation related to setting up the tools should not go here; it should go in `docs/setup/`. The main README.md in this dir functions as an index for all the other documentation files in this dir. |
+| [`docs/setup/`](../docs/setup) | All documentation required to setup a new Cassandra cluster and to install and start cassandra.toolkit tools goes here. Documentation related to actually using the tools should not go here; it should go in `docs/operation/`. The main README.md in this dir functions as an index for all the other documentation files in this dir. |
 | [`docs/assets/`](../docs/assets) | All image files and other documentation related assets for the project should go here |
 | [`quickstart-tutorials/`](../quickstart-tutorials) | These are kind of unrelated to cassandra.toolkit, but provide easy to use starter files to setup Cassandra related tooling on localhost. Nothing should go in here that is actually required for cassandra.toolkit to work. |
 | [`src/`](../src/) | This is the low-level source code for the project, including ansible files and docker related files that are used in cassandra.toolkit. Documentation in this directory and all subdirectories should be mostly for developers, not for end-users, though of course some end-users will want to look in here to see what is going on under the hood. |
@@ -36,7 +36,7 @@ Our goal is to make it easy for new users should be able to open cassandra.toolk
 - **Where to put documentation**
     - Documentation for end users should all go in the main project `docs` dir, not in any other directory.
     - Documentation for installing/setting up/configuring cassandra.toolkit all goes in `docs/setup`
-    - Documentation for using the tools all goes in `docs/cluster-maintenance`
+    - Documentation for using the tools all goes in `docs/operation`
 - **Links** 
     - Links should be relative paths when internal to the project (as modelled within this file). This makes it so users in IDEs or Github can click on them and follow them easily. 
     - Add links liberally so that it is easy to navigate through the documentation, though not too many in order to avoid making the documentation too cluttered.
@@ -55,6 +55,6 @@ Our goal is to make it easy for new users should be able to open cassandra.toolk
     - Make sure to add the new tool's name and description to the following places in the [`docs` directory](../docs) documentation:
         - [Main project README.md](../README.md#tools-in-the-toolkit) under the appropriate category (backup, monitoring, repairs)
         - docs/setup/ instructions (TODO write out specific places here, there's multiple)
-        - docs/cluster-maintenance/ instructions (TODO write out specific places here, there's multiple)
+        - docs/operation/ instructions (TODO write out specific places here, there's multiple)
 - **Where to put the tool**
     - source code all goes in [`src` directory](../src)

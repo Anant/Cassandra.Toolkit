@@ -1,5 +1,9 @@
 # Setup test cluster
-## On Localhost
+Table of Contents
+- [Testing on Localhost](#testing-on-localhost)
+- [Testing on DigitalOcean, DSE 6.8, Centos](#testing-on-digitalocean-dse-6.8-centos)
+- [Debugging](#debugging)
+# Testing on Localhost
 NOTE: WIP!! More needs to be done on this
 
 ### 1) Install and start dse via package installation 
@@ -70,16 +74,24 @@ Then put in your password for your current user so ansible can use sudo commands
 
 
 
-## On Digital Ocean, CentOS, DSE 6.8
-### Notes on 
+## Testing on Digital Ocean, CentOS, DSE 6.8
+These instructions are for specifically CentOS 6.7, DSE 6.8, and setting up on Digital Ocean. The steps will be pretty close to what you would also do for Apache Cassandra rather than DSE, or Ubuntu rather than CentOS as well however.
 
 ### Create the cluster
 - **Droplet size:** Basic, regular intel CPU, 4 GB Memory, 2vCPUs is sufficient for testing. (At time of writing, $20/mo)
 - Make sure to put your ssh key into the cluster as well
 
 ### SSH into your droplet 
+We will need to setup DSE 6.8 so need to ssh into the droplet. 
 
-### Setup DSE
+E.g., if your private key for this droplet is at `~/.ssh/id_rsa`
+```
+ssh root@<droplet's-public-ip> -i ~/.ssh/id_rsa
+```
+
+### Setup DSE 6.8
+We will be doing installation using package installation process for this guide.
+
 #### Install DSE
 
 
@@ -182,7 +194,7 @@ localhost                  : ok=24   changed=10   unreachable=0    failed=0    s
 As long as there's no failed or unreachable then it passes. 
 
 
-# DEBUGGING
+# Debugging 
 For most issues, see [the main document](./setup.debugging.md) that discusses some sample errors you might run into while setting up cassandra.toolkit. However, put notes here for debugging issues that aren't really related to cassandra.toolkit but you might run into when following these instructions for testing.
 
 

@@ -13,7 +13,7 @@
     dest: "{{ playbook_dir }}/../artifacts/datastax-mcac/"
   tags: ["mcac"]
 
-- name: un-archiving datastax mcac grafana dashboars {{ playbook_dir }}/../artifacts/datastax-mcac/
+- name: un-archiving datastax mcac grafana dashboards {{ playbook_dir }}/../artifacts/datastax-mcac/
   unarchive:
     remote_src: yes
     src: "{{ playbook_dir }}/../artifacts/datastax-mcac/{{ datastax_mcac_grafana_dashboards_file_name }}{{ datastax_mcac_grafana_dashboards_file_ext }}"
