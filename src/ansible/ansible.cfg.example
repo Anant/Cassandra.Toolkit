@@ -1,0 +1,8 @@
+[defaults]
+host_key_checking = False
+roles_path = ./src/ansible/roles
+
+### REPLACE WITH REMOTE USERNAME
+remote_user = <remote-user-username>
+library = ./src/ansible/library
+log_path=./src/ansible/ansible.log

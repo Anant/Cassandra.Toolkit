@@ -1,0 +1,55 @@
+---
+- name: install python3-pip and packages (yum)
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - "python3-pip"
+    - "python-devel"
+    - "shiboken-python3*"
+  when: ansible_os_family == "RedHat"
+  tags: ["medusa"]
+
+- name: install python3-pip and packages (apt)
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "python3-pip"
+  when: ansible_os_family == "Debian"
+  tags: ["medusa"]
+
+- name: install virtualenv and packages
+  command: "{{ item }}"
+  with_items:
+    - "pip3 install --upgrade pip"
+    - "pip3 install virtualenv zipp"
+  tags: ["medusa"]
+
+- name: create virtual env && install cassandra medusa
+  command: "{{ item }}"
+  with_items:
+    - "/usr/local/bin/virtualenv -p python3 {{ tools_install_folder }}/venv/python3-cassandra-medusa"
+    - "{{ tools_install_folder }}/venv/python3-cassandra-medusa/bin/pip3 install cassandra-medusa[S3]"
+  tags: ["medusa"]
+
+- name: create /etc/medusa folder
+  file:
+    path: /etc/medusa
+    state: directory
+  tags: ["medusa"]
+
+- name: create /etc/medusa/medusa.ini file
+  template:
+    src: "medusa.ini"
+    dest: "/etc/medusa/medusa.ini"
+  tags: ["medusa"]
+
+- name: create AWS credentials file
+  copy:
+    dest: "{{ medusa_aws_credentials_file }}"
+    content: |
+      [default]
+      aws_access_key_id = {{ aws_access_key_id }}
+      aws_secret_access_key = {{ aws_secret_access_key }}
+  tags: ["medusa"]

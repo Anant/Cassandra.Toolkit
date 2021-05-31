@@ -1,0 +1,59 @@
+- name: install elastic yum repo key (yum)
+  command: "rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch"
+  tags: ["filebeat"]
+  when: ansible_os_family == "RedHat"
+
+
+- name: install elastic repo (yum)
+  template:
+    src: "elastic.repo"
+    dest: "/etc/yum.repos.d"
+  tags: ["filebeat"]
+  when: ansible_os_family == "RedHat"
+
+
+- name: download and install public signing repo key (apt)
+  ansible.builtin.apt_key: 
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+  tags: ["filebeat"]
+  when: ansible_os_family == "Debian"
+
+# https://github.com/elastic/ansible-elasticsearch/blob/master/tasks/elasticsearch-Debian.yml#L56-L64
+# we're not worrying about removing the old repo though, which they do in the code given above
+- name: add elasticsearch repository (apt)
+  ansible.builtin.apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+    state: present
+  tags: ["filebeat"]
+  when: ansible_os_family == "Debian"
+
+- name: install apt-transport-https (apt)
+  apt:
+    name: "apt-transport-https"
+    state: present
+  tags: ["filebeat"]
+  when: ansible_os_family == "Debian"
+
+- name: Update apt packages (apt)
+  become: true
+  apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: install filebeat
+  yum:
+    name: "filebeat"
+    state: present
+  tags: ["filebeat"]
+
+- name: add filebeat.yml
+  template:
+    src: filebeat.yml
+    dest: /etc/filebeat/filebeat.yml
+  tags: ["filebeat"]
+
+- name: (start | restart) & enable filebeat
+  service: name=filebeat state=restarted enabled=yes
+  tags: ["filebeat"]

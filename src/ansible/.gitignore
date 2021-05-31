@@ -1,0 +1,3 @@
+# don't commit artifacts
+artifacts/**
+!artifacts/README.md

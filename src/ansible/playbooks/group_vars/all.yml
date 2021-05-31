@@ -1,0 +1,9 @@
+cassandra_exporter_agent_url: https://github.com/instaclustr/cassandra-exporter/releases/download/v0.9.10/cassandra-exporter-agent-0.9.10.jar
+cassandra_exporter_url: https://github.com/criteo/cassandra_exporter/releases/download/2.3.2/cassandra_exporter-2.3.2-all.jar
+
+datastax_mcac_url: https://github.com/datastax/metric-collector-for-apache-cassandra/releases/download/v0.1.10/datastax-mcac-agent-0.1.10.zip
+datastax_mcac_file_name: datastax-mcac-agent-0.1.10
+datastax_mcac_file_ext: .zip
+datastax_mcac_grafana_dashboards: https://github.com/datastax/metric-collector-for-apache-cassandra/releases/download/v0.1.10/datastax-mcac-dashboards-0.1.10.zip
+datastax_mcac_grafana_dashboards_file_name: datastax-mcac-dashboards-0.1.10
+datastax_mcac_grafana_dashboards_file_ext: .zip

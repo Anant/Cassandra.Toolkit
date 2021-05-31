@@ -103,3 +103,5 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# ansible config, which users are instructed to copy to project root dir
+ansible.cfg
