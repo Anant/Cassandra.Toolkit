@@ -22,3 +22,6 @@ python3 main.py --hostname 123.456.678.123
 # Debugging
 ## Data doesn't match tables when testing
 Make sure to flush tables to disk, using `nodetool flush`
+
+# TODOs
+- Add docs to main c.toolkit docs pages, under [docs/operation](../../docs/operation/README.md)
