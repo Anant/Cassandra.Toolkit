@@ -25,6 +25,14 @@ def main(args):
 
     cleanup(session)
 
+
+
+#############################
+# Helper methods
+#############################
+
+
+
 def get_hostname():
     """
     returns hostname to use to connect to C* using python driver
@@ -62,37 +70,38 @@ def setup_session(hostname):
 
     return session
 
-def is_table_in_ks_data_dir(keyspace, tablename):
+def is_table_in_ks_data_dir(keyspace, table_name, table_id):
     """
     iterate over table dirs in the keyspace data dir, stripping off the table dir's guid, to see if table is in the keyspace dir
     """
-    # get tablenames from the subdirectories of this keyspace in the C* data dir
-    table_names = get_table_names_from_data_dir(keyspace)
-    tables_in_ks_data_subdirs = []
-    for table_name in table_names:
-        print(f"appending: ", table_name)
-        tables_in_ks_data_subdirs.append(table_name)
+    # get table_names from the subdirectories of this keyspace in the C* data dir
+    table_dir_names = get_table_dir_names_from_data_dir(keyspace)
+    table_dirs_in_ks_data_subdirs = []
+    for table_dir_name in table_dir_names:
+        print(f"appending: ", table_dir_name)
+        table_dirs_in_ks_data_subdirs.append(table_dir_name)
 
-    print(f"keyspace {keyspace} has tables:", tables_in_ks_data_subdirs)
+    print(f"keyspace {keyspace} has the following table directories:", table_dirs_in_ks_data_subdirs)
 
     # finally, check to see if provided table is represented in the keyspace data dir
-    return tablename in tables_in_ks_data_subdirs
+    equivalent_dir_name = get_dirname_from_id_and_table(table_name, table_id)
+    is_in_data_dir = bool(equivalent_dir_name in table_dirs_in_ks_data_subdirs)
+    print(f"Is {equivalent_dir_name} in {table_dirs_in_ks_data_subdirs}? {is_in_data_dir}")
 
+    return is_in_data_dir
 
-def get_table_names_from_data_dir(keyspace):
+def get_table_dir_names_from_data_dir(keyspace):
     """
     take all the subdirectories and strip off the guid off the end, so we are left with just nice table names
     """
     ks_data_subdirs = get_table_data_dir_subdirectories(keyspace) 
-    table_names = []
+    # table directory names are the table_name + uuid
+    table_dir_names = []
     for table_dir_name in ks_data_subdirs:
-        # take off the guid before appending to tables_in_ks_data_subdirs
-        # table's cannot have hyphens, so just take off everythign after first hyphen
-        tablename_from_dir = table_dir_name.split("-")[0]
-        table_names.append(tablename_from_dir)
+        table_dir_names.append(table_dir_name)
 
 
-    return table_names
+    return table_dir_names
 
 def get_table_data_dir_subdirectories(keyspace):
     """
@@ -164,13 +173,15 @@ def find_tables_to_keep(session):
 
     for tr in table_rows:
         if tr.keyspace_name not in exclude_ks:
-            print(f"{tr.keyspace_name}.{tr.table_name}")
+            print(f"CHECKING: {tr.keyspace_name}.{tr.table_name} - with id {tr.id}")
 
             # test if data/keyspace dir exists before adding to keep
-            if is_table_in_ks_data_dir(tr.keyspace_name, tr.table_name):
-                tables_to_keep.append([tr.keyspace_name, tr.table_name])
+            if is_table_in_ks_data_dir(tr.keyspace_name, tr.table_name, tr.id):
+                equivalent_dir_name = get_dirname_from_id_and_table(tr.table_name, tr.id)
+                print(f"result: keep this table")
+                tables_to_keep.append([tr.keyspace_name, tr.table_name, tr.id, equivalent_dir_name])
 
-    write_to_file("keeptables.csv", ["keyspace-name", "table-name"], tables_to_keep)
+    write_to_file("keeptables.csv", ["keyspace-name", "table-name", "table-id", "dir-name"], tables_to_keep)
 
     return tables_to_keep
 
@@ -211,37 +222,44 @@ def find_orphan_tables(session, tables_to_keep, orphan_ks):
     # list of tables to remove, because orphaned
     orphan_tables = list()
 
+    # first item is ks, and fourth item is dirname, which is enough to make sure that this table is uniquely identified 
+    table_dirs_to_keep = []
+    for tabledata in tables_to_keep:
+        # add a tuple 
+        table_dirs_to_keep.append((tabledata[0], tabledata[3]))
+
     print(f"~~~ now checking if any of these tables that have a directory in the C* data directory don't exist in the system schema ~~~\n")
     # for each ks in the data dir...
     for ks in get_keyspace_data_dir_subdirectories():
         # get name of each table, and add to list, if not in a keyspace used by C* internally
 
-        for table_name in get_table_names_from_data_dir(ks):
+        for table_dir_name in get_table_dir_names_from_data_dir(ks):
 
             # add table to list of "all tables" no matter what
-            all_tables.append([ks, table_name])
+            table_name, non_hyphenated_table_id = get_table_name_and_id_from_dir(table_dir_name)
+            all_tables.append([ks, table_name, table_dir_name])
 
             # check if ks is orphaned. If ks is orphaned, mark table as orphaned
 
             print(f"is this table's keyspace ({ks}) in the orphan keyspace list?", orphan_ks)
             # put in array, to emulate the format we have our orphan_ks in
             if [ks] in orphan_ks:
-                orphan_tables.append([ks, table_name, True])
+                orphan_tables.append([ks, table_name, non_hyphenated_table_id, table_dir_name, True])
 
             # otherwise, check the table, and see if this table is orphaned, even though its keyspace is not
             else:
-                # note that this should check both keyspace and tablename for identity
-                if [ks, table_name] not in tables_to_keep:
+                # note that this should check both keyspace and table_name for identity
+                equivalent_dir_name = get_dirname_from_id_and_table(table_name, non_hyphenated_table_id)
+                if (ks, equivalent_dir_name) not in tables_to_keep:
                     print("!!! found a phantom table: ", table_name)
-                    orphan_tables.append([ks, table_name, False])
+                    orphan_tables.append([ks, table_name, non_hyphenated_table_id, table_dir_name, False])
                 else:
                     # don't do anything with these. Already have marked the keyspace as a keeper and table as a table to keep
                     pass
 
 
-
-    write_to_file("alltable.csv", ["keyspace-name", "table-name"], all_tables)
-    write_to_file("removetable.csv", ["keyspace-name", "table-name", "is-in-phantom-keyspace"], orphan_tables)
+    write_to_file("alltable.csv", ["keyspace-name", "table-name", "dirname"], all_tables)
+    write_to_file("removetable.csv", ["keyspace-name", "table-name", "non-hyphenated-table-id", "dirname", "is-in-phantom-keyspace"], orphan_tables)
 
     return (all_tables, orphan_tables)
 
@@ -262,14 +280,32 @@ def write_to_file(csv_filename, headers, rows):
         for line in rows:
             writer.writerow(line)
 
+def get_dirname_from_id_and_table(table_name, table_id):
+    # since table_id's hyphens are stripped before use in the data dir, we have to do that as well
+    table_id_no_hyphens = str(table_id).replace("-", "")
+    return f"{table_name}-{table_id_no_hyphens}"
+
+def get_table_name_and_id_from_dir(table_dir_name):
+    """
+    table dir name will look like "<table_name>-<uuid>". This method extracts the table_name
+    - NOTE!!!! uuid returned here will NOT have any hyphens, though the uuid found using cqlsh will. 
+    """
+    # table's cannot have hyphens, so just take off everythign after first hyphen
+    table_name_from_dir, non_hyphenated_table_id = table_dir_name.split("-")
+    
+    return (table_name_from_dir, non_hyphenated_table_id)
+
 def cleanup(session):
     print("\n\ndone.")
     session.shutdown()
 
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='identify directories from orphaned C* keyspaces and tables',
-        usage='{} {node_hostname}')
+        usage='{} --hostname {node_hostname}')
     # set default to empty string, which will later be switched out for output of hostname -i
     parser.add_argument('--hostname', default='', type=str, help='node hostname to connect to using python driver. defaults to output of `hostname -i`')
     args = parser.parse_args()

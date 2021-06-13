@@ -28,6 +28,7 @@ Outcome:
 
 - `removekeyspace.csv`: These are entire keyspaces that are orphaned, i.e., all keyspaces that have directory in C* data dir, but are not in system schema 
 - `removetables.csv`: These are tables that are orphaned that have directory in C* data dir, but are not in system schema. This is for when there are keyspaces that are not entirely orphaned but only have some tables that are orphaned.
+- `alltables.csv`: These are all tables, as according to the data dirs
 
 ### What the Operator then needs to do with the new removekeyspace.csv and removetables.csv
 Currently this is a manual process that the operator needs to do. Since this is potentially very destructive, we have not yet made a script to remove those directories automatically - instead, this is currently done manually. However, we might reconsider adding a script to delete these as well in the future, which could be helpful to avoid human error especially if there are a lot of orphans. 
@@ -37,7 +38,9 @@ Currently this is a manual process that the operator needs to do. Since this is 
 		- foreach removekeyspace.csv and rm the directory 
 		
 2) Remove Orphan Tables
-    - Then do the same with removetables.csv. 
+    - Then do the same with removetables.csv, except with a key difference. Be sure to pay attention to the `table-uuid` column in the csv
+        * This is important in case there are multiple directories with the same base table name. This occurs when a table is dropped then replaced by a table with the same table name, e.g., if they wanted to change the primary key of the table so dropped it, then created with new primary key.
+    - Note also the column ``
 		
 ## Install
 ```
@@ -49,7 +52,8 @@ pip3 install -r requirements.txt
 ## Run
 (assuming DSE is running locally)
 ```
-python3 main.py
+# run with elevated permissions, so it can access the c* data files
+sudo python3 main.py
 ```
 
 ## Specifying hostname
@@ -72,70 +76,74 @@ E.g.,
 docker-compose -f ../../quickstart-tutorials/dse-on-docker/docker-compose.yml up -d 
 ```
 
+**NOTE** You can replace all the rest of the setup steps by running this bash script instead: ./scripts/generate-fake-phantom-data.sh
+- Note though that it does not error out currently if one part goes wrong, and so if everything doesn't run perfectly it won't work
+
+
 2) Create at least two sample Keyspaces, each with 2-3 tables (enough for a control and a test sample).
 We have sample cql script for this, in our case, making three keyspaces:
 
 ```
-docker exec -it dse-on-docker_dse_1 cqlsh -e "$(cat ./scripts/create-test-keyspaces-and-tables.cql)"
+cqlsh -e "$(cat ./scripts/create-test-keyspaces-and-tables.cql)"
 ```
 
 Confirm it worked:
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "DESCRIBE control_ks;"
-docker exec dse-on-docker_dse_1 cqlsh -e "DESCRIBE ks_with_phantoms;"
-docker exec dse-on-docker_dse_1 cqlsh -e "select * from phantom_ks.cyclist_stats;"
+cqlsh -e "DESCRIBE phantom_dir_test_control_ks;"
+cqlsh -e "DESCRIBE phantom_dir_test_ks_with_phantoms;"
+cqlsh -e "select * from phantom_dir_test_phantom_ks.cyclist_stats;"
 # etc
 ```
 
 3) Flush to disk, so Data dirs are created:
 ```
-docker exec -it dse-on-docker_dse_1 nodetool flush
+nodetool flush
 ```
 
 Confirm it worked:
 
 ```
-docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/
-docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/ks_with_phantoms
-docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/phantom_ks
+dir /var/lib/cassandra/data/
+dir /var/lib/cassandra/data/phantom_dir_test_ks_with_phantoms
+dir /var/lib/cassandra/data/phantom_dir_test_phantom_ks
 ```
 
-- You should see your two keyspaces there, `ks_with_phantoms` and `control_ks`
-- Inside of `ks_with_phantoms` there should be two subdirectories, one for each table, each with a UUID at the end, e.g., `cyclist_stats-8e7f9031cc4011ebb3b4b353021fcfe9` and `replaced_phantom_cyclist_stats-8e9429a0cc4011ebb3b4b353021fcfe9`
+- You should see your two keyspaces there, `phantom_dir_test_ks_with_phantoms` and `phantom_dir_test_control_ks`
+- Inside of `phantom_dir_test_ks_with_phantoms` there should be two subdirectories, one for each table, each with a UUID at the end, e.g., `cyclist_stats-8e7f9031cc4011ebb3b4b353021fcfe9` and `replaced_phantom_cyclist_stats-8e9429a0cc4011ebb3b4b353021fcfe9`
 
 
 4) Create one phantom keyspace:
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "$(cat ./scripts/remove-ks-for-phantom.cql)"
+cqlsh -e "$(cat ./scripts/remove-ks-for-phantom.cql)"
 ```
 
 Confirm it dropped:
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "DESCRIBE phantom_ks;"
+cqlsh -e "DESCRIBE phantom_dir_test_phantom_ks;"
 ```
-- If the table is dropped, it should return "'phantom_ks' not found in keyspaces"
+- If the table is dropped, it should return "'phantom_dir_test_phantom_ks' not found in keyspaces"
 
 Confirm you still have the phantom dir:
 ```
-docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/phantom_ks
+dir /var/lib/cassandra/data/phantom_dir_test_phantom_ks
 ```
 - Directory should still be there, with subdirectories.
 
 5) Create one phantom table in one of the remaining Keyspaces
 This will be a table that IS a phantom inside a keyspace that is NOT a phantom:
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "$(cat ./scripts/remove-table-for-phantom.cql)"
+cqlsh -e "$(cat ./scripts/remove-table-for-phantom.cql)"
 ```
 
 Confirm table dropped:
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "DESCRIBE ks_with_phantoms.cyclist_stats;"
+cqlsh -e "DESCRIBE phantom_dir_test_ks_with_phantoms.cyclist_stats;"
 ```
-- If the table is dropped, it should return "'cyclist_stats' not found in keyspace 'ks_with_phantoms'"
+- If the table is dropped, it should return "'cyclist_stats' not found in keyspace 'phantom_dir_test_ks_with_phantoms'"
 
 Confirm data dir for table still exists:
 ```
-docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/ks_with_phantoms
+dir /var/lib/cassandra/data/phantom_dir_test_ks_with_phantoms
 ```
 - `cyclist_stats-<uuid>` Directory should still be there.
 
@@ -143,44 +151,60 @@ docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/ks_with_phantoms
 6) Create one phantom table that will be replaced by table with same name
 Since this is a common scenario, we want to make sure to test this. This is when a table is dropped, then a new table (often with different primary key) is created. 
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "$(cat ./scripts/remove-table-for-phantom-to-be-replaced.cql)"
+cqlsh -e "$(cat ./scripts/remove-table-for-phantom-to-be-replaced.cql)"
 ```
 
 Confirm table dropped:
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "DESCRIBE ks_with_phantoms.replaced_phantom_cyclist_stats;"
+cqlsh -e "DESCRIBE phantom_dir_test_ks_with_phantoms.replaced_phantom_cyclist_stats;"
 ```
-- If the table is dropped, it should return "'replaced_phantom_cyclist_stats' not found in keyspace 'ks_with_phantoms'"
+- If the table is dropped, it should return "'replaced_phantom_cyclist_stats' not found in keyspace 'phantom_dir_test_ks_with_phantoms'"
 
 Confirm data dir for table still exists:
 ```
-docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/ks_with_phantoms
+dir /var/lib/cassandra/data/phantom_dir_test_ks_with_phantoms
 ```
 - `replaced_phantom_cyclist_stats-<uuid>` Directory should still be there.
 
 7) Then replace with table of same name, and insert a record
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "$(cat ./scripts/replace-phantom-table.cql)"
+cqlsh -e "$(cat ./scripts/replace-phantom-table.cql)"
 ```
 
 Confirm new record exists:
 ```
-docker exec dse-on-docker_dse_1 cqlsh -e "SELECT * from ks_with_phantoms.replaced_phantom_cyclist_stats;"
+cqlsh -e "SELECT * from phantom_dir_test_ks_with_phantoms.replaced_phantom_cyclist_stats;"
 ```
 - Should see a record, this one with a last name
 
 
 Flush to make sure it writes to disk:
 ```
-docker exec -it dse-on-docker_dse_1 nodetool flush
+nodetool flush
 ```
 
 Confirm that there are now two data dirs for table `replaced_phantom_cyclist_stats`, one a phantom and one for the new table that replaced it. The dir names for the two should be the same except for a different UUID:
 ```
-docker exec -it dse-on-docker_dse_1 dir /var/lib/cassandra/data/ks_with_phantoms
+dir /var/lib/cassandra/data/phantom_dir_test_ks_with_phantoms
 ```
 
+
 ### Step 2: Run the python script
+Same as running normally, just make sure to point the script to your running docker container.
+```
+sudo python3 main.py --hostname <host>
+```
+
+### Step 3: Check results
+Expected output: 
+
+|   |   |
+|---|---|
+|./results/keepkeyspace.csv | phantom_dir_test_control_ks, phantom_dir_test_ks_with_phantoms |
+| ./results/keeptables.csv |  |
+| ./results/removekeyspace.csv | `phantom_dir_test_phantom_ks` |
+
+
 
 ## Debugging
 ### Data doesn't match tables when testing
