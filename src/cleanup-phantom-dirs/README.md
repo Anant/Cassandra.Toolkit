@@ -76,7 +76,7 @@ E.g.,
 docker-compose -f ../../quickstart-tutorials/dse-on-docker/docker-compose.yml up -d 
 ```
 
-**NOTE** You can replace all the rest of the setup steps by running this bash script instead: ./scripts/generate-fake-phantom-data.sh
+**NOTE** You can replace all the rest of the setup steps by running this bash script instead: `./scripts/test/generate-fake-phantom-data.sh`
 - Note though that it does not error out currently if one part goes wrong, and so if everything doesn't run perfectly it won't work
 
 
@@ -84,7 +84,7 @@ docker-compose -f ../../quickstart-tutorials/dse-on-docker/docker-compose.yml up
 We have sample cql script for this, in our case, making three keyspaces:
 
 ```
-cqlsh -e "$(cat ./scripts/create-test-keyspaces-and-tables.cql)"
+cqlsh -e "$(cat ./scripts/test/create-test-keyspaces-and-tables.cql)"
 ```
 
 Confirm it worked:
@@ -114,7 +114,7 @@ dir /var/lib/cassandra/data/phantom_dir_test_phantom_ks
 
 4) Create one phantom keyspace:
 ```
-cqlsh -e "$(cat ./scripts/remove-ks-for-phantom.cql)"
+cqlsh -e "$(cat ./scripts/test/remove-ks-for-phantom.cql)"
 ```
 
 Confirm it dropped:
@@ -132,7 +132,7 @@ dir /var/lib/cassandra/data/phantom_dir_test_phantom_ks
 5) Create one phantom table in one of the remaining Keyspaces
 This will be a table that IS a phantom inside a keyspace that is NOT a phantom:
 ```
-cqlsh -e "$(cat ./scripts/remove-table-for-phantom.cql)"
+cqlsh -e "$(cat ./scripts/test/remove-table-for-phantom.cql)"
 ```
 
 Confirm table dropped:
@@ -151,7 +151,7 @@ dir /var/lib/cassandra/data/phantom_dir_test_ks_with_phantoms
 6) Create one phantom table that will be replaced by table with same name
 Since this is a common scenario, we want to make sure to test this. This is when a table is dropped, then a new table (often with different primary key) is created. 
 ```
-cqlsh -e "$(cat ./scripts/remove-table-for-phantom-to-be-replaced.cql)"
+cqlsh -e "$(cat ./scripts/test/remove-table-for-phantom-to-be-replaced.cql)"
 ```
 
 Confirm table dropped:
@@ -168,7 +168,7 @@ dir /var/lib/cassandra/data/phantom_dir_test_ks_with_phantoms
 
 7) Then replace with table of same name, and insert a record
 ```
-cqlsh -e "$(cat ./scripts/replace-phantom-table.cql)"
+cqlsh -e "$(cat ./scripts/test/replace-phantom-table.cql)"
 ```
 
 Confirm new record exists:
