@@ -5,26 +5,23 @@ This tool finds "orphaned" (aka "phantom") dirs that used to be related to a key
 ## Process
 ### What the script does: Identify Keepers & Orphans
 1) Identify Keeper 
-  Keyspaces
-  - Walk through system schema for keyspaces 
-  - if DATA/{keyspace} dir exists , add to keepkeyspace.csv
-  Tables
-  - Walk through system schema for tables 
-  - if DATA/{keyspace}/{table}-{guid} dir exists, add to keeptables.csv
+  * Keyspaces:
+    - Walk through system schema for keyspaces 
+    - if DATA/{keyspace} dir exists, add to keepkeyspace.csv
+  * Tables:
+    - Walk through system schema for tables 
+    - if DATA/{keyspace}/{table}-{guid} dir exists, add to keeptables.csv
   
 2) Identify Orphans
-  Keyspaces
-  - list DATA/ and keep in allkeyspace.csv 
-  - iterate through allkeyspace.csv and if in keepkeyspce.csv do nothing
-    otherwise add to removekeyspace.csv
+  * Keyspaces:
+    - list DATA/ and keep in allkeyspace.csv 
+    - iterate through allkeyspace.csv and if in keepkeyspce.csv do nothing. Otherwise add to removekeyspace.csv
 
-  Tables
-  - list DATA/{keyspace} and keep in alltables.csv 
-  - iterate through alltables.csv and if in keeptables.csv do nothing
-    otherwise add to removetables.csv
+  * Tables:
+    - list DATA/{keyspace} and keep in alltables.csv 
+    - iterate through alltables.csv and if in keeptables.csv do nothing, otherwise add to removetables.csv
     
-    
-Outcome: 
+**Outcome:**
 
 - `removekeyspace.csv`: These are entire keyspaces that are orphaned, i.e., all keyspaces that have directory in C* data dir, but are not in system schema 
 - `removetables.csv`: These are tables that are orphaned that have directory in C* data dir, but are not in system schema. This is for when there are keyspaces that are not entirely orphaned but only have some tables that are orphaned.
@@ -198,9 +195,9 @@ sudo python3 main.py --hostname <host>
 ### Step 3: Check results
 Expected output: 
 
-|   |   |
+| file  | ks.table that should be listed in this file  |
 |---|---|
-|./results/keepkeyspace.csv | phantom_dir_test_control_ks, phantom_dir_test_ks_with_phantoms |
+|./results/keepkeyspace.csv | `phantom_dir_test_control_ks`, `phantom_dir_test_ks_with_phantoms` |
 | ./results/keeptables.csv | `phantom_dir_test_ks_with_phantoms.non_phantom` <br /> `phantom_dir_test_ks_with_phantoms.replaced_phantom_cyclist_stats` (one of the two) <br /> `phantom_dir_test_control_ks.cyclist_stats` <br /> `phantom_dir_test_control_ks.alt_cyclist_stats`|
 | ./results/removekeyspace.csv | `phantom_dir_test_phantom_ks` |
 | removetable.csv  | `phantom_dir_test_phantom_ks.cyclist_stats` <br /> `phantom_dir_test_phantom_ks.alt_cyclist_stats` <br /> `phantom_dir_test_ks_with_phantoms.replaced_phantom_cyclist_stats` (one of the two, should be different uuid than the one in the keeptables.csv) <br /> `phantom_dir_test_ks_with_phantoms.cyclist_stats` |
