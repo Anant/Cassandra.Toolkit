@@ -4,7 +4,7 @@ This tool finds "orphaned" (aka "phantom") dirs that used to be related to a key
 
 ## Process
 ### What the script does: Identify Keepers & Orphans
-1) Identify Keeper 
+1) Identify Keepers
   * Keyspaces:
     - Walk through system schema for keyspaces 
     - if DATA/{keyspace} dir exists, add to keepkeyspace.csv
@@ -35,9 +35,11 @@ Currently this is a manual process that the operator needs to do. Since this is 
 		- foreach removekeyspace.csv and rm the directory 
 		
 2) Remove Orphan Tables
-    - Then do the same with removetables.csv, except with a key difference. Be sure to pay attention to the `table-uuid` column in the csv
+    - Then do the same with removetables.csv, except with a key difference. Be sure to pay attention to the `dirname` column in the csv
         * This is important in case there are multiple directories with the same base table name. This occurs when a table is dropped then replaced by a table with the same table name, e.g., if they wanted to change the primary key of the table so dropped it, then created with new primary key.
-    - Note also the column ``
+        * `dirname` column in the csv can distinguish between the old table and the new table even if they have the same name
+        * `non-hyphenated-table-id` column in the csv can be used to the same effect. This column gives the output of `SELECT id from system_schema.tables;` for that table, but with the hyphens stripped off, so that it corresponds to the directory name more closely. 
+    - Note also the column `is-in-phantom-keyspace`. This is a boolean. If `True`, it means that this table is in a phantom keyspace, so if you deleted the directory for this keyspace already, you should not have to do anything additional for the phantom directory of this table.
 		
 ## Install
 ```
@@ -52,8 +54,9 @@ pip3 install -r requirements.txt
 # run with elevated permissions, so it can access the c* data files
 sudo python3 main.py
 ```
+You will then be prompted for username and password.
 
-## Specifying hostname
+### Option: Specify hostname
 By default, we will assume the output of `hostname -i` for a hostname for connecting to your cluster. If that doesn't work for you, make sure to send in arg
 
 ```
