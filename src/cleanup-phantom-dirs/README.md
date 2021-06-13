@@ -64,9 +64,12 @@ python3 main.py --hostname 123.456.678.123
 
 ```
 
+## Current Limitations
+- Needs to be ran locally on the node where the directories live, since the python script is looking through the data directory to find phantoms and no ssh system has been implemented.
+
 ## Testing
 
-Currently there is only a process for manual integration testing - ie, there is no test suite setup currently. 
+Currently there is only a process for manual integration testing - ie, there is no test suite setup currently. However, here is a process that will make it relatively less painful and more reliable to test. Not yet possible for DSE on Docker, unless perhaps it has a volume with its data being stored on the host anyway
 
 ### Step 1: Setup for testing
 1) Start C*/DSE on docker
