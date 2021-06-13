@@ -241,7 +241,7 @@ def find_orphan_tables(session, tables_to_keep, orphan_ks):
 
             # check if ks is orphaned. If ks is orphaned, mark table as orphaned
 
-            print(f"is this table's keyspace ({ks}) in the orphan keyspace list?", orphan_ks)
+            print(f"is this table's keyspace ({ks}) in the orphan keyspace list ({orphan_ks})?", [ks] in orphan_ks)
             # put in array, to emulate the format we have our orphan_ks in
             if [ks] in orphan_ks:
                 orphan_tables.append([ks, table_name, non_hyphenated_table_id, table_dir_name, True])
@@ -250,8 +250,9 @@ def find_orphan_tables(session, tables_to_keep, orphan_ks):
             else:
                 # note that this should check both keyspace and table_name for identity
                 equivalent_dir_name = get_dirname_from_id_and_table(table_name, non_hyphenated_table_id)
-                if (ks, equivalent_dir_name) not in tables_to_keep:
-                    print("!!! found a phantom table: ", table_name)
+                if (ks, equivalent_dir_name) not in table_dirs_to_keep:
+                    print("is (ks, equivalent_dir_name)", table_dir_name)
+                    print("------- found a phantom directory for table: ", table_dir_name)
                     orphan_tables.append([ks, table_name, non_hyphenated_table_id, table_dir_name, False])
                 else:
                     # don't do anything with these. Already have marked the keyspace as a keeper and table as a table to keep

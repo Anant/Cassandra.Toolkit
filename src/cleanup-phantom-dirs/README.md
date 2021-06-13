@@ -201,8 +201,9 @@ Expected output:
 |   |   |
 |---|---|
 |./results/keepkeyspace.csv | phantom_dir_test_control_ks, phantom_dir_test_ks_with_phantoms |
-| ./results/keeptables.csv |  |
+| ./results/keeptables.csv | `phantom_dir_test_ks_with_phantoms.non_phantom` <br /> `phantom_dir_test_ks_with_phantoms.replaced_phantom_cyclist_stats` (one of the two) <br /> `phantom_dir_test_control_ks.cyclist_stats` <br /> `phantom_dir_test_control_ks.alt_cyclist_stats`|
 | ./results/removekeyspace.csv | `phantom_dir_test_phantom_ks` |
+| removetable.csv  | `phantom_dir_test_phantom_ks.cyclist_stats` <br /> `phantom_dir_test_phantom_ks.alt_cyclist_stats` <br /> `phantom_dir_test_ks_with_phantoms.replaced_phantom_cyclist_stats` (one of the two, should be different uuid than the one in the keeptables.csv) <br /> `phantom_dir_test_ks_with_phantoms.cyclist_stats` |
 
 
 
